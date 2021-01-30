@@ -1,0 +1,27 @@
+snapshot:
+  description: Take a snapshot of the media player.
+  fields:
+    entity_id:
+      description: Name(s) of entities that will be snapshot.
+      example: "media_player.group_kitchen_living_room"
+      selector:
+        entity:
+          integration: teufel_raumfeld
+          domain: media_player
+
+restore:
+  description: Restore a snapshot of the media player.
+  fields:
+    entity_id:
+      description: Name(s) of entities that will be restored.
+      example: "media_player.group_kitchen_living_room"
+      selector:
+        entity:
+          integration: teufel_raumfeld
+          domain: media_player
+group:
+  description: Group rooms to virtual media player (multi-room).
+  fields:
+    room_names:
+      description: List of room names that will be grouped together. At least one room must be specified
+      example: "[ 'Kitchen', 'Living room' ]"
