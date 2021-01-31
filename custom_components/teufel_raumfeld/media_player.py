@@ -1,63 +1,37 @@
+import base64
 import datetime
+import logging
+import pickle
+
 import hassfeld
 import voluptuous as vol
-import logging
-import base64
-import pickle
-from hassfeld.constants import (
-    BROWSE_CHILDREN,
-    BROWSE_METADATA,
-    PLAY_MODE_NORMAL,
-    PLAY_MODE_SHUFFLE,
-    PLAY_MODE_REPEAT_ONE,
-    PLAY_MODE_REPEAT_ALL,
-    PLAY_MODE_RANDOM,
-    TRANSPORT_STATE_NO_MEDIA,
-    TRANSPORT_STATE_PAUSED,
-    TRANSPORT_STATE_PLAYING,
-    TRANSPORT_STATE_STOPPED,
-    TRANSPORT_STATE_TRANSITIONING,
-    TRIGGER_UPDATE_DEVICES,
-    TRIGGER_UPDATE_HOST_INFO,
-    TRIGGER_UPDATE_SYSTEM_STATE,
-    TRIGGER_UPDATE_ZONE_CONFIG,
-)
-
-from homeassistant.components.media_player import BrowseMedia, MediaPlayerEntity
+from hassfeld.constants import (BROWSE_CHILDREN, BROWSE_METADATA,
+                                PLAY_MODE_NORMAL, PLAY_MODE_RANDOM,
+                                PLAY_MODE_REPEAT_ALL, PLAY_MODE_REPEAT_ONE,
+                                PLAY_MODE_SHUFFLE, TRANSPORT_STATE_NO_MEDIA,
+                                TRANSPORT_STATE_PAUSED,
+                                TRANSPORT_STATE_PLAYING,
+                                TRANSPORT_STATE_STOPPED,
+                                TRANSPORT_STATE_TRANSITIONING,
+                                TRIGGER_UPDATE_DEVICES,
+                                TRIGGER_UPDATE_HOST_INFO,
+                                TRIGGER_UPDATE_SYSTEM_STATE,
+                                TRIGGER_UPDATE_ZONE_CONFIG)
+from homeassistant.components.media_player import (BrowseMedia,
+                                                   MediaPlayerEntity)
 from homeassistant.components.media_player.const import (
-    MEDIA_TYPE_MUSIC,
-    REPEAT_MODE_ALL,
-    REPEAT_MODE_OFF,
-    REPEAT_MODE_ONE,
-    SUPPORT_PAUSE,
-    SUPPORT_SEEK,
-    SUPPORT_VOLUME_SET,
-    SUPPORT_VOLUME_MUTE,
-    SUPPORT_PREVIOUS_TRACK,
-    SUPPORT_NEXT_TRACK,
-    SUPPORT_PLAY_MEDIA,
-    SUPPORT_VOLUME_STEP,
-    SUPPORT_STOP,
-    SUPPORT_TURN_ON,
-    SUPPORT_PLAY,
-    SUPPORT_SHUFFLE_SET,
-    SUPPORT_BROWSE_MEDIA,
-    SUPPORT_REPEAT_SET,
-)
-
-from homeassistant.const import (
-    STATE_OFF,
-    STATE_PLAYING,
-    STATE_PAUSED,
-    STATE_IDLE,
-)
-
-from homeassistant.helpers import config_validation as cv, entity_platform
+    MEDIA_TYPE_MUSIC, REPEAT_MODE_ALL, REPEAT_MODE_OFF, REPEAT_MODE_ONE,
+    SUPPORT_BROWSE_MEDIA, SUPPORT_NEXT_TRACK, SUPPORT_PAUSE, SUPPORT_PLAY,
+    SUPPORT_PLAY_MEDIA, SUPPORT_PREVIOUS_TRACK, SUPPORT_REPEAT_SET,
+    SUPPORT_SEEK, SUPPORT_SHUFFLE_SET, SUPPORT_STOP, SUPPORT_TURN_ON,
+    SUPPORT_VOLUME_MUTE, SUPPORT_VOLUME_SET, SUPPORT_VOLUME_STEP)
+from homeassistant.const import (STATE_IDLE, STATE_OFF, STATE_PAUSED,
+                                 STATE_PLAYING)
+from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers import entity_platform
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.entity_registry import (
-    async_get_registry,
-    async_entries_for_config_entry,
-)
+    async_entries_for_config_entry, async_get_registry)
 from homeassistant.util.dt import utcnow
 
 SUPPORT_RAUMFELD = SUPPORT_PAUSE | SUPPORT_STOP | SUPPORT_PLAY
@@ -79,20 +53,11 @@ SUPPORT_RAUMFELD_GROUP = (
     | SUPPORT_REPEAT_SET
 )
 
-from .const import (
-    CHANGE_STEP_VOLUME_DOWN,
-    CHANGE_STEP_VOLUME_UP,
-    DEVICE_CLASS_SPEAKER,
-    DEVICE_MANUFACTURER,
-    DOMAIN,
-    GROUP_PREFIX,
-    MEDIA_CONTENT_ID_SEP,
-    ROOM_PREFIX,
-    SERVICE_SNAPSHOT,
-    SERVICE_RESTORE,
-    UPNP_CLASS_ALBUM,
-    UPNP_CLASS_TRACK,
-)
+from .const import (CHANGE_STEP_VOLUME_DOWN, CHANGE_STEP_VOLUME_UP,
+                    DEVICE_CLASS_SPEAKER, DEVICE_MANUFACTURER, DOMAIN,
+                    GROUP_PREFIX, MEDIA_CONTENT_ID_SEP, ROOM_PREFIX,
+                    SERVICE_RESTORE, SERVICE_SNAPSHOT, UPNP_CLASS_ALBUM,
+                    UPNP_CLASS_TRACK)
 
 SUPPORTED_MEDIA_TYPES = [MEDIA_TYPE_MUSIC, UPNP_CLASS_ALBUM, UPNP_CLASS_TRACK]
 

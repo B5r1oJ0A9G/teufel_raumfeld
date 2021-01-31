@@ -1,25 +1,17 @@
 """The Teufel Raumfeld integration."""
 import asyncio
-import hassfeld
 import urllib.parse
-import xmltodict
 
+import hassfeld
 import voluptuous as vol
-
+import xmltodict
 from homeassistant.components.media_player import BrowseMedia
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from .const import (
-    DOMAIN,
-    MEDIA_CONTENT_ID_SEP,
-    PLATFORMS,
-    SUPPORTED_OBJECT_IDS,
-    SUPPORTED_OBJECT_PREFIXES,
-    UPNP_CLASS_ALBUM,
-    UPNP_CLASS_TRACK,
-    URN_CONTENT_DIRECTORY,
-)
+from .const import (DOMAIN, MEDIA_CONTENT_ID_SEP, PLATFORMS,
+                    SUPPORTED_OBJECT_IDS, SUPPORTED_OBJECT_PREFIXES,
+                    UPNP_CLASS_ALBUM, UPNP_CLASS_TRACK, URN_CONTENT_DIRECTORY)
 
 
 async def async_setup(hass: HomeAssistant, config: dict):
