@@ -9,9 +9,16 @@ from homeassistant.components.media_player import BrowseMedia
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from .const import (DOMAIN, MEDIA_CONTENT_ID_SEP, PLATFORMS,
-                    SUPPORTED_OBJECT_IDS, SUPPORTED_OBJECT_PREFIXES,
-                    UPNP_CLASS_ALBUM, UPNP_CLASS_TRACK, URN_CONTENT_DIRECTORY)
+from .const import (DIDL_ATTR_CHILD_CNT, DIDL_ATTR_ID, DIDL_ELEM_ALBUM,
+                    DIDL_ELEM_ART_URI, DIDL_ELEM_ARTIST, DIDL_ELEM_CLASS,
+                    DIDL_ELEM_CONTAINER, DIDL_ELEM_ITEM, DIDL_ELEM_TITLE,
+                    DIDL_ELEMENT, DIDL_VALUE, DOMAIN, MEDIA_CONTENT_ID_SEP,
+                    PLATFORMS, POSINF_ELEM_ABS_TIME, POSINF_ELEM_DURATION,
+                    POSINF_ELEM_TRACK, POSINF_ELEM_TRACK_DATA, POSINF_ELEM_URI,
+                    SERVICE_GROUP, SUPPORTED_OBJECT_IDS,
+                    SUPPORTED_OBJECT_PREFIXES, TRACKINF_ALBUM, TRACKINF_ARTIST,
+                    TRACKINF_IMGURI, TRACKINF_TITLE, UPNP_CLASS_ALBUM,
+                    UPNP_CLASS_TRACK, URN_CONTENT_DIRECTORY)
 
 
 async def async_setup(hass: HomeAssistant, config: dict):
@@ -37,7 +44,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         room_lst = call.data.get("room_names")
         raumfeld.create_group(room_lst)
 
-    hass.services.async_register(DOMAIN, "group", handle_group)
+    hass.services.async_register(DOMAIN, SERVICE_GROUP, handle_group)
 
     return True
 
@@ -144,18 +151,20 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
         track_number = -1
         browsable_oid = object_id.split(MEDIA_CONTENT_ID_SEP)[0]
         media_xml = self.browse_media_server(browsable_oid, browse_flag)
-        media = xmltodict.parse(media_xml, force_list=("container", "item"))
+        media = xmltodict.parse(
+            media_xml, force_list=(DIDL_ELEM_CONTAINER, DIDL_ELEM_ITEM)
+        )
 
-        if "container" in media["DIDL-Lite"]:
-            entry_type = "container"
-        elif "item" in media["DIDL-Lite"]:
-            entry_type = "item"
+        if DIDL_ELEM_CONTAINER in media[DIDL_ELEMENT]:
+            entry_type = DIDL_ELEM_CONTAINER
+        elif DIDL_ELEM_ITEM in media[DIDL_ELEMENT]:
+            entry_type = DIDL_ELEM_ITEM
 
-        media_entries = media["DIDL-Lite"][entry_type]
+        media_entries = media[DIDL_ELEMENT][entry_type]
 
         for entry in media_entries:
             supported_oid = False
-            media_content_id = entry["@id"]
+            media_content_id = entry[DIDL_ATTR_ID]
 
             if media_content_id in SUPPORTED_OBJECT_IDS:
                 supported_oid = True
@@ -168,14 +177,14 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
             if not supported_oid:
                 continue
 
-            media_content_type = entry["upnp:class"]
+            media_content_type = entry[DIDL_ELEM_CLASS]
 
-            if "@childCount" in entry:
-                if entry["@childCount"] != "0":
+            if DIDL_ATTR_CHILD_CNT in entry:
+                if entry[DIDL_ATTR_CHILD_CNT] != "0":
                     can_expand = True
-                if "upnp:albumArtURI" in entry:
-                    thumbnail = entry["upnp:albumArtURI"]["#text"]
-            if entry_type == "item":
+                if DIDL_ELEM_ART_URI in entry:
+                    thumbnail = entry[DIDL_ELEM_ART_URI][DIDL_VALUE]
+            if entry_type == DIDL_ELEM_ITEM:
                 track_number += 1
 
             play_uri = self.mk_play_uri(
@@ -185,7 +194,7 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
 
             browse_lst.append(
                 BrowseMedia(
-                    title=entry["dc:title"],
+                    title=entry[DIDL_ELEM_TITLE],
                     media_class="music",
                     media_content_id=media_content_id,
                     media_content_type=media_content_type,
@@ -199,33 +208,46 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
     def get_track_info(self, zone_room_lst):
         """Return data to update media information."""
         position_info = self.get_position_info(zone_room_lst)
-        metadata_xml = position_info["TrackMetaData"]
+        metadata_xml = position_info[POSINF_ELEM_TRACK_DATA]
 
         track_info = {
-            "title": None,
-            "artist": None,
-            "image_uri": None,
-            "album": None,
+            TRACKINF_TITLE: None,
+            TRACKINF_ARTIST: None,
+            TRACKINF_IMGURI: None,
+            TRACKINF_ALBUM: None,
         }
 
-        track_info["number"] = position_info["Track"]
-        track_info["duration"] = self._timespan_secs(position_info["TrackDuration"])
-        track_info["uri"] = position_info["TrackURI"]
-        track_info["position"] = self._timespan_secs(position_info["AbsTime"])
+        track_info["number"] = position_info[POSINF_ELEM_TRACK]
+        track_info["duration"] = self._timespan_secs(
+            position_info[POSINF_ELEM_DURATION]
+        )
+        track_info["uri"] = position_info[POSINF_ELEM_URI]
+        track_info["position"] = self._timespan_secs(
+            position_info[POSINF_ELEM_ABS_TIME]
+        )
 
         if metadata_xml is not None:
             metadata = xmltodict.parse(metadata_xml)
-            if "dc:title" in metadata["DIDL-Lite"]["item"]:
-                track_info["title"] = metadata["DIDL-Lite"]["item"]["dc:title"]
-            if "upnp:artist" in metadata["DIDL-Lite"]["item"]:
-                track_info["artist"] = metadata["DIDL-Lite"]["item"]["upnp:artist"]
-            if "upnp:albumArtURI" in metadata["DIDL-Lite"]["item"]:
-                if "#text" in metadata["DIDL-Lite"]["item"]["upnp:albumArtURI"]:
-                    track_info["image_uri"] = metadata["DIDL-Lite"]["item"][
-                        "upnp:albumArtURI"
-                    ]["#text"]
-            if "upnp:album" in metadata["DIDL-Lite"]["item"]:
-                track_info["album"] = metadata["DIDL-Lite"]["item"]["upnp:album"]
+            if DIDL_ELEM_TITLE in metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM]:
+                track_info[TRACKINF_TITLE] = metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM][
+                    DIDL_ELEM_TITLE
+                ]
+            if DIDL_ELEM_ARTIST in metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM]:
+                track_info[TRACKINF_ARTIST] = metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM][
+                    DIDL_ELEM_ARTIST
+                ]
+            if DIDL_ELEM_ART_URI in metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM]:
+                if (
+                    DIDL_VALUE
+                    in metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM][DIDL_ELEM_ART_URI]
+                ):
+                    track_info[TRACKINF_IMGURI] = metadata[DIDL_ELEMENT][
+                        DIDL_ELEM_ITEM
+                    ][DIDL_ELEM_ART_URI][DIDL_VALUE]
+            if DIDL_ELEM_ALBUM in metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM]:
+                track_info[TRACKINF_ALBUM] = metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM][
+                    DIDL_ELEM_ALBUM
+                ]
 
         return track_info
 
