@@ -14,12 +14,8 @@ SERVICE_RESTORE = "restore"
 UPNP_CLASS_ALBUM = "object.container.album.musicAlbum"
 UPNP_CLASS_TRACK = "object.item.audioItem.musicTrack"
 URN_CONTENT_DIRECTORY = "urn:upnp-org:serviceId:ContentDirectory"
-MEDIA_CONTENT_ID_SEP = '[:sep:]'
-SUPPORTED_OBJECT_IDS = [
-    "0",
-    "0/DemoTracks",
-    "0/My Music"
-]
+MEDIA_CONTENT_ID_SEP = "[:sep:]"
+SUPPORTED_OBJECT_IDS = ["0", "0/DemoTracks", "0/My Music"]
 SUPPORTED_OBJECT_PREFIXES = [
     "0/My Music/Artists",
     "0/My Music/Albums",
@@ -28,5 +24,5 @@ SUPPORTED_OBJECT_PREFIXES = [
     "0/My Music/ByFolder",
     "0/My Music/RecentlyAdded",
     "0/My Music/AllTracks",
-    "0/DemoTracks"
+    "0/DemoTracks",
 ]

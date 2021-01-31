@@ -9,7 +9,7 @@ from homeassistant import config_entries, core, exceptions
 from .const import (
     DOMAIN,  # pylint:disable=unused-import
     DEFAULT_HOST_WEBSERVICE,
-    DEFAULT_PORT_WEBSERVICE
+    DEFAULT_PORT_WEBSERVICE,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -18,7 +18,7 @@ _LOGGER = logging.getLogger(__name__)
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {
         vol.Required("host", default=DEFAULT_HOST_WEBSERVICE): str,
-        vol.Required("port", default=DEFAULT_PORT_WEBSERVICE): str
+        vol.Required("port", default=DEFAULT_PORT_WEBSERVICE): str,
     }
 )
 
@@ -58,7 +58,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             errors["base"] = "unknown"
         else:
             data = user_input
-            data['entry_id'] = 'raumfeld_host'
+            data["entry_id"] = "raumfeld_host"
             return self.async_create_entry(title=info["title"], data=data)
 
         return self.async_show_form(

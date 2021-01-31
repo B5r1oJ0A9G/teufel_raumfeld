@@ -21,7 +21,6 @@ from hassfeld.constants import (
     TRIGGER_UPDATE_HOST_INFO,
     TRIGGER_UPDATE_SYSTEM_STATE,
     TRIGGER_UPDATE_ZONE_CONFIG,
-
 )
 
 from homeassistant.components.media_player import BrowseMedia, MediaPlayerEntity
@@ -55,14 +54,13 @@ from homeassistant.const import (
 
 from homeassistant.helpers import config_validation as cv, entity_platform
 from homeassistant.helpers.entity import Entity
-from homeassistant.helpers.entity_registry import async_get_registry, async_entries_for_config_entry
+from homeassistant.helpers.entity_registry import (
+    async_get_registry,
+    async_entries_for_config_entry,
+)
 from homeassistant.util.dt import utcnow
 
-SUPPORT_RAUMFELD = (
-    SUPPORT_PAUSE
-    | SUPPORT_STOP
-    | SUPPORT_PLAY
-)
+SUPPORT_RAUMFELD = SUPPORT_PAUSE | SUPPORT_STOP | SUPPORT_PLAY
 
 SUPPORT_RAUMFELD_GROUP = (
     SUPPORT_PAUSE
@@ -77,7 +75,7 @@ SUPPORT_RAUMFELD_GROUP = (
     | SUPPORT_TURN_ON
     | SUPPORT_PLAY
     | SUPPORT_SHUFFLE_SET
-    | SUPPORT_BROWSE_MEDIA 
+    | SUPPORT_BROWSE_MEDIA
     | SUPPORT_REPEAT_SET
 )
 
@@ -94,16 +92,12 @@ from .const import (
     SERVICE_RESTORE,
     UPNP_CLASS_ALBUM,
     UPNP_CLASS_TRACK,
-
 )
 
-SUPPORTED_MEDIA_TYPES = [
-    MEDIA_TYPE_MUSIC,
-    UPNP_CLASS_ALBUM,
-    UPNP_CLASS_TRACK
-]
+SUPPORTED_MEDIA_TYPES = [MEDIA_TYPE_MUSIC, UPNP_CLASS_ALBUM, UPNP_CLASS_TRACK]
 
 _LOGGER = logging.getLogger(__name__)
+
 
 def obj_to_uid(object):
     object_ser = pickle.dumps(object)
@@ -111,20 +105,22 @@ def obj_to_uid(object):
     unique_id = serialised_b64.decode()
     return unique_id
 
+
 def uid_to_obj(uid):
     serialized_b64 = uid.encode()
     object_ser = base64.decodebytes(serialized_b64)
     object = pickle.loads(object_ser)
     return object
 
+
 async def async_setup_entry(hass, config_entry, async_add_devices):
     raumfeld = hass.data[DOMAIN][config_entry.entry_id]
     room_names = raumfeld.get_rooms()
     room_groups = raumfeld.get_groups()
     entity_registry = await hass.helpers.entity_registry.async_get_registry()
-    entity_entries = (
-        hass.helpers.entity_registry.async_entries_for_config_entry(
-            entity_registry, config_entry.entry_id))
+    entity_entries = hass.helpers.entity_registry.async_entries_for_config_entry(
+        entity_registry, config_entry.entry_id
+    )
     platform = entity_platform.current_platform.get()
     devices = []
 
@@ -134,21 +130,21 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     for group in room_groups:
         if len(group) > 1:
             devices.append(RaumfeldGroup(group, raumfeld))
-    
+
     for entity in entity_entries:
         rooms = uid_to_obj(entity.unique_id)
         if len(rooms) > 1:
             group = rooms
             if group not in room_groups:
                 devices.append(RaumfeldGroup(group, raumfeld))
-                 
+
     async_add_devices(devices)
     platform.async_register_entity_service(SERVICE_RESTORE, {}, "restore")
     platform.async_register_entity_service(SERVICE_SNAPSHOT, {}, "snapshot")
     return True
 
-class RaumfeldGroup(MediaPlayerEntity):
 
+class RaumfeldGroup(MediaPlayerEntity):
     def __init__(self, rooms, raumfeld):
         self._rooms = rooms
         self._raumfeld = raumfeld
@@ -313,7 +309,7 @@ class RaumfeldGroup(MediaPlayerEntity):
     def play_media(self, media_type, media_id, **kwargs):
         """Play a piece of media."""
         if media_type == MEDIA_TYPE_MUSIC:
-            if media_id.startswith('http'):
+            if media_id.startswith("http"):
                 play_uri = media_id
         if media_type == UPNP_CLASS_ALBUM or media_type == UPNP_CLASS_TRACK:
             play_uri = media_id.split(MEDIA_CONTENT_ID_SEP)[1]
@@ -369,10 +365,14 @@ class RaumfeldGroup(MediaPlayerEntity):
         else:
             object_id = media_content_id
 
-        metadata = await self.hass.async_add_executor_job(self._raumfeld.browse_media, object_id, BROWSE_METADATA)
+        metadata = await self.hass.async_add_executor_job(
+            self._raumfeld.browse_media, object_id, BROWSE_METADATA
+        )
         metadata = metadata[0]
 
-        children = await self.hass.async_add_executor_job(self._raumfeld.browse_media, object_id, BROWSE_CHILDREN)
+        children = await self.hass.async_add_executor_job(
+            self._raumfeld.browse_media, object_id, BROWSE_CHILDREN
+        )
 
         if children is None:
             raise BrowseError(
@@ -386,7 +386,7 @@ class RaumfeldGroup(MediaPlayerEntity):
 
     def update_transport_state(self):
         info = self._raumfeld.get_transport_info(self._rooms)
-        transport_state = info['CurrentTransportState']
+        transport_state = info["CurrentTransportState"]
         if transport_state == TRANSPORT_STATE_STOPPED:
             self._state = STATE_IDLE
         elif transport_state == TRANSPORT_STATE_NO_MEDIA:
@@ -408,14 +408,14 @@ class RaumfeldGroup(MediaPlayerEntity):
 
     def update_track_info(self):
         track_info = self._raumfeld.get_track_info(self._rooms)
-        self._media_duration = track_info['duration']
-        self._media_image_url = track_info['image_uri']
-        self._media_title = track_info['title']
-        self._media_artist = track_info['artist']
-        self._media_album_name = track_info['album']
-        self._media_album_artist = track_info['artist']
-        self._media_track = track_info['number']
-        self._media_position = track_info['position']
+        self._media_duration = track_info["duration"]
+        self._media_image_url = track_info["image_uri"]
+        self._media_title = track_info["title"]
+        self._media_artist = track_info["artist"]
+        self._media_album_name = track_info["album"]
+        self._media_album_artist = track_info["artist"]
+        self._media_track = track_info["number"]
+        self._media_position = track_info["position"]
         self._media_position_updated_at = utcnow()
 
     def update_play_mode(self):
@@ -460,7 +460,6 @@ class RaumfeldGroup(MediaPlayerEntity):
 
 
 class RaumfeldRoom(RaumfeldGroup):
-
     def __init__(self, room, raumfeld):
         self._rooms = [room]
         self._raumfeld = raumfeld
@@ -485,7 +484,6 @@ class RaumfeldRoom(RaumfeldGroup):
 
 
 class RaumfeldDevice(MediaPlayerEntity):
-
     def __init__(self, room, raumfeld):
         self._room = room
         self._raumfeld = raumfeld
@@ -496,9 +494,7 @@ class RaumfeldDevice(MediaPlayerEntity):
         self._host_entry_id = ROOM_PREFIX + repr(self._raumfeld.get_host_room())
 
         self._device_info = {
-            "identifiers": {
-                (DOMAIN, self._name)
-            },
+            "identifiers": {(DOMAIN, self._name)},
             "name": self.name,
             "manufacturer": DEVICE_MANUFACTURER,
             "via_device": (DOMAIN, self._host_entry_id),
