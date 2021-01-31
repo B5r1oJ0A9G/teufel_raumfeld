@@ -1,6 +1,5 @@
 {
   "name": "Teufel Raumfeld",
-  "render_readme": true,
   "domains": ["media_player"],
   "iot_class": ["Local Polling"]
 }
