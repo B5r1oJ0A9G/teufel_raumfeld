@@ -65,6 +65,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 def obj_to_uid(object):
+    """Bulid unique id based on object (room list)."""
     object_ser = pickle.dumps(object)
     serialised_b64 = base64.encodebytes(object_ser)
     unique_id = serialised_b64.decode()
@@ -72,6 +73,7 @@ def obj_to_uid(object):
 
 
 def uid_to_obj(uid):
+    """Bulid object (room list) from unique id."""
     serialized_b64 = uid.encode()
     object_ser = base64.decodebytes(serialized_b64)
     object = pickle.loads(object_ser)
@@ -79,6 +81,7 @@ def uid_to_obj(uid):
 
 
 async def async_setup_entry(hass, config_entry, async_add_devices):
+    """Set up entry."""
     raumfeld = hass.data[DOMAIN][config_entry.entry_id]
     room_names = raumfeld.get_rooms()
     room_groups = raumfeld.get_groups()
@@ -110,7 +113,10 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 
 
 class RaumfeldGroup(MediaPlayerEntity):
+    """Class representing a virtual media renderer for a speaker group."""
+
     def __init__(self, rooms, raumfeld):
+        """Initialize media player for speaker group."""
         self._rooms = rooms
         self._raumfeld = raumfeld
         self._mute = None
@@ -136,14 +142,17 @@ class RaumfeldGroup(MediaPlayerEntity):
 
     @property
     def should_poll(self):
+        """Return True as entity has to be polled for state."""
         return True
 
     @property
     def unique_id(self):
+        """Return a unique ID."""
         return self._unique_id
 
     @property
     def name(self):
+        """Return the name of the entity."""
         return self._name
 
     @property
@@ -153,10 +162,12 @@ class RaumfeldGroup(MediaPlayerEntity):
 
     @property
     def device_class(self):
+        """Return the class of this device, from component DEVICE_CLASSES."""
         return DEVICE_CLASS_SPEAKER
 
     @property
     def icon(self):
+        """Return the icon to use in the frontend."""
         return self._icon
 
     # MediaPlayer properties
@@ -228,6 +239,7 @@ class RaumfeldGroup(MediaPlayerEntity):
 
     @property
     def supported_features(self):
+        """Flag media player features that are supported."""
         return SUPPORT_RAUMFELD_GROUP
 
     # MediaPlayer Methods
@@ -238,35 +250,43 @@ class RaumfeldGroup(MediaPlayerEntity):
         self.update_transport_state()
 
     def mute_volume(self, mute):
+        """Mute the volume."""
         self._raumfeld.set_group_mute(self._rooms, mute)
         self.update_mute()
 
     def set_volume_level(self, volume):
+        """Set volume level, range 0..1."""
         raumfeld_vol = volume * 100
         self._raumfeld.set_group_volume(self._rooms, raumfeld_vol)
         self.update_volume_level()
 
     def media_play(self):
+        """Send play command."""
         self._raumfeld.group_play(self._rooms)
         self.update_transport_state()
 
     def media_pause(self):
+        """Send pause command."""
         self._raumfeld.group_pause(self._rooms)
         self.update_transport_state()
 
     def media_stop(self):
+        """Send stop command."""
         self._raumfeld.group_stop(self._rooms)
         self.update_transport_state()
 
     def media_previous_track(self):
+        """Send previous track command."""
         self._raumfeld.group_previous_track(self._rooms)
         self.update_track_info()
 
     def media_next_track(self):
+        """Send next track command."""
         self._raumfeld.group_next_track(self._rooms)
         self.update_track_info()
 
     def media_seek(self, position):
+        """Send seek command."""
         raumfeld_pos = str(datetime.timedelta(seconds=int(position)))
         self._raumfeld.group_seek(self._rooms, raumfeld_pos)
         self.update_track_info()
@@ -313,10 +333,12 @@ class RaumfeldGroup(MediaPlayerEntity):
         self.update_play_mode()
 
     def volume_up(self):
+        """Turn volume up for media player."""
         self._raumfeld.change_group_volume(self._rooms, CHANGE_STEP_VOLUME_UP)
         self.update_volume_level()
 
     def volume_down(self):
+        """Turn volume down for media player."""
         self._raumfeld.change_group_volume(self._rooms, CHANGE_STEP_VOLUME_DOWN)
         self.update_volume_level()
 
@@ -350,6 +372,7 @@ class RaumfeldGroup(MediaPlayerEntity):
     # MediaPlayer update methods
 
     def update_transport_state(self):
+        """Update state of the player."""
         info = self._raumfeld.get_transport_info(self._rooms)
         transport_state = info["CurrentTransportState"]
         if transport_state == TRANSPORT_STATE_STOPPED:
@@ -366,12 +389,15 @@ class RaumfeldGroup(MediaPlayerEntity):
             self._state = STATE_OFF
 
     def update_volume_level(self):
+        """Update volume level of the player."""
         self._volume_level = self._raumfeld.get_group_volume(self._rooms) / 100
 
     def update_mute(self):
+        """Update mute status of the player."""
         self._mute = self._raumfeld.get_group_mute(self._rooms)
 
     def update_track_info(self):
+        """Update media information of the player."""
         track_info = self._raumfeld.get_track_info(self._rooms)
         self._media_duration = track_info["duration"]
         self._media_image_url = track_info["image_uri"]
@@ -384,6 +410,7 @@ class RaumfeldGroup(MediaPlayerEntity):
         self._media_position_updated_at = utcnow()
 
     def update_play_mode(self):
+        """Update play mode of the player."""
         play_mode = self._raumfeld.get_play_mode(self._rooms)
         self._play_mode = play_mode
         if play_mode == PLAY_MODE_NORMAL:
@@ -403,6 +430,7 @@ class RaumfeldGroup(MediaPlayerEntity):
             self._repeat = REPEAT_MODE_ALL
 
     def update_all(self):
+        """Run all state update methods of the player."""
         self.update_transport_state()
         self.update_volume_level()
         self.update_mute()
@@ -410,6 +438,7 @@ class RaumfeldGroup(MediaPlayerEntity):
         self.update_play_mode()
 
     def update(self):
+        """Update entity"""
         if self._raumfeld.group_is_valid(self._rooms):
             self.update_all()
         else:
@@ -418,14 +447,19 @@ class RaumfeldGroup(MediaPlayerEntity):
     # MediaPlayer service methods
 
     def snapshot(self):
+        """Save the current media and position of the player."""
         self._raumfeld.save_group(self._rooms)
 
     def restore(self):
+        """Restore previously saved media and position of the player."""
         self._raumfeld.restore_group(self._rooms)
 
 
 class RaumfeldRoom(RaumfeldGroup):
+    """Class representing a virtual media renderer for a room."""
+
     def __init__(self, room, raumfeld):
+        """Initialize media player for room."""
         self._rooms = [room]
         self._raumfeld = raumfeld
         self._mute = None
@@ -449,7 +483,14 @@ class RaumfeldRoom(RaumfeldGroup):
 
 
 class RaumfeldDevice(MediaPlayerEntity):
+    """Class representing a speaker device
+
+
+    NOT IMPLEMENTED YET
+    """
+
     def __init__(self, room, raumfeld):
+        """Initialize representation of physical device."""
         self._room = room
         self._raumfeld = raumfeld
         self._icon = "mdi:speaker"

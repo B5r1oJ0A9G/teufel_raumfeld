@@ -59,55 +59,74 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
 
 
 class HassRaumfeldHost(hassfeld.RaumfeldHost):
+    """Raumfeld Host class adapted for Home Assistant."""
+
     def get_groups(self):
+        """Get active speaker groups."""
         return self.get_zones()
 
     def group_is_valid(self, room_lst):
+        """Check whether a speaker group according to passed rooms exists."""
         return self.zone_is_valid(room_lst)
 
     def create_group(self, room_lst):
+        """Create a speaker group with rooms passed."""
         self.create_zone(room_lst)
 
     def set_group_mute(self, room_lst, mute):
+        """Create a speaker group with rooms passed."""
         self.set_zone_mute(room_lst, mute)
 
     def set_group_volume(self, room_lst, raumfeld_vol):
+        """Mute the speaker group corresponding to passed rooms."""
         self.set_zone_volume(room_lst, raumfeld_vol)
 
     def group_play(self, room_lst):
+        """Play media of speaker group corresponding to passed rooms."""
         self.zone_play(room_lst)
 
     def group_pause(self, room_lst):
+        """Pause media of speaker group corresponding to passed rooms."""
         self.zone_pause(room_lst)
 
     def group_stop(self, room_lst):
+        """Stop media of speaker group corresponding to passed rooms."""
         self.zone_stop(room_lst)
 
     def group_previous_track(self, room_lst):
+        """Jump to previous track on speaker group corresp. to passed rooms."""
         self.zone_previous_track(room_lst)
 
     def group_next_track(self, room_lst):
+        """Jump to next track on speaker group corresp. to passed rooms."""
         self.zone_next_track(room_lst)
 
     def group_seek(self, room_lst, position):
+        """Seek to position on speaker group corresp. to passed rooms."""
         self.zone_seek(room_lst, position)
 
     def change_group_volume(self, room_lst, volume):
+        """Change volume on speaker group corresp. to passed rooms."""
         self.change_zone_volume(room_lst, volume)
 
     def get_group_volume(self, room_lst):
+        """Return volume [0-100] of speaker group corresp. to passed rooms."""
         return self.get_zone_volume(room_lst)
 
     def get_group_mute(self, room_lst):
+        """Return bool mute status of speaker group corresp. to passed rooms."""
         return self.get_zone_mute(room_lst)
 
     def save_group(self, room_lst):
+        """Save media and position of speaker group corresp. to passed rooms."""
         self.save_zone(room_lst)
 
     def restore_group(self, room_lst):
+        """Restore media and position of speaker group corresp. to passed rooms."""
         self.restore_zone(room_lst)
 
     def search_and_group_play(self, zone_room_lst, search_criteria):
+        """Search track and play first hit on speaker group"""
         self.search_and_zone_play(zone_room_lst, search_criteria)
 
     def _timespan_secs(self, timespan):
@@ -117,6 +136,7 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
         )
 
     def browse_media(self, object_id=0, browse_flag=None):
+        """Browse conent directory and return object as expected by webhook."""
         browse_lst = []
         can_expand = False
         can_play = False
@@ -177,6 +197,7 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
         return browse_lst
 
     def get_track_info(self, zone_room_lst):
+        """Return data to update media information."""
         position_info = self.get_position_info(zone_room_lst)
         metadata_xml = position_info["TrackMetaData"]
 
@@ -209,6 +230,7 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
         return track_info
 
     def mk_play_uri(self, media_type, media_id, track_number=0):
+        """Create a valid URI playable by raumfeld media renderer."""
         if media_type == UPNP_CLASS_ALBUM or media_type == UPNP_CLASS_TRACK:
             media_server_udn = self.media_server_udn
 
