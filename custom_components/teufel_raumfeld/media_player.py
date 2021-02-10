@@ -54,7 +54,7 @@ SUPPORT_RAUMFELD_GROUP = (
 )
 
 from .const import (CHANGE_STEP_VOLUME_DOWN, CHANGE_STEP_VOLUME_UP,
-                    DEVICE_CLASS_SPEAKER, DEVICE_MANUFACTURER, DOMAIN,
+                    DEVICE_CLASS_SPEAKER, DOMAIN,
                     GROUP_PREFIX, MEDIA_CONTENT_ID_SEP, ROOM_PREFIX,
                     SERVICE_RESTORE, SERVICE_SNAPSHOT, UPNP_CLASS_ALBUM,
                     UPNP_CLASS_TRACK)
@@ -100,6 +100,9 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
             devices.append(RaumfeldGroup(group, raumfeld))
 
     for entity in entity_entries:
+        if not entity.entity_id.startswith(DOMAIN):
+            continue
+
         rooms = uid_to_obj(entity.unique_id)
         if len(rooms) > 1:
             group = rooms
@@ -480,76 +483,3 @@ class RaumfeldRoom(RaumfeldGroup):
         self._shuffle = None
         self._repeat = None
         self._play_mode = None
-
-
-class RaumfeldDevice(MediaPlayerEntity):
-    """Class representing a speaker device
-
-
-    NOT IMPLEMENTED YET
-    """
-
-    def __init__(self, room, raumfeld):
-        """Initialize representation of physical device."""
-        self._room = room
-        self._raumfeld = raumfeld
-        self._icon = "mdi:speaker"
-        self._name = ROOM_PREFIX + self._room
-        self._unique_id = self._name
-        self._state = STATE_IDLE
-        self._host_entry_id = ROOM_PREFIX + repr(self._raumfeld.get_host_room())
-
-        self._device_info = {
-            "identifiers": {(DOMAIN, self._name)},
-            "name": self.name,
-            "manufacturer": DEVICE_MANUFACTURER,
-            "via_device": (DOMAIN, self._host_entry_id),
-        }
-
-    @property
-    def device_class(self):
-        return DEVICE_CLASS_SPEAKER
-
-    @property
-    def device_info(self):
-        return self._device_info
-
-    @property
-    def icon(self):
-        return self._icon
-
-    @property
-    def name(self):
-        return self._name
-
-    @property
-    def should_poll(self):
-        return False
-
-    @property
-    def state(self):
-        return self._state
-
-    @property
-    def supported_features(self):
-        return SUPPORT_RAUMFELD
-
-    @property
-    def unique_id(self):
-        return self._unique_id
-
-    @property
-    def media_content_type(self):
-        pass
-
-    def media_stop(self):
-        pass
-
-    def media_play(self):
-        pass
-
-    def media_pause(self):
-        pass
-
-    def media_seek(self, target):
-        pass
