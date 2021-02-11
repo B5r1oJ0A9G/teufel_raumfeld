@@ -99,7 +99,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
             devices.append(RaumfeldGroup(group, raumfeld))
 
     for entity in entity_entries:
-        if not entity.entity_id.startswith(DOMAIN):
+        if not entity.entity_id.startswith(platform.domain):
             continue
 
         rooms = uid_to_obj(entity.unique_id)
