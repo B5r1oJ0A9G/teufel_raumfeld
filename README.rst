@@ -4,6 +4,10 @@ teufel_raumfeld
 
 teufel_raumfeld is an integration for Teufel smart speaker (aka Raumfeld Multiroom) into https://www.home-assistant.io/.
 
+Installation
+------------
+The recommended installation method is via the Home Assistant Community Store: https://hacs.xyz/
+
 Features
 --------
 
