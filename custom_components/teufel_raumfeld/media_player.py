@@ -106,6 +106,8 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
         if len(rooms) > 1:
             group = rooms
             if group not in room_groups:
+                if entity.disabled:
+                    continue
                 devices.append(RaumfeldGroup(group, raumfeld))
 
     async_add_devices(devices)
