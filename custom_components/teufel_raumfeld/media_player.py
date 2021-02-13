@@ -294,101 +294,115 @@ class RaumfeldGroup(MediaPlayerEntity):
 
     def turn_on(self):
         """Turn the media player on."""
-        self._raumfeld.create_group(self._rooms)
-        self.update_transport_state()
+        if not self._raumfeld.group_is_valid(self._rooms):
+            self._raumfeld.create_group(self._rooms)
+            self.update_transport_state()
 
     def mute_volume(self, mute):
         """Mute the volume."""
-        self._raumfeld.set_group_mute(self._rooms, mute)
-        self.update_mute()
+        if self._raumfeld.group_is_valid(self._rooms):
+            self._raumfeld.set_group_mute(self._rooms, mute)
+            self.update_mute()
 
     def set_volume_level(self, volume):
         """Set volume level, range 0..1."""
-        raumfeld_vol = volume * 100
-        self._raumfeld.set_group_volume(self._rooms, raumfeld_vol)
-        self.update_volume_level()
+        if self._raumfeld.group_is_valid(self._rooms):
+            raumfeld_vol = volume * 100
+            self._raumfeld.set_group_volume(self._rooms, raumfeld_vol)
+            self.update_volume_level()
 
     def media_play(self):
         """Send play command."""
-        self._raumfeld.group_play(self._rooms)
-        self.update_transport_state()
+        if self._raumfeld.group_is_valid(self._rooms):
+            self._raumfeld.group_play(self._rooms)
+            self.update_transport_state()
 
     def media_pause(self):
         """Send pause command."""
-        self._raumfeld.group_pause(self._rooms)
-        self.update_transport_state()
+        if self._raumfeld.group_is_valid(self._rooms):
+            self._raumfeld.group_pause(self._rooms)
+            self.update_transport_state()
 
     def media_stop(self):
         """Send stop command."""
-        self._raumfeld.group_stop(self._rooms)
-        self.update_transport_state()
+        if self._raumfeld.group_is_valid(self._rooms):
+            self._raumfeld.group_stop(self._rooms)
+            self.update_transport_state()
 
     def media_previous_track(self):
         """Send previous track command."""
-        self._raumfeld.group_previous_track(self._rooms)
-        self.update_track_info()
+        if self._raumfeld.group_is_valid(self._rooms):
+            self._raumfeld.group_previous_track(self._rooms)
+            self.update_track_info()
 
     def media_next_track(self):
         """Send next track command."""
-        self._raumfeld.group_next_track(self._rooms)
-        self.update_track_info()
+        if self._raumfeld.group_is_valid(self._rooms):
+            self._raumfeld.group_next_track(self._rooms)
+            self.update_track_info()
 
     def media_seek(self, position):
         """Send seek command."""
-        raumfeld_pos = str(datetime.timedelta(seconds=int(position)))
-        self._raumfeld.group_seek(self._rooms, raumfeld_pos)
-        self.update_track_info()
+        if self._raumfeld.group_is_valid(self._rooms):
+            raumfeld_pos = str(datetime.timedelta(seconds=int(position)))
+            self._raumfeld.group_seek(self._rooms, raumfeld_pos)
+            self.update_track_info()
 
     def play_media(self, media_type, media_id, **kwargs):
         """Play a piece of media."""
-        if media_type == MEDIA_TYPE_MUSIC:
-            if media_id.startswith("http"):
-                play_uri = media_id
-        if media_type == UPNP_CLASS_ALBUM or media_type == UPNP_CLASS_TRACK:
-            play_uri = media_id.split(MEDIA_CONTENT_ID_SEP)[1]
-        if media_type in SUPPORTED_MEDIA_TYPES:
-            if self.state == STATE_OFF:
-                self.turn_on()
-            self._raumfeld.set_av_transport_uri(self._rooms, play_uri)
+        if self._raumfeld.group_is_valid(self._rooms):
+            if media_type == MEDIA_TYPE_MUSIC:
+                if media_id.startswith("http"):
+                    play_uri = media_id
+            if media_type == UPNP_CLASS_ALBUM or media_type == UPNP_CLASS_TRACK:
+                play_uri = media_id.split(MEDIA_CONTENT_ID_SEP)[1]
+            if media_type in SUPPORTED_MEDIA_TYPES:
+                if self.state == STATE_OFF:
+                    self.turn_on()
+                self._raumfeld.set_av_transport_uri(self._rooms, play_uri)
 
     def set_shuffle(self, shuffle):
         """Enable/disable shuffle mode."""
-        if shuffle:
-            if self._repeat != REPEAT_MODE_OFF:
-                self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_RANDOM)
-            else:
-                self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_SHUFFLE)
-        elif self._play_mode == PLAY_MODE_SHUFFLE:
-            self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_NORMAL)
-        elif self._play_mode == PLAY_MODE_RANDOM:
-            self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_REPEAT_ALL)
-        self.update_play_mode()
+        if self._raumfeld.group_is_valid(self._rooms):
+            if shuffle:
+                if self._repeat != REPEAT_MODE_OFF:
+                    self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_RANDOM)
+                else:
+                    self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_SHUFFLE)
+            elif self._play_mode == PLAY_MODE_SHUFFLE:
+                self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_NORMAL)
+            elif self._play_mode == PLAY_MODE_RANDOM:
+                self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_REPEAT_ALL)
+            self.update_play_mode()
 
     def set_repeat(self, repeat):
         """Set repeat mode."""
-        if repeat == REPEAT_MODE_ALL:
-            if self._shuffle:
-                self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_RANDOM)
-            else:
-                self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_REPEAT_ALL)
-        elif repeat == REPEAT_MODE_ONE:
-            self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_REPEAT_ONE)
-        elif repeat == REPEAT_MODE_OFF:
-            if self._shuffle:
-                self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_SHUFFLE)
-            else:
-                self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_NORMAL)
-        self.update_play_mode()
+        if self._raumfeld.group_is_valid(self._rooms):
+            if repeat == REPEAT_MODE_ALL:
+                if self._shuffle:
+                    self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_RANDOM)
+                else:
+                    self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_REPEAT_ALL)
+            elif repeat == REPEAT_MODE_ONE:
+                self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_REPEAT_ONE)
+            elif repeat == REPEAT_MODE_OFF:
+                if self._shuffle:
+                    self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_SHUFFLE)
+                else:
+                    self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_NORMAL)
+            self.update_play_mode()
 
     def volume_up(self):
         """Turn volume up for media player."""
-        self._raumfeld.change_group_volume(self._rooms, CHANGE_STEP_VOLUME_UP)
-        self.update_volume_level()
+        if self._raumfeld.group_is_valid(self._rooms):
+            self._raumfeld.change_group_volume(self._rooms, CHANGE_STEP_VOLUME_UP)
+            self.update_volume_level()
 
     def volume_down(self):
         """Turn volume down for media player."""
-        self._raumfeld.change_group_volume(self._rooms, CHANGE_STEP_VOLUME_DOWN)
-        self.update_volume_level()
+        if self._raumfeld.group_is_valid(self._rooms):
+            self._raumfeld.change_group_volume(self._rooms, CHANGE_STEP_VOLUME_DOWN)
+            self.update_volume_level()
 
     async def async_browse_media(self, media_content_type=None, media_content_id=None):
         """Implement the websocket media browsing helper."""
@@ -496,17 +510,20 @@ class RaumfeldGroup(MediaPlayerEntity):
 
     def snapshot(self):
         """Save the current media and position of the player."""
-        self._raumfeld.save_group(self._rooms)
+        if self._raumfeld.group_is_valid(self._rooms):
+            self._raumfeld.save_group(self._rooms)
 
     def restore(self):
         """Restore previously saved media and position of the player."""
-        self._raumfeld.restore_group(self._rooms)
+        if self._raumfeld.group_is_valid(self._rooms):
+            self._raumfeld.restore_group(self._rooms)
 
     def set_rooms_volume_level(self, volume_level, rooms=None):
         """Set volume level, range 0..1."""
-        raumfeld_vol = volume_level * 100
-        self._raumfeld.set_group_room_volume(self._rooms, raumfeld_vol, rooms)
-        self.update_volume_level()
+        if self._raumfeld.group_is_valid(self._rooms):
+            raumfeld_vol = volume_level * 100
+            self._raumfeld.set_group_room_volume(self._rooms, raumfeld_vol, rooms)
+            self.update_volume_level()
 
 
 class RaumfeldRoom(RaumfeldGroup):
