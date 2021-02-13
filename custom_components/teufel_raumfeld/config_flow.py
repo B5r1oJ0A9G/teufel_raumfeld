@@ -3,10 +3,11 @@ import logging
 
 import hassfeld
 import voluptuous as vol
+
 from homeassistant import config_entries, core, exceptions
 
-from .const import DOMAIN  # pylint:disable=unused-import
 from .const import DEFAULT_HOST_WEBSERVICE, DEFAULT_PORT_WEBSERVICE
+from .const import DOMAIN  # pylint:disable=unused-import
 
 _LOGGER = logging.getLogger(__name__)
 
