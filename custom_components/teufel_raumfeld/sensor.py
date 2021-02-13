@@ -1,5 +1,6 @@
 """Platform for sensor integration."""
 import hassfeld.upnp
+
 from homeassistant.helpers import entity_platform
 from homeassistant.helpers.entity import Entity
 
