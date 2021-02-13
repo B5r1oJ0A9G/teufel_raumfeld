@@ -147,7 +147,12 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
         "abs_volume_set",
         vol.All(
             cv.make_entity_service_schema(
-                {vol.Required(ATTR_MEDIA_VOLUME_LEVEL): cv.small_float}
+                {
+                    vol.Required(ATTR_MEDIA_VOLUME_LEVEL): cv.small_float,
+                    vol.Optional("rooms"): vol.All(
+                        cv.ensure_list, [vol.In(room_names)]
+                    ),
+                }
             )
         ),
         "set_rooms_volume_level",
@@ -497,10 +502,10 @@ class RaumfeldGroup(MediaPlayerEntity):
         """Restore previously saved media and position of the player."""
         self._raumfeld.restore_group(self._rooms)
 
-    def set_rooms_volume_level(self, volume_level):
+    def set_rooms_volume_level(self, volume_level, rooms=None):
         """Set volume level, range 0..1."""
         raumfeld_vol = volume_level * 100
-        self._raumfeld.set_group_room_volume(self._rooms, raumfeld_vol)
+        self._raumfeld.set_group_room_volume(self._rooms, raumfeld_vol, rooms)
         self.update_volume_level()
 
 

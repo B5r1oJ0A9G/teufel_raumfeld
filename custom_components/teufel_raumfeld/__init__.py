@@ -110,9 +110,9 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
         """Mute the speaker group corresponding to passed rooms."""
         self.set_zone_volume(room_lst, raumfeld_vol)
 
-    def set_group_room_volume(self, room_lst, raumfeld_vol):
+    def set_group_room_volume(self, room_lst, raumfeld_vol, rooms=None):
         """Set volume of all rooms in a speaker group."""
-        self.set_zone_room_volume(room_lst, raumfeld_vol)
+        self.set_zone_room_volume(room_lst, raumfeld_vol, rooms)
 
     def group_play(self, room_lst):
         """Play media of speaker group corresponding to passed rooms."""
