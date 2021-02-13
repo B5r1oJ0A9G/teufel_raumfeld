@@ -4,34 +4,55 @@ import logging
 import pickle
 
 import hassfeld
+from hassfeld.constants import (
+    BROWSE_CHILDREN,
+    BROWSE_METADATA,
+    PLAY_MODE_NORMAL,
+    PLAY_MODE_RANDOM,
+    PLAY_MODE_REPEAT_ALL,
+    PLAY_MODE_REPEAT_ONE,
+    PLAY_MODE_SHUFFLE,
+    TRANSPORT_STATE_NO_MEDIA,
+    TRANSPORT_STATE_PAUSED,
+    TRANSPORT_STATE_PLAYING,
+    TRANSPORT_STATE_STOPPED,
+    TRANSPORT_STATE_TRANSITIONING,
+    TRIGGER_UPDATE_DEVICES,
+    TRIGGER_UPDATE_HOST_INFO,
+    TRIGGER_UPDATE_SYSTEM_STATE,
+    TRIGGER_UPDATE_ZONE_CONFIG,
+)
 import voluptuous as vol
-from hassfeld.constants import (BROWSE_CHILDREN, BROWSE_METADATA,
-                                PLAY_MODE_NORMAL, PLAY_MODE_RANDOM,
-                                PLAY_MODE_REPEAT_ALL, PLAY_MODE_REPEAT_ONE,
-                                PLAY_MODE_SHUFFLE, TRANSPORT_STATE_NO_MEDIA,
-                                TRANSPORT_STATE_PAUSED,
-                                TRANSPORT_STATE_PLAYING,
-                                TRANSPORT_STATE_STOPPED,
-                                TRANSPORT_STATE_TRANSITIONING,
-                                TRIGGER_UPDATE_DEVICES,
-                                TRIGGER_UPDATE_HOST_INFO,
-                                TRIGGER_UPDATE_SYSTEM_STATE,
-                                TRIGGER_UPDATE_ZONE_CONFIG)
-from homeassistant.components.media_player import (BrowseMedia,
-                                                   MediaPlayerEntity)
+
+from homeassistant.components.media_player import BrowseMedia, MediaPlayerEntity
 from homeassistant.components.media_player.const import (
-    MEDIA_TYPE_MUSIC, REPEAT_MODE_ALL, REPEAT_MODE_OFF, REPEAT_MODE_ONE,
-    SUPPORT_BROWSE_MEDIA, SUPPORT_NEXT_TRACK, SUPPORT_PAUSE, SUPPORT_PLAY,
-    SUPPORT_PLAY_MEDIA, SUPPORT_PREVIOUS_TRACK, SUPPORT_REPEAT_SET,
-    SUPPORT_SEEK, SUPPORT_SHUFFLE_SET, SUPPORT_STOP, SUPPORT_TURN_ON,
-    SUPPORT_VOLUME_MUTE, SUPPORT_VOLUME_SET, SUPPORT_VOLUME_STEP)
-from homeassistant.const import (STATE_IDLE, STATE_OFF, STATE_PAUSED,
-                                 STATE_PLAYING)
-from homeassistant.helpers import config_validation as cv
-from homeassistant.helpers import entity_platform
+    ATTR_MEDIA_VOLUME_LEVEL,
+    MEDIA_TYPE_MUSIC,
+    REPEAT_MODE_ALL,
+    REPEAT_MODE_OFF,
+    REPEAT_MODE_ONE,
+    SUPPORT_BROWSE_MEDIA,
+    SUPPORT_NEXT_TRACK,
+    SUPPORT_PAUSE,
+    SUPPORT_PLAY,
+    SUPPORT_PLAY_MEDIA,
+    SUPPORT_PREVIOUS_TRACK,
+    SUPPORT_REPEAT_SET,
+    SUPPORT_SEEK,
+    SUPPORT_SHUFFLE_SET,
+    SUPPORT_STOP,
+    SUPPORT_TURN_ON,
+    SUPPORT_VOLUME_MUTE,
+    SUPPORT_VOLUME_SET,
+    SUPPORT_VOLUME_STEP,
+)
+from homeassistant.const import STATE_IDLE, STATE_OFF, STATE_PAUSED, STATE_PLAYING
+from homeassistant.helpers import config_validation as cv, entity_platform
 from homeassistant.helpers.entity import Entity
 from homeassistant.helpers.entity_registry import (
-    async_entries_for_config_entry, async_get_registry)
+    async_entries_for_config_entry,
+    async_get_registry,
+)
 from homeassistant.util.dt import utcnow
 
 SUPPORT_RAUMFELD = SUPPORT_PAUSE | SUPPORT_STOP | SUPPORT_PLAY
@@ -53,10 +74,19 @@ SUPPORT_RAUMFELD_GROUP = (
     | SUPPORT_REPEAT_SET
 )
 
-from .const import (CHANGE_STEP_VOLUME_DOWN, CHANGE_STEP_VOLUME_UP,
-                    DEVICE_CLASS_SPEAKER, DOMAIN, GROUP_PREFIX,
-                    MEDIA_CONTENT_ID_SEP, ROOM_PREFIX, SERVICE_RESTORE,
-                    SERVICE_SNAPSHOT, UPNP_CLASS_ALBUM, UPNP_CLASS_TRACK)
+from .const import (
+    CHANGE_STEP_VOLUME_DOWN,
+    CHANGE_STEP_VOLUME_UP,
+    DEVICE_CLASS_SPEAKER,
+    DOMAIN,
+    GROUP_PREFIX,
+    MEDIA_CONTENT_ID_SEP,
+    ROOM_PREFIX,
+    SERVICE_RESTORE,
+    SERVICE_SNAPSHOT,
+    UPNP_CLASS_ALBUM,
+    UPNP_CLASS_TRACK,
+)
 
 SUPPORTED_MEDIA_TYPES = [MEDIA_TYPE_MUSIC, UPNP_CLASS_ALBUM, UPNP_CLASS_TRACK]
 
@@ -113,6 +143,15 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     async_add_devices(devices)
     platform.async_register_entity_service(SERVICE_RESTORE, {}, "restore")
     platform.async_register_entity_service(SERVICE_SNAPSHOT, {}, "snapshot")
+    platform.async_register_entity_service(
+        "abs_volume_set",
+        vol.All(
+            cv.make_entity_service_schema(
+                {vol.Required(ATTR_MEDIA_VOLUME_LEVEL): cv.small_float}
+            )
+        ),
+        "set_rooms_volume_level",
+    )
     return True
 
 
@@ -457,6 +496,12 @@ class RaumfeldGroup(MediaPlayerEntity):
     def restore(self):
         """Restore previously saved media and position of the player."""
         self._raumfeld.restore_group(self._rooms)
+
+    def set_rooms_volume_level(self, volume_level):
+        """Set volume level, range 0..1."""
+        raumfeld_vol = volume_level * 100
+        self._raumfeld.set_group_room_volume(self._rooms, raumfeld_vol)
+        self.update_volume_level()
 
 
 class RaumfeldRoom(RaumfeldGroup):

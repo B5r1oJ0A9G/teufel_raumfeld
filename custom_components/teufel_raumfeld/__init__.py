@@ -5,20 +5,42 @@ import urllib.parse
 import hassfeld
 import voluptuous as vol
 import xmltodict
+
 from homeassistant.components.media_player import BrowseMedia
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
-from .const import (DIDL_ATTR_CHILD_CNT, DIDL_ATTR_ID, DIDL_ELEM_ALBUM,
-                    DIDL_ELEM_ART_URI, DIDL_ELEM_ARTIST, DIDL_ELEM_CLASS,
-                    DIDL_ELEM_CONTAINER, DIDL_ELEM_ITEM, DIDL_ELEM_TITLE,
-                    DIDL_ELEMENT, DIDL_VALUE, DOMAIN, MEDIA_CONTENT_ID_SEP,
-                    PLATFORMS, POSINF_ELEM_ABS_TIME, POSINF_ELEM_DURATION,
-                    POSINF_ELEM_TRACK, POSINF_ELEM_TRACK_DATA, POSINF_ELEM_URI,
-                    SERVICE_GROUP, SUPPORTED_OBJECT_IDS,
-                    SUPPORTED_OBJECT_PREFIXES, TRACKINF_ALBUM, TRACKINF_ARTIST,
-                    TRACKINF_IMGURI, TRACKINF_TITLE, UPNP_CLASS_ALBUM,
-                    UPNP_CLASS_TRACK, URN_CONTENT_DIRECTORY)
+from .const import (
+    DIDL_ATTR_CHILD_CNT,
+    DIDL_ATTR_ID,
+    DIDL_ELEM_ALBUM,
+    DIDL_ELEM_ART_URI,
+    DIDL_ELEM_ARTIST,
+    DIDL_ELEM_CLASS,
+    DIDL_ELEM_CONTAINER,
+    DIDL_ELEM_ITEM,
+    DIDL_ELEM_TITLE,
+    DIDL_ELEMENT,
+    DIDL_VALUE,
+    DOMAIN,
+    MEDIA_CONTENT_ID_SEP,
+    PLATFORMS,
+    POSINF_ELEM_ABS_TIME,
+    POSINF_ELEM_DURATION,
+    POSINF_ELEM_TRACK,
+    POSINF_ELEM_TRACK_DATA,
+    POSINF_ELEM_URI,
+    SERVICE_GROUP,
+    SUPPORTED_OBJECT_IDS,
+    SUPPORTED_OBJECT_PREFIXES,
+    TRACKINF_ALBUM,
+    TRACKINF_ARTIST,
+    TRACKINF_IMGURI,
+    TRACKINF_TITLE,
+    UPNP_CLASS_ALBUM,
+    UPNP_CLASS_TRACK,
+    URN_CONTENT_DIRECTORY,
+)
 
 
 async def async_setup(hass: HomeAssistant, config: dict):
@@ -87,6 +109,10 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
     def set_group_volume(self, room_lst, raumfeld_vol):
         """Mute the speaker group corresponding to passed rooms."""
         self.set_zone_volume(room_lst, raumfeld_vol)
+
+    def set_group_room_volume(self, room_lst, raumfeld_vol):
+        """Set volume of all rooms in a speaker group."""
+        self.set_zone_room_volume(room_lst, raumfeld_vol)
 
     def group_play(self, room_lst):
         """Play media of speaker group corresponding to passed rooms."""
