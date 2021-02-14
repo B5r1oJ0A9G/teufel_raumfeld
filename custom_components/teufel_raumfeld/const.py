@@ -1,4 +1,5 @@
 """Constants for the Teufel Raumfeld integration."""
+ATTR_EVENT_WSUPD_TYPE = "type"
 CHANGE_STEP_VOLUME_DOWN = -2
 CHANGE_STEP_VOLUME_UP = 5
 DEFAULT_HOST_WEBSERVICE = "raumfeld-host.example.com"
@@ -17,6 +18,7 @@ DIDL_ELEM_ALBUM = "upnp:album"
 DIDL_ELEMENT = "DIDL-Lite"
 DIDL_VALUE = "#text"
 DOMAIN = "teufel_raumfeld"
+EVENT_WEBSERVICE_UPDATE = "teufel_raumfeld.webservice_update"
 GROUP_PREFIX = "Group: "
 MEDIA_CONTENT_ID_SEP = "[:sep:]"
 PLATFORMS = ["media_player", "sensor"]

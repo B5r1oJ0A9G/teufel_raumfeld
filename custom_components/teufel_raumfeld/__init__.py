@@ -3,6 +3,12 @@ import asyncio
 import urllib.parse
 
 import hassfeld
+from hassfeld.constants import (
+    TRIGGER_UPDATE_DEVICES,
+    TRIGGER_UPDATE_HOST_INFO,
+    TRIGGER_UPDATE_SYSTEM_STATE,
+    TRIGGER_UPDATE_ZONE_CONFIG,
+)
 import voluptuous as vol
 import xmltodict
 
@@ -11,6 +17,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
 from .const import (
+    ATTR_EVENT_WSUPD_TYPE,
     DIDL_ATTR_CHILD_CNT,
     DIDL_ATTR_ID,
     DIDL_ELEM_ALBUM,
@@ -23,6 +30,7 @@ from .const import (
     DIDL_ELEMENT,
     DIDL_VALUE,
     DOMAIN,
+    EVENT_WEBSERVICE_UPDATE,
     MEDIA_CONTENT_ID_SEP,
     PLATFORMS,
     POSINF_ELEM_ABS_TIME,
@@ -49,11 +57,36 @@ async def async_setup(hass: HomeAssistant, config: dict):
     return True
 
 
+def event_on_update(hass, update_type):
+    if update_type == TRIGGER_UPDATE_HOST_INFO:
+        hass.bus.fire(
+            EVENT_WEBSERVICE_UPDATE, {ATTR_EVENT_WSUPD_TYPE: TRIGGER_UPDATE_HOST_INFO}
+        )
+    elif update_type == TRIGGER_UPDATE_ZONE_CONFIG:
+        hass.bus.fire(
+            EVENT_WEBSERVICE_UPDATE, {ATTR_EVENT_WSUPD_TYPE: TRIGGER_UPDATE_ZONE_CONFIG}
+        )
+    elif update_type == TRIGGER_UPDATE_DEVICES:
+        hass.bus.fire(
+            EVENT_WEBSERVICE_UPDATE, {ATTR_EVENT_WSUPD_TYPE: TRIGGER_UPDATE_DEVICES}
+        )
+    elif update_type == TRIGGER_UPDATE_SYSTEM_STATE:
+        hass.bus.fire(
+            EVENT_WEBSERVICE_UPDATE,
+            {ATTR_EVENT_WSUPD_TYPE: TRIGGER_UPDATE_SYSTEM_STATE},
+        )
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up Teufel Raumfeld from a config entry."""
+
+    def cb_webservice_update(update_type, hass=hass):
+        event_on_update(hass, update_type)
+
     host = entry.data["host"]
     port = entry.data["port"]
     raumfeld = HassRaumfeldHost(host, port)
+    raumfeld.callback = cb_webservice_update
     raumfeld.start_update_thread()
     hass.data[DOMAIN][entry.entry_id] = raumfeld
 
