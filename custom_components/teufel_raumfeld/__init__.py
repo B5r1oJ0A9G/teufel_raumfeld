@@ -1,5 +1,8 @@
 """The Teufel Raumfeld integration."""
 import asyncio
+import inspect
+import logging
+import os
 import urllib.parse
 
 import hassfeld
@@ -50,6 +53,19 @@ from .const import (
     URN_CONTENT_DIRECTORY,
 )
 
+_LOGGER = logging.getLogger(__name__)
+
+
+def log_debug(message):
+    name = inspect.currentframe().f_back.f_code.co_name
+    filename = inspect.currentframe().f_back.f_code.co_filename
+    basename = os.path.basename(filename)
+    _LOGGER.debug("%s->%s: %s", basename, name, message)
+
+
+def log_info(message):
+    _LOGGER.debug(message)
+
 
 async def async_setup(hass: HomeAssistant, config: dict):
     """Set up the Teufel Raumfeld component."""
@@ -58,6 +74,7 @@ async def async_setup(hass: HomeAssistant, config: dict):
 
 
 def event_on_update(hass, update_type):
+    log_info("Update event triggered for type: %s" % update_type)
     if update_type == TRIGGER_UPDATE_HOST_INFO:
         hass.bus.fire(
             EVENT_WEBSERVICE_UPDATE, {ATTR_EVENT_WSUPD_TYPE: TRIGGER_UPDATE_HOST_INFO}
@@ -87,7 +104,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     port = entry.data["port"]
     raumfeld = HassRaumfeldHost(host, port)
     raumfeld.callback = cb_webservice_update
+    log_info("Starting web service update thread")
     raumfeld.start_update_thread()
+    log_info("Web service update thread started")
+    log_debug("raumfeld.wsd=%s" % raumfeld.wsd)
     hass.data[DOMAIN][entry.entry_id] = raumfeld
 
     for component in PLATFORMS:

@@ -1,10 +1,11 @@
 """Platform for sensor integration."""
+
 import hassfeld.upnp
 
 from homeassistant.helpers import entity_platform
 from homeassistant.helpers.entity import Entity
 
-from . import DOMAIN
+from . import DOMAIN, log_debug
 from .const import DEVICE_CLASS_SPEAKER, DOMAIN
 
 
@@ -18,6 +19,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     """Set up entry."""
     raumfeld = hass.data[DOMAIN][config_entry.entry_id]
     device_udns = raumfeld.get_raumfeld_device_udns()
+    log_debug("device_udns=%s" % device_udns)
     entity_registry = await hass.helpers.entity_registry.async_get_registry()
     entity_entries = hass.helpers.entity_registry.async_entries_for_config_entry(
         entity_registry, config_entry.entry_id
@@ -51,10 +53,12 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
             "sensor_name": "SoftwareVersion",
             "sw_version": sw_version,
         }
+        log_debug("sensor_config=%s" % sensor_config)
         devices.append(RaumfeldSensor(sensor_config))
 
         sensor_config["sensor_name"] = "UpdateInfoVersion"
         sensor_config["get_state"] = get_update_info_version
+        log_debug("sensor_config=%s" % sensor_config)
         devices.append(RaumfeldSensor(sensor_config))
 
     async_add_devices(devices)
