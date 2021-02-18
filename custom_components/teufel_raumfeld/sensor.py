@@ -106,15 +106,10 @@ class RaumfeldSpeaker(Entity):
     def __init__(self, sensor_config):
         """Initialize the Raumfeld speaker sensor."""
         self._config = sensor_config
-        self._name = self._config["device_name"] + " - " + self._config["sensor_name"]
         self._device_name = self._config["device_name"]
-        self._unique_id = (
-            DOMAIN
-            + "."
-            + self._config["device_name"]
-            + "."
-            + self._config["sensor_name"]
-        )
+        self._sensor_name = self._config["sensor_name"]
+        self._name = f"{self._device_name} - {self._sensor_name}"
+        self._unique_id = f"{DOMAIN}.{self._device_name}.{self._sensor_name}"
         self._location = self._config["location"]
         self._get_state = self._config["get_state"]
         self._sw_version = self._config["sw_version"]
