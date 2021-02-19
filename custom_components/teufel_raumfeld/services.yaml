@@ -28,3 +28,13 @@ abs_volume_set:
     volume_level:
       description: Volume level to set as float.
       example: 0.3
+
+set_power_state:
+  description: Enter automatic or manual standby, resp. leave standby.
+  fields:
+    entity_id:
+      description: Name(s) of entities to set the power state.
+      example: "sensor.room_kitchen_powerstate"
+    power_state:
+      description: "Power state: eco, off, on."
+      example: "off"

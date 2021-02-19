@@ -1,5 +1,6 @@
 """Constants for the Teufel Raumfeld integration."""
 ATTR_EVENT_WSUPD_TYPE = "type"
+ATTR_POWER_STATE = "power_state"
 CHANGE_STEP_VOLUME_DOWN = -2
 CHANGE_STEP_VOLUME_UP = 5
 DEFAULT_HOST_WEBSERVICE = "raumfeld-host.example.com"
@@ -21,6 +22,7 @@ DOMAIN = "teufel_raumfeld"
 EVENT_WEBSERVICE_UPDATE = "teufel_raumfeld.webservice_update"
 GROUP_PREFIX = "Group: "
 MEDIA_CONTENT_ID_SEP = "[:sep:]"
+MESSAGE_PHASE_ALPHA = "You are using teufel_raumfeld, which is still in alpha phase and therefore subject to change. This includes, among other things, the addition, redesign or removal of functionality."
 PLATFORMS = ["media_player", "sensor"]
 POSINF_ELEM_ABS_TIME = "AbsTime"
 POSINF_ELEM_DURATION = "TrackDuration"

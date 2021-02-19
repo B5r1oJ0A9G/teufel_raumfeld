@@ -74,6 +74,7 @@ SUPPORT_RAUMFELD_GROUP = (
     | SUPPORT_REPEAT_SET
 )
 
+from . import log_debug, log_error, log_fatal, log_info
 from .const import (
     CHANGE_STEP_VOLUME_DOWN,
     CHANGE_STEP_VOLUME_UP,
@@ -130,6 +131,10 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 
     for entity in entity_entries:
         if not entity.entity_id.startswith(platform.domain):
+            log_info(
+                "Entity '%s' is not recognized as media player and will not be restored as such"
+                % entity.entity_id
+            )
             continue
 
         rooms = uid_to_obj(entity.unique_id)
@@ -139,6 +144,11 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
                 if entity.disabled:
                     continue
                 devices.append(RaumfeldGroup(group, raumfeld))
+        else:
+            log_info(
+                "Media player entity '%s' is not recognized as speaker group"
+                % entity.entity_id
+            )
 
     async_add_devices(devices)
     platform.async_register_entity_service(SERVICE_RESTORE, {}, "restore")
@@ -297,12 +307,16 @@ class RaumfeldGroup(MediaPlayerEntity):
         if not self._raumfeld.group_is_valid(self._rooms):
             self._raumfeld.create_group(self._rooms)
             self.update_transport_state()
+        else:
+            log_debug("Method was called although room '%s' is invalid" % self._rooms)
 
     def mute_volume(self, mute):
         """Mute the volume."""
         if self._raumfeld.group_is_valid(self._rooms):
             self._raumfeld.set_group_mute(self._rooms, mute)
             self.update_mute()
+        else:
+            log_debug("Method was called although room '%s' is invalid" % self._rooms)
 
     def set_volume_level(self, volume):
         """Set volume level, range 0..1."""
@@ -310,36 +324,48 @@ class RaumfeldGroup(MediaPlayerEntity):
             raumfeld_vol = volume * 100
             self._raumfeld.set_group_volume(self._rooms, raumfeld_vol)
             self.update_volume_level()
+        else:
+            log_debug("Method was called although room '%s' is invalid" % self._rooms)
 
     def media_play(self):
         """Send play command."""
         if self._raumfeld.group_is_valid(self._rooms):
             self._raumfeld.group_play(self._rooms)
             self.update_transport_state()
+        else:
+            log_debug("Method was called although room '%s' is invalid" % self._rooms)
 
     def media_pause(self):
         """Send pause command."""
         if self._raumfeld.group_is_valid(self._rooms):
             self._raumfeld.group_pause(self._rooms)
             self.update_transport_state()
+        else:
+            log_debug("Method was called although room '%s' is invalid" % self._rooms)
 
     def media_stop(self):
         """Send stop command."""
         if self._raumfeld.group_is_valid(self._rooms):
             self._raumfeld.group_stop(self._rooms)
             self.update_transport_state()
+        else:
+            log_debug("Method was called although room '%s' is invalid" % self._rooms)
 
     def media_previous_track(self):
         """Send previous track command."""
         if self._raumfeld.group_is_valid(self._rooms):
             self._raumfeld.group_previous_track(self._rooms)
             self.update_track_info()
+        else:
+            log_debug("Method was called although room '%s' is invalid" % self._rooms)
 
     def media_next_track(self):
         """Send next track command."""
         if self._raumfeld.group_is_valid(self._rooms):
             self._raumfeld.group_next_track(self._rooms)
             self.update_track_info()
+        else:
+            log_debug("Method was called although room '%s' is invalid" % self._rooms)
 
     def media_seek(self, position):
         """Send seek command."""
@@ -347,6 +373,8 @@ class RaumfeldGroup(MediaPlayerEntity):
             raumfeld_pos = str(datetime.timedelta(seconds=int(position)))
             self._raumfeld.group_seek(self._rooms, raumfeld_pos)
             self.update_track_info()
+        else:
+            log_debug("Method was called although room '%s' is invalid" % self._rooms)
 
     def play_media(self, media_type, media_id, **kwargs):
         """Play a piece of media."""
@@ -360,6 +388,10 @@ class RaumfeldGroup(MediaPlayerEntity):
                 if self.state == STATE_OFF:
                     self.turn_on()
                 self._raumfeld.set_av_transport_uri(self._rooms, play_uri)
+            else:
+                log_error("Playing of media type '%s' not supported" % media_type)
+        else:
+            log_debug("Method was called although room '%s' is invalid" % self._rooms)
 
     def set_shuffle(self, shuffle):
         """Enable/disable shuffle mode."""
@@ -373,7 +405,11 @@ class RaumfeldGroup(MediaPlayerEntity):
                 self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_NORMAL)
             elif self._play_mode == PLAY_MODE_RANDOM:
                 self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_REPEAT_ALL)
+            else:
+                log_fatal("Invalid shuffle mode: %s" % shuffle)
             self.update_play_mode()
+        else:
+            log_debug("Method was called although room '%s' is invalid" % self._rooms)
 
     def set_repeat(self, repeat):
         """Set repeat mode."""
@@ -390,19 +426,27 @@ class RaumfeldGroup(MediaPlayerEntity):
                     self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_SHUFFLE)
                 else:
                     self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_NORMAL)
+            else:
+                log_fatal("Invalid repeate mode: %s" % repeat)
             self.update_play_mode()
+        else:
+            log_debug("Method was called although room '%s' is invalid" % self._rooms)
 
     def volume_up(self):
         """Turn volume up for media player."""
         if self._raumfeld.group_is_valid(self._rooms):
             self._raumfeld.change_group_volume(self._rooms, CHANGE_STEP_VOLUME_UP)
             self.update_volume_level()
+        else:
+            log_debug("Method was called although room '%s' is invalid" % self._rooms)
 
     def volume_down(self):
         """Turn volume down for media player."""
         if self._raumfeld.group_is_valid(self._rooms):
             self._raumfeld.change_group_volume(self._rooms, CHANGE_STEP_VOLUME_DOWN)
             self.update_volume_level()
+        else:
+            log_debug("Method was called although room '%s' is invalid" % self._rooms)
 
     async def async_browse_media(self, media_content_type=None, media_content_id=None):
         """Implement the websocket media browsing helper."""
@@ -448,6 +492,7 @@ class RaumfeldGroup(MediaPlayerEntity):
         elif transport_state == TRANSPORT_STATE_TRANSITIONING:
             pass
         else:
+            log_fatal("Unrecognized transport state: %s" % transport_state)
             self._state = STATE_OFF
 
     def update_volume_level(self):
@@ -490,6 +535,8 @@ class RaumfeldGroup(MediaPlayerEntity):
         elif play_mode == PLAY_MODE_RANDOM:
             self._shuffle = True
             self._repeat = REPEAT_MODE_ALL
+        else:
+            log_fatal("Unrecognized play mode: %s" % play_mode)
 
     def update_all(self):
         """Run all state update methods of the player."""
@@ -512,11 +559,15 @@ class RaumfeldGroup(MediaPlayerEntity):
         """Save the current media and position of the player."""
         if self._raumfeld.group_is_valid(self._rooms):
             self._raumfeld.save_group(self._rooms)
+        else:
+            log_debug("Method was called although room '%s' is invalid" % self._rooms)
 
     def restore(self):
         """Restore previously saved media and position of the player."""
         if self._raumfeld.group_is_valid(self._rooms):
             self._raumfeld.restore_group(self._rooms)
+        else:
+            log_debug("Method was called although room '%s' is invalid" % self._rooms)
 
     def set_rooms_volume_level(self, volume_level, rooms=None):
         """Set volume level, range 0..1."""
@@ -524,6 +575,8 @@ class RaumfeldGroup(MediaPlayerEntity):
             raumfeld_vol = volume_level * 100
             self._raumfeld.set_group_room_volume(self._rooms, raumfeld_vol, rooms)
             self.update_volume_level()
+        else:
+            log_debug("Method was called although room '%s' is invalid" % self._rooms)
 
 
 class RaumfeldRoom(RaumfeldGroup):

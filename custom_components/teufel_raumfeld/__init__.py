@@ -35,6 +35,7 @@ from .const import (
     DOMAIN,
     EVENT_WEBSERVICE_UPDATE,
     MEDIA_CONTENT_ID_SEP,
+    MESSAGE_PHASE_ALPHA,
     PLATFORMS,
     POSINF_ELEM_ABS_TIME,
     POSINF_ELEM_DURATION,
@@ -67,8 +68,24 @@ def log_info(message):
     _LOGGER.debug(message)
 
 
+def log_warn(message):
+    _LOGGER.warn(message)
+
+
+def log_error(message):
+    _LOGGER.error(message)
+
+
+def log_fatal(message):
+    name = inspect.currentframe().f_back.f_code.co_name
+    filename = inspect.currentframe().f_back.f_code.co_filename
+    basename = os.path.basename(filename)
+    _LOGGER.fatal("%s->%s: %s", basename, name, message)
+
+
 async def async_setup(hass: HomeAssistant, config: dict):
     """Set up the Teufel Raumfeld component."""
+    log_warn(MESSAGE_PHASE_ALPHA)
     hass.data[DOMAIN] = {}
     return True
 
@@ -92,6 +109,8 @@ def event_on_update(hass, update_type):
             EVENT_WEBSERVICE_UPDATE,
             {ATTR_EVENT_WSUPD_TYPE: TRIGGER_UPDATE_SYSTEM_STATE},
         )
+    else:
+        log_fatal("Unexpected update type: %s" % update_type)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
@@ -103,6 +122,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     host = entry.data["host"]
     port = entry.data["port"]
     raumfeld = HassRaumfeldHost(host, port)
+    host_is_not_valid = not await raumfeld.async_host_is_valid()
+    if host_is_not_valid:
+        log_error("Invalid host: %s:%s" % (host, port))
+        return False
     raumfeld.callback = cb_webservice_update
     log_info("Starting web service update thread")
     raumfeld.start_update_thread()
@@ -238,6 +261,8 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
             entry_type = DIDL_ELEM_CONTAINER
         elif DIDL_ELEM_ITEM in media[DIDL_ELEMENT]:
             entry_type = DIDL_ELEM_ITEM
+        else:
+            log_fatal("Unexpected DIDL-Light entry type: %s" % entry_type)
 
         media_entries = media[DIDL_ELEMENT][entry_type]
 
@@ -254,6 +279,7 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
                         break
 
             if not supported_oid:
+                log_info("Unsupported Object ID: %s" % media_content_id)
                 continue
 
             media_content_type = entry[DIDL_ELEM_CLASS]
@@ -359,4 +385,8 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
 
             return play_uri
         else:
+            log_info(
+                "Building of playable URI for media type '%s' not needed or not implemented"
+                % media_type
+            )
             return media_id

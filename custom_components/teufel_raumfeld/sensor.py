@@ -6,12 +6,14 @@ from hassfeld.constants import (
     POWER_STANDBY_MANUAL,
 )
 import hassfeld.upnp
+import voluptuous as vol
 
-from homeassistant.helpers import entity_platform
+from homeassistant.helpers import config_validation as cv, entity_platform
 from homeassistant.helpers.entity import Entity
 
-from . import DOMAIN, log_debug
+from . import DOMAIN, log_debug, log_fatal
 from .const import (
+    ATTR_POWER_STATE,
     DEVICE_CLASS_SPEAKER,
     DOMAIN,
     POWER_ECO,
@@ -94,9 +96,18 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
             "sensor_name": "PowerState",
         }
         log_debug("sensor_config=%s" % sensor_config)
-        devices.append(RaumfeldRoom(sensor_config))
+        devices.append(RaumfeldPowerState(raumfeld, sensor_config))
 
     async_add_devices(devices)
+
+    platform.async_register_entity_service(
+        "set_power_state",
+        vol.All(
+            cv.make_entity_service_schema({vol.Required(ATTR_POWER_STATE): cv.string})
+        ),
+        "set_room_power_state",
+    )
+
     return True
 
 
@@ -210,3 +221,30 @@ class RaumfeldRoom(Entity):
             self._state = state
         if state in STATE_TO_ICON:
             self._icon = STATE_TO_ICON[state]
+
+
+class RaumfeldPowerState(RaumfeldRoom):
+    """Power state sensor of a room."""
+
+    def __init__(self, raumfeld, sensor_config):
+        """Initialize the Raumfeld speaker sensor."""
+        self._raumfeld = raumfeld
+        self._config = sensor_config
+        self._room_name = self._config["room_name"]
+        self._sensor_name = self._config["sensor_name"]
+        self._name = f"{ROOM_PREFIX}{self._room_name} - {self._sensor_name}"
+        self._unique_id = f"{DOMAIN}.{ROOM_PREFIX}{self._room_name}.{self._sensor_name}"
+        self._get_state = self._config["get_state"]
+        self._room_name = self._config["room_name"]
+        self._state = None
+        self._icon = None
+
+    def set_room_power_state(self, power_state):
+        if power_state == POWER_ON:
+            self._raumfeld.leave_standby(self._room_name)
+        elif power_state == POWER_ECO:
+            self._raumfeld.enter_automatic_standby(self._room_name)
+        elif power_state == POWER_STANDBY:
+            self._raumfeld.enter_manual_standby(self._room_name)
+        else:
+            log_fatal("Unexpected power state: {power_state}")
