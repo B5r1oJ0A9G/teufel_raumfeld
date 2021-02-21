@@ -21,7 +21,7 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
 
 
 async def validate_input(hass: core.HomeAssistant, data):
-
+    """Connects to raumfehld host and tested the interface."""
     raumfeld = hassfeld.RaumfeldHost(data["host"], data["port"])
 
     if not await raumfeld.async_host_is_valid():
@@ -32,7 +32,7 @@ async def validate_input(hass: core.HomeAssistant, data):
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-
+    """Config flow to add Raumfeld media players and sensors."""
     VERSION = 1
     # TODO pick one of the available connection classes in homeassistant/config_entries.py
     CONNECTION_CLASS = config_entries.CONN_CLASS_UNKNOWN

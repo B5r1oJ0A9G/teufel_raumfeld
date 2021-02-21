@@ -64,6 +64,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 def log_debug(message):
+    """Logging of debug information."""
     name = inspect.currentframe().f_back.f_code.co_name
     filename = inspect.currentframe().f_back.f_code.co_filename
     basename = os.path.basename(filename)
@@ -71,18 +72,22 @@ def log_debug(message):
 
 
 def log_info(message):
+    """Logging of information."""
     _LOGGER.debug(message)
 
 
 def log_warn(message):
+    """Logging of warnings."""
     _LOGGER.warn(message)
 
 
 def log_error(message):
+    """Logging of errors. E.g. user errors."""
     _LOGGER.error(message)
 
 
 def log_fatal(message):
+    """Logging of fatal errors. E.g. unexpected constellations."""
     name = inspect.currentframe().f_back.f_code.co_name
     filename = inspect.currentframe().f_back.f_code.co_filename
     basename = os.path.basename(filename)
@@ -97,6 +102,7 @@ async def async_setup(hass: HomeAssistant, config: dict):
 
 
 def event_on_update(hass, update_type):
+    """fires events on Raumfeld web service updates."""
     log_info("Update event triggered for type: %s" % update_type)
     if update_type == TRIGGER_UPDATE_HOST_INFO:
         hass.bus.fire(

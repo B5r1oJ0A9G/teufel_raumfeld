@@ -1,3 +1,4 @@
+""The Teufel Raumfeld media_player component."""
 import base64
 import datetime
 import logging

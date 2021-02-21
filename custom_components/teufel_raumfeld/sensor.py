@@ -240,6 +240,7 @@ class RaumfeldPowerState(RaumfeldRoom):
         self._icon = None
 
     def set_room_power_state(self, power_state):
+        """Put a speaker in standby or wake it up."""
         if power_state == POWER_ON:
             self._raumfeld.leave_standby(self._room_name)
         elif power_state == POWER_ECO:
