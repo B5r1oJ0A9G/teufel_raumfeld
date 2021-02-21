@@ -1,1 +1,1 @@
-{"name": "Teufel Raumfeld", "domains": ["media_player"], "iot_class": ["Local Polling"]}
+{"name": "Teufel Raumfeld", "domains": ["media_player", "sensor"], "iot_class": ["Local Polling"]}
