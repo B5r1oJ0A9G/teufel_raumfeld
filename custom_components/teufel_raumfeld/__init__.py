@@ -99,6 +99,76 @@ def timespan_secs(timespan):
     return sum(60 ** x[0] * int(x[1]) for x in enumerate(reversed(timespan.split(":"))))
 
 
+def is_supported_oid(oid):
+    """Returns True, if the passed object ID should be supported."""
+    supported_oid = False
+    if oid not in UNSUPPORTED_OBJECT_IDS:
+        # FIXME: Should be removed in favor of checking for UNSUPPORTED_OBJECT_IDS
+        if oid in SUPPORTED_OBJECT_IDS:
+            supported_oid = True
+        else:
+            for oid_prefix in SUPPORTED_OBJECT_PREFIXES:
+                if oid.startswith(oid_prefix):
+                    supported_oid = True
+                    break
+
+    return supported_oid
+
+
+def mk_play_uri(media_server_udn, media_type, media_id, track_number=0):
+    """Create a valid URI playable by raumfeld media renderer."""
+    if media_type in [
+        UPNP_CLASS_ALBUM,
+        UPNP_CLASS_PLAYLIST_CONTAINER,
+        UPNP_CLASS_PODCAST_EPISODE,
+        UPNP_CLASS_TRACK,
+    ]:
+        play_uri = (
+            "dlna-playcontainer://"
+            + urllib.parse.quote(media_server_udn)
+            + "?sid="
+            + urllib.parse.quote(URN_CONTENT_DIRECTORY)
+            + "&cid="
+        )
+
+        if media_type in [UPNP_CLASS_ALBUM, UPNP_CLASS_PLAYLIST_CONTAINER]:
+            play_uri += urllib.parse.quote(media_id, safe="")
+        elif media_type in [UPNP_CLASS_PODCAST_EPISODE, UPNP_CLASS_TRACK]:
+            container_id = media_id.rsplit("/", 1)[0]
+            play_uri += urllib.parse.quote(container_id, safe="")
+
+        play_uri += "&md=0"
+
+        if media_type in [UPNP_CLASS_TRACK, UPNP_CLASS_PODCAST_EPISODE]:
+            track_number = str(track_number)
+            play_uri += (
+                "&fid=" + urllib.parse.quote(media_id, safe="") + "&fii=" + track_number
+            )
+
+        return play_uri
+    if media_type == UPNP_CLASS_RADIO:
+        play_uri = (
+            "dlna-playsingle://"
+            + urllib.parse.quote(media_server_udn)
+            + "?sid="
+            + urllib.parse.quote(URN_CONTENT_DIRECTORY)
+            + "&iid="
+        )
+
+        play_uri += urllib.parse.quote(media_id, safe="")
+        return play_uri
+    if media_type == UPNP_CLASS_LINE_IN:
+        play_uri = "http://10.0.107.17:8888/stream.flac"
+        return play_uri
+
+    log_info(
+        "Building of playable URI for media type '%s' not needed or not implemented"
+        % media_type
+    )
+
+    return media_id
+
+
 async def async_setup(hass: HomeAssistant, config: dict):
     """Set up the Teufel Raumfeld component."""
     log_warn(MESSAGE_PHASE_ALPHA)
@@ -265,31 +335,22 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
         track_number = 0
         browsable_oid = object_id.split(MEDIA_CONTENT_ID_SEP)[0]
         media_xml = self.browse_media_server(browsable_oid, browse_flag)
+
         media = xmltodict.parse(
             media_xml, force_list=(DIDL_ELEM_CONTAINER, DIDL_ELEM_ITEM)
         )
 
         if DIDL_ELEM_CONTAINER in media[DIDL_ELEMENT]:
             media_entries += media[DIDL_ELEMENT][DIDL_ELEM_CONTAINER]
+
         if DIDL_ELEM_ITEM in media[DIDL_ELEMENT]:
             media_entries += media[DIDL_ELEMENT][DIDL_ELEM_ITEM]
 
         for entry in media_entries:
             can_expand = True
-            supported_oid = False
             media_content_id = entry[DIDL_ATTR_ID]
 
-            if media_content_id not in UNSUPPORTED_OBJECT_IDS:
-                # FIXME: Should be removed in favor of checking for UNSUPPORTED_OBJECT_IDS
-                if media_content_id in SUPPORTED_OBJECT_IDS:
-                    supported_oid = True
-                else:
-                    for oid_prefix in SUPPORTED_OBJECT_PREFIXES:
-                        if media_content_id.startswith(oid_prefix):
-                            supported_oid = True
-                            break
-
-            if not supported_oid:
+            if not is_supported_oid(media_content_id):
                 log_info("Unsupported Object ID: %s" % media_content_id)
                 continue
 
@@ -307,11 +368,15 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
 
             if media_content_type.startswith(UPNP_CLASS_AUDIO_ITEM):
                 can_expand = False
+
             if DIDL_ELEM_ART_URI in entry:
                 thumbnail = entry[DIDL_ELEM_ART_URI][DIDL_VALUE]
 
-            play_uri = self.mk_play_uri(
-                media_content_type, media_content_id, track_number
+            play_uri = mk_play_uri(
+                self.media_server_udn,
+                media_content_type,
+                media_content_id,
+                track_number,
             )
             media_content_id += MEDIA_CONTENT_ID_SEP + play_uri
             track_number += 1
@@ -370,62 +435,3 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
                 ]
 
         return track_info
-
-    def mk_play_uri(self, media_type, media_id, track_number=0):
-        """Create a valid URI playable by raumfeld media renderer."""
-        if media_type in [
-            UPNP_CLASS_ALBUM,
-            UPNP_CLASS_PLAYLIST_CONTAINER,
-            UPNP_CLASS_PODCAST_EPISODE,
-            UPNP_CLASS_TRACK,
-        ]:
-            media_server_udn = self.media_server_udn
-
-            play_uri = (
-                "dlna-playcontainer://"
-                + urllib.parse.quote(media_server_udn)
-                + "?sid="
-                + urllib.parse.quote(URN_CONTENT_DIRECTORY)
-                + "&cid="
-            )
-
-            if media_type in [UPNP_CLASS_ALBUM, UPNP_CLASS_PLAYLIST_CONTAINER]:
-                play_uri += urllib.parse.quote(media_id, safe="")
-            elif media_type in [UPNP_CLASS_PODCAST_EPISODE, UPNP_CLASS_TRACK]:
-                container_id = media_id.rsplit("/", 1)[0]
-                play_uri += urllib.parse.quote(container_id, safe="")
-
-            play_uri += "&md=0"
-
-            if media_type in [UPNP_CLASS_TRACK, UPNP_CLASS_PODCAST_EPISODE]:
-                track_number = str(track_number)
-                play_uri += (
-                    "&fid="
-                    + urllib.parse.quote(media_id, safe="")
-                    + "&fii="
-                    + track_number
-                )
-
-            return play_uri
-        if media_type == UPNP_CLASS_RADIO:
-            media_server_udn = self.media_server_udn
-
-            play_uri = (
-                "dlna-playsingle://"
-                + urllib.parse.quote(media_server_udn)
-                + "?sid="
-                + urllib.parse.quote(URN_CONTENT_DIRECTORY)
-                + "&iid="
-            )
-
-            play_uri += urllib.parse.quote(media_id, safe="")
-            return play_uri
-        if media_type == UPNP_CLASS_LINE_IN:
-            play_uri = "http://10.0.107.17:8888/stream.flac"
-            return play_uri
-        else:
-            log_info(
-                "Building of playable URI for media type '%s' not needed or not implemented"
-                % media_type
-            )
-            return media_id
