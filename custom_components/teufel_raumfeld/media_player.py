@@ -4,7 +4,6 @@ import datetime
 import logging
 import pickle
 
-import hassfeld
 from hassfeld.constants import (
     BROWSE_CHILDREN,
     BROWSE_METADATA,
@@ -18,14 +17,10 @@ from hassfeld.constants import (
     TRANSPORT_STATE_PLAYING,
     TRANSPORT_STATE_STOPPED,
     TRANSPORT_STATE_TRANSITIONING,
-    TRIGGER_UPDATE_DEVICES,
-    TRIGGER_UPDATE_HOST_INFO,
-    TRIGGER_UPDATE_SYSTEM_STATE,
-    TRIGGER_UPDATE_ZONE_CONFIG,
 )
 import voluptuous as vol
 
-from homeassistant.components.media_player import BrowseMedia, MediaPlayerEntity
+from homeassistant.components.media_player import MediaPlayerEntity
 from homeassistant.components.media_player.const import (
     ATTR_MEDIA_VOLUME_LEVEL,
     MEDIA_TYPE_MUSIC,
@@ -49,11 +44,6 @@ from homeassistant.components.media_player.const import (
 )
 from homeassistant.const import STATE_IDLE, STATE_OFF, STATE_PAUSED, STATE_PLAYING
 from homeassistant.helpers import config_validation as cv, entity_platform
-from homeassistant.helpers.entity import Entity
-from homeassistant.helpers.entity_registry import (
-    async_entries_for_config_entry,
-    async_get_registry,
-)
 from homeassistant.util.dt import utcnow
 
 from . import log_debug, log_error, log_fatal, log_info
@@ -641,23 +631,9 @@ class RaumfeldRoom(RaumfeldGroup):
 
     def __init__(self, room, raumfeld):
         """Initialize media player for room."""
+        super().__init__(room, raumfeld)
         self._rooms = [room]
         self._raumfeld = raumfeld
-        self._mute = None
-        self._media_position = None
-        self._media_position_updated_at = None
         self._name = ROOM_PREFIX + repr(self._rooms)
-        self._state = None
-        self._volume_level = None
         self._unique_id = obj_to_uid([room])
         self._icon = "mdi:speaker"
-        self._media_duration = None
-        self._media_image_url = None
-        self._media_title = None
-        self._media_artist = None
-        self._media_album_name = None
-        self._media_album_artist = None
-        self._media_track = None
-        self._shuffle = None
-        self._repeat = None
-        self._play_mode = None
