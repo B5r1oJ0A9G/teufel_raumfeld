@@ -86,10 +86,22 @@ from .const import (
     SERVICE_RESTORE,
     SERVICE_SNAPSHOT,
     UPNP_CLASS_ALBUM,
+    UPNP_CLASS_LINE_IN,
+    UPNP_CLASS_PLAYLIST_CONTAINER,
+    UPNP_CLASS_PODCAST_EPISODE,
+    UPNP_CLASS_RADIO,
     UPNP_CLASS_TRACK,
 )
 
-SUPPORTED_MEDIA_TYPES = [MEDIA_TYPE_MUSIC, UPNP_CLASS_ALBUM, UPNP_CLASS_TRACK]
+SUPPORTED_MEDIA_TYPES = [
+    MEDIA_TYPE_MUSIC,
+    UPNP_CLASS_ALBUM,
+    UPNP_CLASS_TRACK,
+    UPNP_CLASS_RADIO,
+    UPNP_CLASS_PLAYLIST_CONTAINER,
+    UPNP_CLASS_PODCAST_EPISODE,
+    UPNP_CLASS_LINE_IN,
+]
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -379,14 +391,26 @@ class RaumfeldGroup(MediaPlayerEntity):
     def play_media(self, media_type, media_id, **kwargs):
         """Play a piece of media."""
         if self._raumfeld.group_is_valid(self._rooms):
-            if media_type == MEDIA_TYPE_MUSIC:
-                if media_id.startswith("http"):
-                    play_uri = media_id
-            if media_type == UPNP_CLASS_ALBUM or media_type == UPNP_CLASS_TRACK:
-                play_uri = media_id.split(MEDIA_CONTENT_ID_SEP)[1]
             if media_type in SUPPORTED_MEDIA_TYPES:
+                if media_type == MEDIA_TYPE_MUSIC:
+                    if media_id.startswith("http"):
+                        play_uri = media_id
+                    else:
+                        log_error("Unexpected URI for media type: %s" % media_type)
+                elif media_type in [
+                    UPNP_CLASS_ALBUM,
+                    UPNP_CLASS_LINE_IN,
+                    UPNP_CLASS_PLAYLIST_CONTAINER,
+                    UPNP_CLASS_PODCAST_EPISODE,
+                    UPNP_CLASS_RADIO,
+                    UPNP_CLASS_TRACK,
+                ]:
+                    play_uri = media_id.split(MEDIA_CONTENT_ID_SEP)[1]
+                else:
+                    log_error("Unhandled media type: %s" % media_type)
                 if self.state == STATE_OFF:
                     self.turn_on()
+                log_debug("self._rooms=%s, play_uri=%s" % (self._rooms, play_uri))
                 self._raumfeld.set_av_transport_uri(self._rooms, play_uri)
             else:
                 log_error("Playing of media type '%s' not supported" % media_type)

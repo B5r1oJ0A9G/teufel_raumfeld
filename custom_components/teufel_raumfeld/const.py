@@ -36,21 +36,34 @@ ROOM_PREFIX = "Room: "
 SERVICE_GROUP = "group"
 SERVICE_RESTORE = "restore"
 SERVICE_SNAPSHOT = "snapshot"
-SUPPORTED_OBJECT_IDS = ["0", "0/DemoTracks", "0/My Music"]
-SUPPORTED_OBJECT_PREFIXES = [
-    "0/My Music/Artists",
-    "0/My Music/Albums",
-    "0/My Music/Genres",
-    "0/My Music/Composers",
-    "0/My Music/ByFolder",
-    "0/My Music/RecentlyAdded",
-    "0/My Music/AllTracks",
+SUPPORTED_OBJECT_IDS = [
+    "0",
     "0/DemoTracks",
+    "0/Favorites",
+    "0/Line In",
+    "0/My Music",
+    "0/Playlists",
+    "0/Tidal",
+    "0/RadioTime",
 ]
+SUPPORTED_OBJECT_PREFIXES = SUPPORTED_OBJECT_IDS[1:]
 TRACKINF_ALBUM = "album"
 TRACKINF_ARTIST = "artist"
 TRACKINF_IMGURI = "image_uri"
 TRACKINF_TITLE = "title"
+UNSUPPORTED_OBJECT_IDS = [
+    "0/My Music/Search",
+    "0/Playlists/Shuffles",
+    "0/Renderers",
+    "0/Tidal/Search",
+    "0/RadioTime/Search",
+    "0/Zones",
+]
 UPNP_CLASS_ALBUM = "object.container.album.musicAlbum"
 UPNP_CLASS_TRACK = "object.item.audioItem.musicTrack"
+UPNP_CLASS_RADIO = "object.item.audioItem.audioBroadcast.radio"
+UPNP_CLASS_PLAYLIST_CONTAINER = "object.container.playlistContainer"
+UPNP_CLASS_PODCAST_EPISODE = "object.item.audioItem.podcastEpisode"
+UPNP_CLASS_LINE_IN = "object.item.audioItem.audioBroadcast.lineIn"
+UPNP_CLASS_AUDIO_ITEM = "object.item.audioItem"
 URN_CONTENT_DIRECTORY = "urn:upnp-org:serviceId:ContentDirectory"
