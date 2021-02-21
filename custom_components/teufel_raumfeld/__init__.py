@@ -94,9 +94,15 @@ def log_fatal(message):
     _LOGGER.fatal("%s->%s: %s", basename, name, message)
 
 
+def timespan_secs(timespan):
+    """Parse a time-span into number of seconds."""
+    return sum(60 ** x[0] * int(x[1]) for x in enumerate(reversed(timespan.split(":"))))
+
+
 async def async_setup(hass: HomeAssistant, config: dict):
     """Set up the Teufel Raumfeld component."""
     log_warn(MESSAGE_PHASE_ALPHA)
+    log_debug(config)
     hass.data[DOMAIN] = {}
     return True
 
@@ -250,12 +256,6 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
         """Search track and play first hit on speaker group"""
         self.search_and_zone_play(zone_room_lst, search_criteria)
 
-    def _timespan_secs(self, timespan):
-        """Parse a time-span into number of seconds."""
-        return sum(
-            60 ** x[0] * int(x[1]) for x in enumerate(reversed(timespan.split(":")))
-        )
-
     def browse_media(self, object_id=0, browse_flag=None):
         """Browse conent directory and return object as expected by webhook."""
         browse_lst = []
@@ -342,13 +342,9 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
         }
 
         track_info["number"] = position_info[POSINF_ELEM_TRACK]
-        track_info["duration"] = self._timespan_secs(
-            position_info[POSINF_ELEM_DURATION]
-        )
+        track_info["duration"] = timespan_secs(position_info[POSINF_ELEM_DURATION])
         track_info["uri"] = position_info[POSINF_ELEM_URI]
-        track_info["position"] = self._timespan_secs(
-            position_info[POSINF_ELEM_ABS_TIME]
-        )
+        track_info["position"] = timespan_secs(position_info[POSINF_ELEM_ABS_TIME])
 
         if metadata_xml is not None:
             metadata = xmltodict.parse(metadata_xml)
