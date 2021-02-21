@@ -78,7 +78,7 @@ def log_info(message):
 
 def log_warn(message):
     """Logging of warnings."""
-    _LOGGER.warn(message)
+    _LOGGER.warning(message)
 
 
 def log_error(message):
