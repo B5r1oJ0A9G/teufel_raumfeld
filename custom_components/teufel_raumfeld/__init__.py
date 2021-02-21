@@ -288,10 +288,10 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
                 continue
 
             # Workaround: Sometimes XML includes namespaces.
-            if DIDL_VALUE in entry[DIDL_ELEM_TITLE]:
-                title = title = entry[DIDL_ELEM_TITLE][DIDL_VALUE]
+            if entry[DIDL_ELEM_TITLE] and DIDL_VALUE in entry[DIDL_ELEM_TITLE]:
+                title = entry[DIDL_ELEM_TITLE][DIDL_VALUE]
             else:
-                title = title = entry[DIDL_ELEM_TITLE]
+                title = entry[DIDL_ELEM_TITLE]
 
             # Workaround: Sometimes XML includes namespaces.
             if DIDL_VALUE in entry[DIDL_ELEM_CLASS]:
