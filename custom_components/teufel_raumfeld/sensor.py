@@ -11,7 +11,7 @@ import voluptuous as vol
 from homeassistant.helpers import config_validation as cv, entity_platform
 from homeassistant.helpers.entity import Entity
 
-from . import DOMAIN, log_debug, log_fatal
+from . import log_debug, log_fatal
 from .const import (
     ATTR_POWER_STATE,
     DEVICE_CLASS_SPEAKER,
@@ -47,10 +47,6 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     device_udns = raumfeld.get_raumfeld_device_udns()
     log_debug("device_udns=%s" % device_udns)
     room_names = raumfeld.get_rooms()
-    entity_registry = await hass.helpers.entity_registry.async_get_registry()
-    entity_entries = hass.helpers.entity_registry.async_entries_for_config_entry(
-        entity_registry, config_entry.entry_id
-    )
     platform = entity_platform.current_platform.get()
     devices = []
 
@@ -228,16 +224,8 @@ class RaumfeldPowerState(RaumfeldRoom):
 
     def __init__(self, raumfeld, sensor_config):
         """Initialize the Raumfeld speaker sensor."""
+        super().__init__(sensor_config)
         self._raumfeld = raumfeld
-        self._config = sensor_config
-        self._room_name = self._config["room_name"]
-        self._sensor_name = self._config["sensor_name"]
-        self._name = f"{ROOM_PREFIX}{self._room_name} - {self._sensor_name}"
-        self._unique_id = f"{DOMAIN}.{ROOM_PREFIX}{self._room_name}.{self._sensor_name}"
-        self._get_state = self._config["get_state"]
-        self._room_name = self._config["room_name"]
-        self._state = None
-        self._icon = None
 
     def set_room_power_state(self, power_state):
         """Put a speaker in standby or wake it up."""
