@@ -56,25 +56,6 @@ from homeassistant.helpers.entity_registry import (
 )
 from homeassistant.util.dt import utcnow
 
-SUPPORT_RAUMFELD = SUPPORT_PAUSE | SUPPORT_STOP | SUPPORT_PLAY
-
-SUPPORT_RAUMFELD_GROUP = (
-    SUPPORT_PAUSE
-    | SUPPORT_SEEK
-    | SUPPORT_VOLUME_SET
-    | SUPPORT_VOLUME_MUTE
-    | SUPPORT_PREVIOUS_TRACK
-    | SUPPORT_NEXT_TRACK
-    | SUPPORT_PLAY_MEDIA
-    | SUPPORT_VOLUME_STEP
-    | SUPPORT_STOP
-    | SUPPORT_TURN_ON
-    | SUPPORT_PLAY
-    | SUPPORT_SHUFFLE_SET
-    | SUPPORT_BROWSE_MEDIA
-    | SUPPORT_REPEAT_SET
-)
-
 from . import log_debug, log_error, log_fatal, log_info
 from .const import (
     CHANGE_STEP_VOLUME_DOWN,
@@ -94,6 +75,25 @@ from .const import (
     UPNP_CLASS_TRACK,
 )
 
+SUPPORT_RAUMFELD = SUPPORT_PAUSE | SUPPORT_STOP | SUPPORT_PLAY
+
+SUPPORT_RAUMFELD_GROUP = (
+    SUPPORT_PAUSE
+    | SUPPORT_SEEK
+    | SUPPORT_VOLUME_SET
+    | SUPPORT_VOLUME_MUTE
+    | SUPPORT_PREVIOUS_TRACK
+    | SUPPORT_NEXT_TRACK
+    | SUPPORT_PLAY_MEDIA
+    | SUPPORT_VOLUME_STEP
+    | SUPPORT_STOP
+    | SUPPORT_TURN_ON
+    | SUPPORT_PLAY
+    | SUPPORT_SHUFFLE_SET
+    | SUPPORT_BROWSE_MEDIA
+    | SUPPORT_REPEAT_SET
+)
+
 SUPPORTED_MEDIA_TYPES = [
     MEDIA_TYPE_MUSIC,
     UPNP_CLASS_ALBUM,
@@ -107,9 +107,9 @@ SUPPORTED_MEDIA_TYPES = [
 _LOGGER = logging.getLogger(__name__)
 
 
-def obj_to_uid(object):
+def obj_to_uid(obj):
     """Bulid unique id based on object (room list)."""
-    object_ser = pickle.dumps(object)
+    object_ser = pickle.dumps(obj)
     serialised_b64 = base64.encodebytes(object_ser)
     unique_id = serialised_b64.decode()
     return unique_id
@@ -119,8 +119,8 @@ def uid_to_obj(uid):
     """Bulid object (room list) from unique id."""
     serialized_b64 = uid.encode()
     object_ser = base64.decodebytes(serialized_b64)
-    object = pickle.loads(object_ser)
-    return object
+    obj = pickle.loads(object_ser)
+    return obj
 
 
 async def async_setup_entry(hass, config_entry, async_add_devices):
