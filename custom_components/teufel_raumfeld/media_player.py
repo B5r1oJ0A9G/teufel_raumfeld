@@ -521,9 +521,7 @@ class RaumfeldGroup(MediaPlayerEntity):
         )
 
         if children is None:
-            raise BrowseError(
-                f"Media not found: {media_content_type} / {media_content_id}"
-            )
+            log_fatal("No media identified")
 
         metadata.children = children
         return metadata
