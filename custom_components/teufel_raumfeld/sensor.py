@@ -38,7 +38,11 @@ STATE_TO_STATE = {
 def get_update_info_version(location):
     """Wrapper function to return the version of a device"""
     response = hassfeld.upnp.get_update_info(location)
-    return response["Version"]
+    if "Version" in response:
+        version = response["Version"]
+    else:
+        version = None
+    return version
 
 
 async def async_setup_entry(hass, config_entry, async_add_devices):
@@ -77,12 +81,12 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
             "sw_version": sw_version,
         }
         log_debug("sensor_config=%s" % sensor_config)
-        devices.append(RaumfeldSpeaker(sensor_config))
+        devices.append(RaumfeldSpeaker(raumfeld, sensor_config))
 
         sensor_config["sensor_name"] = "UpdateInfoVersion"
         sensor_config["get_state"] = get_update_info_version
         log_debug("sensor_config=%s" % sensor_config)
-        devices.append(RaumfeldSpeaker(sensor_config))
+        devices.append(RaumfeldSpeaker(raumfeld, sensor_config))
 
     for room in room_names:
         sensor_config = {
@@ -110,8 +114,9 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 class RaumfeldSpeaker(Entity):
     """Representation of a Raumfeld speaker."""
 
-    def __init__(self, sensor_config):
+    def __init__(self, raumfeld, sensor_config):
         """Initialize the Raumfeld speaker sensor."""
+        self._raumfeld = raumfeld
         self._config = sensor_config
         self._device_name = self._config["device_name"]
         self._sensor_name = self._config["sensor_name"]
@@ -165,7 +170,10 @@ class RaumfeldSpeaker(Entity):
 
     def update(self):
         """Update sensor."""
-        self._state = self._get_state(self._location)
+        if self._raumfeld.location_is_valid(self._location):
+            self._state = self._get_state(self._location)
+        else:
+            self._state = None
 
 
 class RaumfeldRoom(Entity):

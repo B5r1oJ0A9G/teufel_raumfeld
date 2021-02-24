@@ -520,21 +520,26 @@ class RaumfeldGroup(MediaPlayerEntity):
 
     def update_transport_state(self):
         """Update state of the player."""
-        info = self._raumfeld.get_transport_info(self._rooms)
-        transport_state = info["CurrentTransportState"]
-        if transport_state == TRANSPORT_STATE_STOPPED:
-            self._state = STATE_IDLE
-        elif transport_state == TRANSPORT_STATE_NO_MEDIA:
-            self._state = STATE_IDLE
-        elif transport_state == TRANSPORT_STATE_PLAYING:
-            self._state = STATE_PLAYING
-        elif transport_state == TRANSPORT_STATE_PAUSED:
-            self._state = STATE_PAUSED
-        elif transport_state == TRANSPORT_STATE_TRANSITIONING:
-            pass
+        if self._raumfeld.group_is_valid(self._rooms):
+            info = self._raumfeld.get_transport_info(self._rooms)
+            transport_state = info["CurrentTransportState"]
+            if transport_state == TRANSPORT_STATE_STOPPED:
+                self._state = STATE_IDLE
+            elif transport_state == TRANSPORT_STATE_NO_MEDIA:
+                self._state = STATE_IDLE
+            elif transport_state == TRANSPORT_STATE_PLAYING:
+                self._state = STATE_PLAYING
+            elif transport_state == TRANSPORT_STATE_PAUSED:
+                self._state = STATE_PAUSED
+            elif transport_state == TRANSPORT_STATE_TRANSITIONING:
+                pass
+            else:
+                log_fatal("Unrecognized transport state: %s" % transport_state)
+                self._state = STATE_OFF
         else:
-            log_fatal("Unrecognized transport state: %s" % transport_state)
-            self._state = STATE_OFF
+            log_debug(
+                "Method was called although speaker group '%s' is invalid" % self._rooms
+            )
 
     def update_volume_level(self):
         """Update volume level of the player."""
