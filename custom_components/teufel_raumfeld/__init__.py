@@ -63,6 +63,22 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 
+def set_hassfeld_log_level(raumfeld):
+    """Activates logging of hassfeld, if teufel_raumfeld is set to DEBUG"""
+    current_level = _LOGGER.level
+
+    if current_level == logging.DEBUG:
+        hassfeld_level = logging.DEBUG
+    else:
+        hassfeld_level = logging.CRITICAL
+
+    log_info(
+        "Setting logging level of hassfeld to: %s"
+        % logging.getLevelName(hassfeld_level)
+    )
+    raumfeld.set_logging_level(hassfeld_level)
+
+
 def log_debug(message):
     """Logging of debug information."""
     name = inspect.currentframe().f_back.f_code.co_name
@@ -210,6 +226,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     host = entry.data["host"]
     port = entry.data["port"]
     raumfeld = HassRaumfeldHost(host, port)
+    set_hassfeld_log_level(raumfeld)
     host_is_not_valid = not await raumfeld.async_host_is_valid()
     if host_is_not_valid:
         log_error("Invalid host: %s:%s" % (host, port))
