@@ -33,6 +33,7 @@ async def validate_input(hass: core.HomeAssistant, data):
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Config flow to add Raumfeld media players and sensors."""
+
     VERSION = 1
     # TODO pick one of the available connection classes in homeassistant/config_entries.py
     CONNECTION_CLASS = config_entries.CONN_CLASS_UNKNOWN
