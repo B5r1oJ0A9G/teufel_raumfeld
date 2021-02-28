@@ -154,7 +154,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
             )
 
     async_add_devices(devices)
-    platform.async_register_entity_service(SERVICE_RESTORE, {}, "restore")
+    platform.async_register_entity_service(SERVICE_RESTORE, {}, "async_restore")
     platform.async_register_entity_service(SERVICE_SNAPSHOT, {}, "snapshot")
     platform.async_register_entity_service(
         "abs_volume_set",
@@ -168,7 +168,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
                 }
             )
         ),
-        "set_rooms_volume_level",
+        "async_set_rooms_volume_level",
     )
     return True
 
@@ -305,99 +305,101 @@ class RaumfeldGroup(MediaPlayerEntity):
 
     # MediaPlayer Methods
 
-    def turn_on(self):
+    async def async_turn_on(self):
         """Turn the media player on."""
         if not self._raumfeld.group_is_valid(self._rooms):
-            self._raumfeld.create_group(self._rooms)
-            self.update_transport_state()
+            await self.hass.async_add_executor_job(
+                self._raumfeld.create_group, self._rooms
+            )
+            await self.async_update_transport_state()
         else:
             log_debug(
                 "Method was called although speaker group '%s' is invalid" % self._rooms
             )
 
-    def mute_volume(self, mute):
+    async def async_mute_volume(self, mute):
         """Mute the volume."""
         if self._raumfeld.group_is_valid(self._rooms):
-            self._raumfeld.set_group_mute(self._rooms, mute)
-            self.update_mute()
+            await self._raumfeld.async_set_group_mute(self._rooms, mute)
+            await self.async_update_mute()
         else:
             log_debug(
                 "Method was called although speaker group '%s' is invalid" % self._rooms
             )
 
-    def set_volume_level(self, volume):
+    async def async_set_volume_level(self, volume):
         """Set volume level, range 0..1."""
         if self._raumfeld.group_is_valid(self._rooms):
-            raumfeld_vol = volume * 100
-            self._raumfeld.set_group_volume(self._rooms, raumfeld_vol)
-            self.update_volume_level()
+            raumfeld_vol = int(volume * 100)
+            await self._raumfeld.async_set_group_volume(self._rooms, raumfeld_vol)
+            await self.async_update_volume_level()
         else:
             log_debug(
                 "Method was called although speaker group '%s' is invalid" % self._rooms
             )
 
-    def media_play(self):
+    async def async_media_play(self):
         """Send play command."""
         if self._raumfeld.group_is_valid(self._rooms):
-            self._raumfeld.group_play(self._rooms)
-            self.update_transport_state()
+            await self._raumfeld.async_group_play(self._rooms)
+            await self.async_update_transport_state()
         else:
             log_debug(
                 "Method was called although speaker group '%s' is invalid" % self._rooms
             )
 
-    def media_pause(self):
+    async def async_media_pause(self):
         """Send pause command."""
         if self._raumfeld.group_is_valid(self._rooms):
-            self._raumfeld.group_pause(self._rooms)
-            self.update_transport_state()
+            await self._raumfeld.async_group_pause(self._rooms)
+            await self.async_update_transport_state()
         else:
             log_debug(
                 "Method was called although speaker group '%s' is invalid" % self._rooms
             )
 
-    def media_stop(self):
+    async def async_media_stop(self):
         """Send stop command."""
         if self._raumfeld.group_is_valid(self._rooms):
-            self._raumfeld.group_stop(self._rooms)
-            self.update_transport_state()
+            await self._raumfeld.async_group_stop(self._rooms)
+            await self.async_update_transport_state()
         else:
             log_debug(
                 "Method was called although speaker group '%s' is invalid" % self._rooms
             )
 
-    def media_previous_track(self):
+    async def async_media_previous_track(self):
         """Send previous track command."""
         if self._raumfeld.group_is_valid(self._rooms):
-            self._raumfeld.group_previous_track(self._rooms)
-            self.update_track_info()
+            await self._raumfeld.async_group_previous_track(self._rooms)
+            await self.async_update_track_info()
         else:
             log_debug(
                 "Method was called although speaker group '%s' is invalid" % self._rooms
             )
 
-    def media_next_track(self):
+    async def async_media_next_track(self):
         """Send next track command."""
         if self._raumfeld.group_is_valid(self._rooms):
-            self._raumfeld.group_next_track(self._rooms)
-            self.update_track_info()
+            await self._raumfeld.async_group_next_track(self._rooms)
+            await self.async_update_track_info()
         else:
             log_debug(
                 "Method was called although speaker group '%s' is invalid" % self._rooms
             )
 
-    def media_seek(self, position):
+    async def async_media_seek(self, position):
         """Send seek command."""
         if self._raumfeld.group_is_valid(self._rooms):
             raumfeld_pos = str(datetime.timedelta(seconds=int(position)))
-            self._raumfeld.group_seek(self._rooms, raumfeld_pos)
-            self.update_track_info()
+            await self._raumfeld.async_group_seek(self._rooms, raumfeld_pos)
+            await self.async_update_track_info()
         else:
             log_debug(
                 "Method was called although speaker group '%s' is invalid" % self._rooms
             )
 
-    def play_media(self, media_type, media_id, **kwargs):
+    async def async_play_media(self, media_type, media_id, **kwargs):
         """Play a piece of media."""
         if self._raumfeld.group_is_valid(self._rooms):
             if media_type in SUPPORTED_MEDIA_TYPES:
@@ -418,9 +420,9 @@ class RaumfeldGroup(MediaPlayerEntity):
                 else:
                     log_error("Unhandled media type: %s" % media_type)
                 if self.state == STATE_OFF:
-                    self.turn_on()
+                    await self.async_turn_on()
                 log_debug("self._rooms=%s, play_uri=%s" % (self._rooms, play_uri))
-                self._raumfeld.set_av_transport_uri(self._rooms, play_uri)
+                await self._raumfeld.async_set_av_transport_uri(self._rooms, play_uri)
             else:
                 log_error("Playing of media type '%s' not supported" % media_type)
         else:
@@ -428,64 +430,84 @@ class RaumfeldGroup(MediaPlayerEntity):
                 "Method was called although speaker group '%s' is invalid" % self._rooms
             )
 
-    def set_shuffle(self, shuffle):
+    async def async_set_shuffle(self, shuffle):
         """Enable/disable shuffle mode."""
         if self._raumfeld.group_is_valid(self._rooms):
             if shuffle:
                 if self._repeat != REPEAT_MODE_OFF:
-                    self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_RANDOM)
+                    await self._raumfeld.async_set_play_mode(
+                        self._rooms, PLAY_MODE_RANDOM
+                    )
                 else:
-                    self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_SHUFFLE)
+                    await self._raumfeld.async_set_play_mode(
+                        self._rooms, PLAY_MODE_SHUFFLE
+                    )
             elif self._play_mode == PLAY_MODE_SHUFFLE:
-                self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_NORMAL)
+                await self._raumfeld.async_set_play_mode(self._rooms, PLAY_MODE_NORMAL)
             elif self._play_mode == PLAY_MODE_RANDOM:
-                self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_REPEAT_ALL)
+                await self._raumfeld.async_set_play_mode(
+                    self._rooms, PLAY_MODE_REPEAT_ALL
+                )
             else:
                 log_fatal("Invalid shuffle mode: %s" % shuffle)
-            self.update_play_mode()
+            await self.async_update_play_mode()
         else:
             log_debug(
                 "Method was called although speaker group '%s' is invalid" % self._rooms
             )
 
-    def set_repeat(self, repeat):
+    async def async_set_repeat(self, repeat):
         """Set repeat mode."""
         if self._raumfeld.group_is_valid(self._rooms):
             if repeat == REPEAT_MODE_ALL:
                 if self._shuffle:
-                    self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_RANDOM)
+                    await self._raumfeld.async_set_play_mode(
+                        self._rooms, PLAY_MODE_RANDOM
+                    )
                 else:
-                    self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_REPEAT_ALL)
+                    await self._raumfeld.async_set_play_mode(
+                        self._rooms, PLAY_MODE_REPEAT_ALL
+                    )
             elif repeat == REPEAT_MODE_ONE:
-                self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_REPEAT_ONE)
+                await self._raumfeld.async_set_play_mode(
+                    self._rooms, PLAY_MODE_REPEAT_ONE
+                )
             elif repeat == REPEAT_MODE_OFF:
                 if self._shuffle:
-                    self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_SHUFFLE)
+                    await self._raumfeld.async_set_play_mode(
+                        self._rooms, PLAY_MODE_SHUFFLE
+                    )
                 else:
-                    self._raumfeld.set_play_mode(self._rooms, PLAY_MODE_NORMAL)
+                    await self._raumfeld.async_set_play_mode(
+                        self._rooms, PLAY_MODE_NORMAL
+                    )
             else:
                 log_fatal("Invalid repeate mode: %s" % repeat)
-            self.update_play_mode()
+            await self.async_update_play_mode()
         else:
             log_debug(
                 "Method was called although speaker group '%s' is invalid" % self._rooms
             )
 
-    def volume_up(self):
+    async def async_volume_up(self):
         """Turn volume up for media player."""
         if self._raumfeld.group_is_valid(self._rooms):
-            self._raumfeld.change_group_volume(self._rooms, CHANGE_STEP_VOLUME_UP)
-            self.update_volume_level()
+            await self._raumfeld.async_change_group_volume(
+                self._rooms, CHANGE_STEP_VOLUME_UP
+            )
+            await self.async_update_volume_level()
         else:
             log_debug(
                 "Method was called although speaker group '%s' is invalid" % self._rooms
             )
 
-    def volume_down(self):
+    async def async_volume_down(self):
         """Turn volume down for media player."""
         if self._raumfeld.group_is_valid(self._rooms):
-            self._raumfeld.change_group_volume(self._rooms, CHANGE_STEP_VOLUME_DOWN)
-            self.update_volume_level()
+            await self._raumfeld.async_change_group_volume(
+                self._rooms, CHANGE_STEP_VOLUME_DOWN
+            )
+            await self.async_update_volume_level()
         else:
             log_debug(
                 "Method was called although speaker group '%s' is invalid" % self._rooms
@@ -518,10 +540,10 @@ class RaumfeldGroup(MediaPlayerEntity):
 
     # MediaPlayer update methods
 
-    def update_transport_state(self):
+    async def async_update_transport_state(self):
         """Update state of the player."""
         if self._raumfeld.group_is_valid(self._rooms):
-            info = self._raumfeld.get_transport_info(self._rooms)
+            info = await self._raumfeld.async_get_transport_info(self._rooms)
             transport_state = info["CurrentTransportState"]
             if transport_state == TRANSPORT_STATE_STOPPED:
                 self._state = STATE_IDLE
@@ -541,17 +563,21 @@ class RaumfeldGroup(MediaPlayerEntity):
                 "Method was called although speaker group '%s' is invalid" % self._rooms
             )
 
-    def update_volume_level(self):
+    async def async_update_volume_level(self):
         """Update volume level of the player."""
-        self._volume_level = self._raumfeld.get_group_volume(self._rooms) / 100
+        self._volume_level = (
+            await self._raumfeld.async_get_group_volume(self._rooms) / 100
+        )
 
-    def update_mute(self):
+    async def async_update_mute(self):
         """Update mute status of the player."""
-        self._mute = self._raumfeld.get_group_mute(self._rooms)
+        self._mute = await self._raumfeld.async_get_group_mute(self._rooms)
 
-    def update_track_info(self):
+    async def async_update_track_info(self):
         """Update media information of the player."""
-        track_info = self._raumfeld.get_track_info(self._rooms)
+        track_info = await self.hass.async_add_executor_job(
+            self._raumfeld.get_track_info, self._rooms
+        )
         self._media_duration = track_info["duration"]
         self._media_image_url = track_info["image_uri"]
         self._media_title = track_info["title"]
@@ -562,9 +588,9 @@ class RaumfeldGroup(MediaPlayerEntity):
         self._media_position = track_info["position"]
         self._media_position_updated_at = utcnow()
 
-    def update_play_mode(self):
+    async def async_update_play_mode(self):
         """Update play mode of the player."""
-        play_mode = self._raumfeld.get_play_mode(self._rooms)
+        play_mode = await self._raumfeld.async_get_play_mode(self._rooms)
         self._play_mode = play_mode
         if play_mode == PLAY_MODE_NORMAL:
             self._shuffle = False
@@ -584,18 +610,18 @@ class RaumfeldGroup(MediaPlayerEntity):
         else:
             log_fatal("Unrecognized play mode: %s" % play_mode)
 
-    def update_all(self):
+    async def async_update_all(self):
         """Run all state update methods of the player."""
-        self.update_transport_state()
-        self.update_volume_level()
-        self.update_mute()
-        self.update_track_info()
-        self.update_play_mode()
+        await self.async_update_transport_state()
+        await self.async_update_volume_level()
+        await self.async_update_mute()
+        await self.async_update_track_info()
+        await self.async_update_play_mode()
 
-    def update(self):
+    async def async_update(self):
         """Update entity"""
         if self._raumfeld.group_is_valid(self._rooms):
-            self.update_all()
+            await self.async_update_all()
         else:
             self._state = STATE_OFF
 
@@ -610,21 +636,23 @@ class RaumfeldGroup(MediaPlayerEntity):
                 "Method was called although speaker group '%s' is invalid" % self._rooms
             )
 
-    def restore(self):
+    async def async_restore(self):
         """Restore previously saved media and position of the player."""
         if self._raumfeld.group_is_valid(self._rooms):
-            self._raumfeld.restore_group(self._rooms)
+            await self._raumfeld.async_restore_group(self._rooms)
         else:
             log_debug(
                 "Method was called although speaker group '%s' is invalid" % self._rooms
             )
 
-    def set_rooms_volume_level(self, volume_level, rooms=None):
+    async def async_set_rooms_volume_level(self, volume_level, rooms=None):
         """Set volume level, range 0..1."""
         if self._raumfeld.group_is_valid(self._rooms):
-            raumfeld_vol = volume_level * 100
-            self._raumfeld.set_group_room_volume(self._rooms, raumfeld_vol, rooms)
-            self.update_volume_level()
+            raumfeld_vol = int(volume_level * 100)
+            await self._raumfeld.async_set_group_room_volume(
+                self._rooms, raumfeld_vol, rooms
+            )
+            await self.async_update_volume_level()
         else:
             log_debug(
                 "Method was called although speaker group '%s' is invalid" % self._rooms

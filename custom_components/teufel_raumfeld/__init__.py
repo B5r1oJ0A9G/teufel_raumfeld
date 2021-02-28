@@ -283,65 +283,65 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
         """Create a speaker group with rooms passed."""
         self.create_zone(room_lst)
 
-    def set_group_mute(self, room_lst, mute):
+    async def async_set_group_mute(self, room_lst, mute):
         """Create a speaker group with rooms passed."""
-        self.set_zone_mute(room_lst, mute)
+        await self.async_set_zone_mute(room_lst, mute)
 
-    def set_group_volume(self, room_lst, raumfeld_vol):
+    async def async_set_group_volume(self, room_lst, raumfeld_vol):
         """Mute the speaker group corresponding to passed rooms."""
-        self.set_zone_volume(room_lst, raumfeld_vol)
+        await self.async_set_zone_volume(room_lst, raumfeld_vol)
 
-    def set_group_room_volume(self, room_lst, raumfeld_vol, rooms=None):
+    async def async_set_group_room_volume(self, room_lst, raumfeld_vol, rooms=None):
         """Set volume of all rooms in a speaker group."""
-        self.set_zone_room_volume(room_lst, raumfeld_vol, rooms)
+        await self.async_set_zone_room_volume(room_lst, raumfeld_vol, rooms)
 
-    def group_play(self, room_lst):
+    async def async_group_play(self, room_lst):
         """Play media of speaker group corresponding to passed rooms."""
-        self.zone_play(room_lst)
+        await self.async_zone_play(room_lst)
 
-    def group_pause(self, room_lst):
+    async def async_group_pause(self, room_lst):
         """Pause media of speaker group corresponding to passed rooms."""
-        self.zone_pause(room_lst)
+        await self.async_zone_pause(room_lst)
 
-    def group_stop(self, room_lst):
+    async def async_group_stop(self, room_lst):
         """Stop media of speaker group corresponding to passed rooms."""
-        self.zone_stop(room_lst)
+        await self.async_zone_stop(room_lst)
 
-    def group_previous_track(self, room_lst):
+    async def async_group_previous_track(self, room_lst):
         """Jump to previous track on speaker group corresp. to passed rooms."""
-        self.zone_previous_track(room_lst)
+        await self.async_zone_previous_track(room_lst)
 
-    def group_next_track(self, room_lst):
+    async def async_group_next_track(self, room_lst):
         """Jump to next track on speaker group corresp. to passed rooms."""
-        self.zone_next_track(room_lst)
+        await self.async_zone_next_track(room_lst)
 
-    def group_seek(self, room_lst, position):
+    async def async_group_seek(self, room_lst, position):
         """Seek to position on speaker group corresp. to passed rooms."""
-        self.zone_seek(room_lst, position)
+        await self.async_zone_seek(room_lst, position)
 
-    def change_group_volume(self, room_lst, volume):
+    async def async_change_group_volume(self, room_lst, volume):
         """Change volume on speaker group corresp. to passed rooms."""
-        self.change_zone_volume(room_lst, volume)
+        await self.async_change_zone_volume(room_lst, volume)
 
-    def get_group_volume(self, room_lst):
+    async def async_get_group_volume(self, room_lst):
         """Return volume [0-100] of speaker group corresp. to passed rooms."""
-        return self.get_zone_volume(room_lst)
+        return await self.async_get_zone_volume(room_lst)
 
-    def get_group_mute(self, room_lst):
+    async def async_get_group_mute(self, room_lst):
         """Return bool mute status of speaker group corresp. to passed rooms."""
-        return self.get_zone_mute(room_lst)
+        return await self.async_get_zone_mute(room_lst)
 
     def save_group(self, room_lst):
         """Save media and position of speaker group corresp. to passed rooms."""
         self.save_zone(room_lst)
 
-    def restore_group(self, room_lst):
+    async def async_restore_group(self, room_lst):
         """Restore media and position of speaker group corresp. to passed rooms."""
-        self.restore_zone(room_lst)
+        await self.async_restore_zone(room_lst)
 
-    def search_and_group_play(self, zone_room_lst, search_criteria):
+    async def async_search_and_group_play(self, zone_room_lst, search_criteria):
         """Search track and play first hit on speaker group"""
-        self.search_and_zone_play(zone_room_lst, search_criteria)
+        await self.async_search_and_zone_play(zone_room_lst, search_criteria)
 
     def browse_media(self, object_id=0, browse_flag=None):
         """Browse conent directory and return object as expected by webhook."""
