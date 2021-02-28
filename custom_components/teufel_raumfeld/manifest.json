@@ -1,7 +1,7 @@
 {
     "domain": "teufel_raumfeld",
     "name": "Teufel Raumfeld",
-    "version": "0.1.0-alpha",
+    "version": "0.1.1-alpha",
     "config_flow": true,
     "documentation": "https://www.home-assistant.io/integrations/teufel_raumfeld",
     "issue_tracker": "https://github.com/B5r1oJ0A9G/teufel_raumfeld/issues",
