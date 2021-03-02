@@ -198,6 +198,7 @@ class RaumfeldGroup(MediaPlayerEntity):
         self._shuffle = None
         self._repeat = None
         self._play_mode = None
+        self._is_spotify_sroom = None
 
     # Entity Properties
 
@@ -343,9 +344,12 @@ class RaumfeldGroup(MediaPlayerEntity):
         if self._raumfeld.group_is_valid(self._rooms):
             await self._raumfeld.async_group_play(self._rooms)
             await self.async_update_transport_state()
+        elif self._is_spotify_sroom:
+            await self._raumfeld.async_room_play(self._room)
+            await self.async_update_transport_state()
         else:
             log_debug(
-                "Method was called although speaker group '%s' is invalid" % self._rooms
+                "Method was called although speaker (group) '%s' is invalid" % self._rooms
             )
 
     async def async_media_pause(self):
@@ -353,9 +357,12 @@ class RaumfeldGroup(MediaPlayerEntity):
         if self._raumfeld.group_is_valid(self._rooms):
             await self._raumfeld.async_group_pause(self._rooms)
             await self.async_update_transport_state()
+        elif self._is_spotify_sroom:
+            await self._raumfeld.async_room_pause(self._rooms)
+            await self.async_update_transport_state()
         else:
             log_debug(
-                "Method was called although speaker group '%s' is invalid" % self._rooms
+                "Method was called although speaker (group) '%s' is invalid" % self._rooms
             )
 
     async def async_media_stop(self):
@@ -542,8 +549,14 @@ class RaumfeldGroup(MediaPlayerEntity):
 
     async def async_update_transport_state(self):
         """Update state of the player."""
+        info = None
+
         if self._raumfeld.group_is_valid(self._rooms):
             info = await self._raumfeld.async_get_transport_info(self._rooms)
+        elif self._is_spotify_sroom:
+            info = await self._raumfeld.async_get_room_transport_info(self._rooms)
+
+        if info:
             transport_state = info["CurrentTransportState"]
             if transport_state == TRANSPORT_STATE_STOPPED:
                 self._state = STATE_IDLE
@@ -680,24 +693,6 @@ class RaumfeldRoom(RaumfeldGroup):
             return SUPPORT_RAUMFELD_SPOTIFY
         else:
             return super().supported_features
-
-    async def async_media_play(self):
-        """Send play command."""
-        if self._is_spotify_sroom:
-            await self._raumfeld.async_room_play(self._room)
-            await self.async_update_transport_state()
-            self._state = STATE_PLAYING
-        else:
-            return await super().async_media_play()
-
-    async def async_media_pause(self):
-        """Send pause command."""
-        if self._is_spotify_sroom:
-            await self._raumfeld.async_room_pause(self._room)
-            await self.async_update_transport_state()
-            self._state = STATE_PAUSED
-        else:
-            return await super().async_media_pause()
 
     async def async_update(self):
         """Update entity"""
