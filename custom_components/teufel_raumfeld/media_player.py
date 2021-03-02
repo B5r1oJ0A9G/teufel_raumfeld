@@ -65,7 +65,7 @@ from .const import (
     UPNP_CLASS_TRACK,
 )
 
-SUPPORT_RAUMFELD = SUPPORT_PAUSE | SUPPORT_STOP | SUPPORT_PLAY
+SUPPORT_RAUMFELD_SPOTIFY = SUPPORT_PAUSE | SUPPORT_STOP | SUPPORT_PLAY
 
 SUPPORT_RAUMFELD_GROUP = (
     SUPPORT_PAUSE
@@ -666,7 +666,46 @@ class RaumfeldRoom(RaumfeldGroup):
         """Initialize media player for room."""
         super().__init__(room, raumfeld)
         self._rooms = [room]
+        self._room = room
         self._raumfeld = raumfeld
         self._name = ROOM_PREFIX + repr(self._rooms)
         self._unique_id = obj_to_uid([room])
         self._icon = "mdi:speaker"
+        self._is_spotify_sroom = False
+
+    @property
+    def supported_features(self):
+        """Flag media player features that are supported."""
+        if self._is_spotify_sroom:
+            return SUPPORT_RAUMFELD_SPOTIFY
+        else:
+            return super().supported_features
+
+    async def async_media_play(self):
+        """Send play command."""
+        if self._is_spotify_sroom:
+            await self._raumfeld.async_room_play(self._room)
+            await self.async_update_transport_state()
+            self._state = STATE_PLAYING
+        else:
+            return await super().async_media_play()
+
+    async def async_media_pause(self):
+        """Send pause command."""
+        if self._is_spotify_sroom:
+            await self._raumfeld.async_room_pause(self._room)
+            await self.async_update_transport_state()
+            self._state = STATE_PAUSED
+        else:
+            return await super().async_media_pause()
+
+    async def async_update(self):
+        """Update entity"""
+        if self._raumfeld.group_is_valid(self._rooms):
+            await super().async_update_all()
+        elif self._raumfeld.room_is_spotify_single_room(self._room):
+            self._is_spotify_sroom = True
+            self._state = STATE_IDLE
+        else:
+            self._is_spotify_sroom = False
+            self._state = STATE_OFF
