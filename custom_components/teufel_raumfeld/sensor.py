@@ -5,8 +5,10 @@ from hassfeld.constants import (
     POWER_STANDBY_AUTOMATIC,
     POWER_STANDBY_MANUAL,
 )
-import hassfeld.upnp
+import hassfeld.aioupnp
 import voluptuous as vol
+import asyncio
+import inspect
 
 from homeassistant.helpers import config_validation as cv, entity_platform
 from homeassistant.helpers.entity import Entity
@@ -35,9 +37,9 @@ STATE_TO_STATE = {
 }
 
 
-def get_update_info_version(location):
+async def async_get_update_info_version(location):
     """Wrapper function to return the version of a device"""
-    response = hassfeld.upnp.get_update_info(location)
+    response = await hassfeld.aioupnp.async_get_update_info(location)
     if "Version" in response:
         version = response["Version"]
     else:
@@ -56,23 +58,15 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 
     for udn in device_udns:
         device_location = raumfeld.device_udn_to_location(udn)
-        renderer_udn = await hass.async_add_executor_job(
-            hassfeld.upnp.get_device, device_location, "renderer"
-        )
+        renderer_udn = await hassfeld.aioupnp.async_get_device(device_location, "renderer")
         device_name = raumfeld.device_udn_to_name(renderer_udn)
-        sw_version = await hass.async_add_executor_job(
-            hassfeld.upnp.get_info, device_location
-        )
-        manufacturer = await hass.async_add_executor_job(
-            hassfeld.upnp.get_manufacturer, device_location
-        )
-        model = await hass.async_add_executor_job(
-            hassfeld.upnp.get_model_name, device_location
-        )
+        sw_version = await hassfeld.aioupnp.async_get_info(device_location)
+        manufacturer = await hassfeld.aioupnp.async_get_manufacturer(device_location)
+        model = await hassfeld.aioupnp.async_get_model_name(device_location)
 
         sensor_config = {
             "device_name": device_name,
-            "get_state": hassfeld.upnp.get_info,
+            "get_state": hassfeld.aioupnp.async_get_info,
             "identifier": device_name,
             "location": device_location,
             "manufacturer": manufacturer,
@@ -84,7 +78,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
         devices.append(RaumfeldSpeaker(raumfeld, sensor_config))
 
         sensor_config["sensor_name"] = "UpdateInfoVersion"
-        sensor_config["get_state"] = get_update_info_version
+        sensor_config["get_state"] = async_get_update_info_version
         log_debug("sensor_config=%s" % sensor_config)
         devices.append(RaumfeldSpeaker(raumfeld, sensor_config))
 
@@ -168,10 +162,10 @@ class RaumfeldSpeaker(Entity):
         """Return a unique ID."""
         return self._unique_id
 
-    def update(self):
+    async def async_update(self):
         """Update sensor."""
         if self._raumfeld.location_is_valid(self._location):
-            self._state = self._get_state(self._location)
+            self._state = await self._get_state(self._location)
         else:
             self._state = None
 
@@ -216,9 +210,13 @@ class RaumfeldRoom(Entity):
         """Return a unique ID."""
         return self._unique_id
 
-    def update(self):
+    async def async_update(self):
         """Update sensor."""
-        state = self._get_state(self._room_name)
+        if inspect.iscoroutinefunction(self._get_state):
+            state = await self._get_state(self._room_name)
+        else:
+            state = self._get_state(self._room_name)
+
         if state in STATE_TO_STATE:
             self._state = STATE_TO_STATE[state]
         else:
