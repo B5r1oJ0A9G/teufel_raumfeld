@@ -401,7 +401,7 @@ class RaumfeldGroup(MediaPlayerEntity):
 
     async def async_play_media(self, media_type, media_id, **kwargs):
         """Play a piece of media."""
-        if self._raumfeld.group_is_valid(self._rooms):
+        if self._raumfeld.rooms_are_valid(self._rooms):
             if media_type in SUPPORTED_MEDIA_TYPES:
                 if media_type == MEDIA_TYPE_MUSIC:
                     if media_id.startswith("http"):
