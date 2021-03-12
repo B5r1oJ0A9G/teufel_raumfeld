@@ -416,7 +416,10 @@ class RaumfeldGroup(MediaPlayerEntity):
                     UPNP_CLASS_RADIO,
                     UPNP_CLASS_TRACK,
                 ]:
-                    play_uri = media_id.split(MEDIA_CONTENT_ID_SEP)[1]
+                    if MEDIA_CONTENT_ID_SEP in media_id:
+                        play_uri = media_id.split(MEDIA_CONTENT_ID_SEP)[1]
+                    else:
+                        play_uri = media_id
                 else:
                     log_error("Unhandled media type: %s" % media_type)
                 if self.state == STATE_OFF:
