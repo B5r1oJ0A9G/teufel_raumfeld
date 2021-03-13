@@ -5,7 +5,7 @@
     "config_flow": true,
     "documentation": "https://www.home-assistant.io/integrations/teufel_raumfeld",
     "issue_tracker": "https://github.com/B5r1oJ0A9G/teufel_raumfeld/issues",
-    "requirements": ["hassfeld==0.3.2-alpha1"],
+    "requirements": ["hassfeld==0.3.2-alpha2"],
     "dependencies": [],
     "codeowners": ["@B5r1oJ0A9G"]
 }
