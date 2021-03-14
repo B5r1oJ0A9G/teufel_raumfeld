@@ -350,7 +350,7 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
 
         return media_id
 
-    def browse_media(self, object_id=0, browse_flag=None):
+    async def async_browse_media(self, object_id=0, browse_flag=None):
         """Browse conent directory and return object as expected by webhook."""
         browse_lst = []
         media_entries = []
@@ -358,7 +358,7 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
         thumbnail = None
         track_number = 0
         browsable_oid = object_id.split(MEDIA_CONTENT_ID_SEP)[0]
-        media_xml = self.browse_media_server(browsable_oid, browse_flag)
+        media_xml = await self.async_browse_media_server(browsable_oid, browse_flag)
 
         media = xmltodict.parse(
             media_xml, force_list=(DIDL_ELEM_CONTAINER, DIDL_ELEM_ITEM)
@@ -418,9 +418,9 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
             )
         return browse_lst
 
-    def get_track_info(self, zone_room_lst):
+    async def async_get_track_info(self, zone_room_lst):
         """Return data to update media information."""
-        position_info = self.get_position_info(zone_room_lst)
+        position_info = await self.async_get_position_info(zone_room_lst)
         metadata_xml = position_info[POSINF_ELEM_TRACK_DATA]
 
         track_info = {

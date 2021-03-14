@@ -526,14 +526,10 @@ class RaumfeldGroup(MediaPlayerEntity):
         else:
             object_id = media_content_id
 
-        metadata = await self.hass.async_add_executor_job(
-            self._raumfeld.browse_media, object_id, BROWSE_METADATA
-        )
+        metadata = await self._raumfeld.async_browse_media(object_id, BROWSE_METADATA)
         metadata = metadata[0]
 
-        children = await self.hass.async_add_executor_job(
-            self._raumfeld.browse_media, object_id, BROWSE_CHILDREN
-        )
+        children = await self._raumfeld.async_browse_media(object_id, BROWSE_CHILDREN)
 
         if children is None:
             log_fatal("No media identified")
@@ -578,9 +574,7 @@ class RaumfeldGroup(MediaPlayerEntity):
 
     async def async_update_track_info(self):
         """Update media information of the player."""
-        track_info = await self.hass.async_add_executor_job(
-            self._raumfeld.get_track_info, self._rooms
-        )
+        track_info = await self._raumfeld.async_get_track_info(self._rooms)
         self._media_duration = track_info["duration"]
         self._media_image_url = track_info["image_uri"]
         self._media_title = track_info["title"]
