@@ -60,6 +60,7 @@ from .const import (
     UPNP_CLASS_TRACK,
     URN_CONTENT_DIRECTORY,
 )
+from .requirements import async_process_requirements
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -195,6 +196,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         raumfeld.create_group(room_lst)
 
     hass.services.async_register(DOMAIN, SERVICE_GROUP, handle_group)
+
+
+    # FIXME: To be disabled, if no longer needed
+    if "enforce_req" in entry.data:
+        enforce_requirements = entry.data["enforce_req"]
+        if enforce_requirements:
+            log_warn("Enforced requirements only take effect the next time Home Assistant started")
+            await asyncio.sleep(5)
+            await async_process_requirements(hass)
 
     return True
 

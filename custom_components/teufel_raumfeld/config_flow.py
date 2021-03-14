@@ -16,6 +16,7 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
     {
         vol.Required("host", default=DEFAULT_HOST_WEBSERVICE): str,
         vol.Required("port", default=DEFAULT_PORT_WEBSERVICE): str,
+        vol.Required("enforce_req", default=False): bool,
     }
 )
 

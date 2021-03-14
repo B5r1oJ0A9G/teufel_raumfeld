@@ -19,6 +19,7 @@ DIDL_ELEM_ALBUM = "upnp:album"
 DIDL_ELEMENT = "DIDL-Lite"
 DIDL_VALUE = "#text"
 DOMAIN = "teufel_raumfeld"
+ENFORCED_REQUIREMENTS = ["async-upnp-client==0.15.0"]
 EVENT_WEBSERVICE_UPDATE = "teufel_raumfeld.webservice_update"
 GROUP_PREFIX = "Group: "
 MEDIA_CONTENT_ID_SEP = "[:sep:]"
