@@ -379,10 +379,15 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
                 continue
 
             # Workaround: Sometimes XML includes namespaces.
-            if entry[DIDL_ELEM_TITLE] and DIDL_VALUE in entry[DIDL_ELEM_TITLE]:
-                title = entry[DIDL_ELEM_TITLE][DIDL_VALUE]
+            if DIDL_ELEM_TITLE in entry:
+                if DIDL_VALUE in entry[DIDL_ELEM_TITLE]:
+                    title = entry[DIDL_ELEM_TITLE][DIDL_VALUE]
+                else:
+                    title = entry[DIDL_ELEM_TITLE]
             else:
-                title = entry[DIDL_ELEM_TITLE]
+                #FIXME: add a constant
+                log_warn("Media with id '%s' is lacking a title." % media_content_id)
+                title = "Unknown title"
 
             # Workaround: Sometimes XML includes namespaces.
             if DIDL_VALUE in entry[DIDL_ELEM_CLASS]:
