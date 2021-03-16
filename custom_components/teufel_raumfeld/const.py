@@ -23,6 +23,7 @@ EVENT_WEBSERVICE_UPDATE = "teufel_raumfeld.webservice_update"
 GROUP_PREFIX = "Group: "
 MEDIA_CONTENT_ID_SEP = "[:sep:]"
 MESSAGE_PHASE_ALPHA = "You are using teufel_raumfeld, which is still in alpha phase and therefore subject to change. This includes, among other things, the addition, redesign or removal of functionality."
+OBJECT_ID_LINE_IN = "0/Line In"
 PLATFORMS = ["media_player", "sensor"]
 PORT_LINE_IN = 8888
 POSINF_ELEM_ABS_TIME = "AbsTime"

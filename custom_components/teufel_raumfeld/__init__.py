@@ -36,6 +36,7 @@ from .const import (
     EVENT_WEBSERVICE_UPDATE,
     MEDIA_CONTENT_ID_SEP,
     MESSAGE_PHASE_ALPHA,
+    OBJECT_ID_LINE_IN,
     PLATFORMS,
     PORT_LINE_IN,
     POSINF_ELEM_ABS_TIME,
@@ -335,13 +336,21 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
 
             play_uri += urllib.parse.quote(media_id, safe="")
             return play_uri
+
         if media_type == UPNP_CLASS_LINE_IN:
-            udn_quoted = media_id.rsplit("/", 1)[1]
-            device_udn = urllib.parse.unquote(udn_quoted)
-            location = self.device_udn_to_location(device_udn)
-            uri_prefix = location.rsplit(":", 1)[0]
-            play_uri = f"{uri_prefix}:{PORT_LINE_IN}/stream.flac"
-            return play_uri
+            if media_id.startswith(OBJECT_ID_LINE_IN):
+                udn_quoted = media_id.rsplit("/", 1)[1]
+                device_udn = urllib.parse.unquote(udn_quoted)
+                location = self.device_udn_to_location(device_udn)
+                uri_prefix = location.rsplit(":", 1)[0]
+                play_uri = f"{uri_prefix}:{PORT_LINE_IN}/stream.flac"
+                return play_uri
+            else:
+                log_error(
+                    "Passed media_id '%s' does not appear appropriate for media_type '%s'"
+                    % (media_id, media_type)
+                )
+                return None
 
         log_info(
             "Building of playable URI for media type '%s' not needed or not implemented"
@@ -385,7 +394,7 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
                 else:
                     title = entry[DIDL_ELEM_TITLE]
             else:
-                #FIXME: add a constant
+                # FIXME: add a constant
                 log_warn("Media with id '%s' is lacking a title." % media_content_id)
                 title = "Unknown title"
 
@@ -407,7 +416,10 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
                 media_content_id,
                 track_number,
             )
-            media_content_id += MEDIA_CONTENT_ID_SEP + play_uri
+
+            if play_uri:
+                media_content_id += MEDIA_CONTENT_ID_SEP + play_uri
+
             track_number += 1
 
             browse_lst.append(

@@ -1,14 +1,15 @@
 """Platform for sensor integration."""
 
+import asyncio
+import inspect
+
+import hassfeld.aioupnp
 from hassfeld.constants import (
     POWER_ACTIVE,
     POWER_STANDBY_AUTOMATIC,
     POWER_STANDBY_MANUAL,
 )
-import hassfeld.aioupnp
 import voluptuous as vol
-import asyncio
-import inspect
 
 from homeassistant.helpers import config_validation as cv, entity_platform
 from homeassistant.helpers.entity import Entity
@@ -58,7 +59,9 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 
     for udn in device_udns:
         device_location = raumfeld.device_udn_to_location(udn)
-        renderer_udn = await hassfeld.aioupnp.async_get_device(device_location, "renderer")
+        renderer_udn = await hassfeld.aioupnp.async_get_device(
+            device_location, "renderer"
+        )
         device_name = raumfeld.device_udn_to_name(renderer_udn)
         sw_version = await hassfeld.aioupnp.async_get_info(device_location)
         manufacturer = await hassfeld.aioupnp.async_get_manufacturer(device_location)
