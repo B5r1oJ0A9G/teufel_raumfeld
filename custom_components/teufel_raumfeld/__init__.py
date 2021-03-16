@@ -47,6 +47,7 @@ from .const import (
     SERVICE_GROUP,
     SUPPORTED_OBJECT_IDS,
     SUPPORTED_OBJECT_PREFIXES,
+    TITLE_UNKNOWN,
     TRACKINF_ALBUM,
     TRACKINF_ARTIST,
     TRACKINF_IMGURI,
@@ -394,9 +395,8 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
                 else:
                     title = entry[DIDL_ELEM_TITLE]
             else:
-                # FIXME: add a constant
-                log_warn("Media with id '%s' is lacking a title." % media_content_id)
-                title = "Unknown title"
+                log_warn("Media with id '%s' is lacking a title" % media_content_id)
+                title = TITLE_UNKNOWN
 
             # Workaround: Sometimes XML includes namespaces.
             if DIDL_VALUE in entry[DIDL_ELEM_CLASS]:

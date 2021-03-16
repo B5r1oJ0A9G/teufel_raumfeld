@@ -49,6 +49,7 @@ SUPPORTED_OBJECT_IDS = [
     "0/RadioTime",
 ]
 SUPPORTED_OBJECT_PREFIXES = SUPPORTED_OBJECT_IDS[1:]
+TITLE_UNKNOWN = "Unkown title (Teufel Raumfeld)"
 TRACKINF_ALBUM = "album"
 TRACKINF_ARTIST = "artist"
 TRACKINF_IMGURI = "image_uri"
