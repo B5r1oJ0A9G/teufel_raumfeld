@@ -720,3 +720,7 @@ class RaumfeldRoom(RaumfeldGroup):
             await super().async_update_all()
         elif self._raumfeld.room_is_spotify_single_room(self._room):
             self._is_spotify_sroom = True
+            await super().async_update_transport_state()
+        else:
+            self._is_spotify_sroom = False
+            self._state = STATE_OFF
