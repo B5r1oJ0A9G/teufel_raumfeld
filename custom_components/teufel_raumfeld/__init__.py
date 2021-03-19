@@ -280,9 +280,9 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
         """Return bool mute status of speaker group corresp. to passed rooms."""
         return await self.async_get_zone_mute(room_lst)
 
-    def save_group(self, room_lst):
+    async def async_save_group(self, room_lst):
         """Save media and position of speaker group corresp. to passed rooms."""
-        self.save_zone(room_lst)
+        await self.async_save_zone(room_lst)
 
     async def async_restore_group(self, room_lst):
         """Restore media and position of speaker group corresp. to passed rooms."""

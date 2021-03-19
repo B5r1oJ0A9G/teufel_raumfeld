@@ -158,7 +158,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 
     async_add_devices(devices)
     platform.async_register_entity_service(SERVICE_RESTORE, {}, "async_restore")
-    platform.async_register_entity_service(SERVICE_SNAPSHOT, {}, "snapshot")
+    platform.async_register_entity_service(SERVICE_SNAPSHOT, {}, "async_snapshot")
     platform.async_register_entity_service(
         "abs_volume_set",
         vol.All(
@@ -640,10 +640,10 @@ class RaumfeldGroup(MediaPlayerEntity):
 
     # MediaPlayer service methods
 
-    def snapshot(self):
+    async def async_snapshot(self):
         """Save the current media and position of the player."""
         if self._raumfeld.group_is_valid(self._rooms):
-            self._raumfeld.save_group(self._rooms)
+            await self._raumfeld.async_save_group(self._rooms)
         else:
             log_debug(
                 "Method was called although speaker group '%s' is invalid" % self._rooms
