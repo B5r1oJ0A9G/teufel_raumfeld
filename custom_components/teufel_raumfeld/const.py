@@ -36,6 +36,7 @@ POWER_ON = "on"
 POWER_STANDBY = "off"
 ROOM_PREFIX = "Room: "
 SERVICE_GROUP = "group"
+SERVICE_PLAY_SYSTEM_SOUND = "play_sound"
 SERVICE_RESTORE = "restore"
 SERVICE_SNAPSHOT = "snapshot"
 SUPPORTED_OBJECT_IDS = [

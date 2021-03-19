@@ -12,6 +12,8 @@ from hassfeld.constants import (
     PLAY_MODE_REPEAT_ALL,
     PLAY_MODE_REPEAT_ONE,
     PLAY_MODE_SHUFFLE,
+    SOUND_FAILURE,
+    SOUND_SUCCESS,
     TRANSPORT_STATE_NO_MEDIA,
     TRANSPORT_STATE_PAUSED,
     TRANSPORT_STATE_PLAYING,
@@ -55,6 +57,7 @@ from .const import (
     GROUP_PREFIX,
     MEDIA_CONTENT_ID_SEP,
     ROOM_PREFIX,
+    SERVICE_PLAY_SYSTEM_SOUND,
     SERVICE_RESTORE,
     SERVICE_SNAPSHOT,
     UPNP_CLASS_ALBUM,
@@ -169,6 +172,19 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
             )
         ),
         "async_set_rooms_volume_level",
+    )
+    platform.async_register_entity_service(
+        SERVICE_PLAY_SYSTEM_SOUND,
+        vol.All(
+            cv.make_entity_service_schema(
+                {
+                    vol.Optional("sound"): vol.All(
+                        cv.string, vol.In([SOUND_SUCCESS, SOUND_FAILURE])
+                    ),
+                }
+            )
+        ),
+        "async_play_system_sound",
     )
     return True
 
@@ -662,8 +678,13 @@ class RaumfeldRoom(RaumfeldGroup):
     def __init__(self, room, raumfeld):
         """Initialize media player for room."""
         super().__init__(room, raumfeld)
+        self._room = room
         self._rooms = [room]
         self._raumfeld = raumfeld
         self._name = ROOM_PREFIX + repr(self._rooms)
         self._unique_id = obj_to_uid([room])
         self._icon = "mdi:speaker"
+
+    async def async_play_system_sound(self, sound=SOUND_SUCCESS):
+        """Play system sound 'Success' or 'Failure'."""
+        await self._raumfeld.async_room_play_system_sound(self._room, sound)
