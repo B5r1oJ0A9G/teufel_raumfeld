@@ -649,6 +649,16 @@ class RaumfeldGroup(MediaPlayerEntity):
                 "Method was called although speaker group '%s' is invalid" % self._rooms
             )
 
+    async def async_play_system_sound(self, sound=SOUND_SUCCESS):
+        """Play system sound 'Success' or 'Failure'."""
+        if self._raumfeld.group_is_valid(self._rooms):
+            for room in self._rooms:
+                await self._raumfeld.async_room_play_system_sound(room, sound)
+        else:
+            log_debug(
+                "Method was called although speaker group '%s' is invalid" % self._rooms
+            )
+
     async def async_restore(self):
         """Restore previously saved media and position of the player."""
         if self._raumfeld.group_is_valid(self._rooms):
@@ -684,7 +694,3 @@ class RaumfeldRoom(RaumfeldGroup):
         self._name = ROOM_PREFIX + repr(self._rooms)
         self._unique_id = obj_to_uid([room])
         self._icon = "mdi:speaker"
-
-    async def async_play_system_sound(self, sound=SOUND_SUCCESS):
-        """Play system sound 'Success' or 'Failure'."""
-        await self._raumfeld.async_room_play_system_sound(self._room, sound)

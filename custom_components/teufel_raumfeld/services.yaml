@@ -44,7 +44,7 @@ play_sound:
   fields:
     entity_id:
       description: Name(s) of entities to set volume level on.
-      example: "media_player.room_kitchen"
+      example: "media_player.group_kitchen_living_room"
     sound:
       description: "Sound to play"
       example: "Success"
