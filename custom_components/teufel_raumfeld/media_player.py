@@ -68,7 +68,7 @@ from .const import (
     UPNP_CLASS_TRACK,
 )
 
-SUPPORT_RAUMFELD = SUPPORT_PAUSE | SUPPORT_STOP | SUPPORT_PLAY
+SUPPORT_RAUMFELD_SPOTIFY = SUPPORT_PAUSE | SUPPORT_PLAY
 
 SUPPORT_RAUMFELD_GROUP = (
     SUPPORT_PAUSE
@@ -214,6 +214,7 @@ class RaumfeldGroup(MediaPlayerEntity):
         self._shuffle = None
         self._repeat = None
         self._play_mode = None
+        self._is_spotify_sroom = None
 
     # Entity Properties
 
@@ -358,21 +359,25 @@ class RaumfeldGroup(MediaPlayerEntity):
         """Send play command."""
         if self._raumfeld.group_is_valid(self._rooms):
             await self._raumfeld.async_group_play(self._rooms)
-            await self.async_update_transport_state()
+        elif self._is_spotify_sroom:
+            await self._raumfeld.async_room_play(self._room)
         else:
             log_debug(
                 "Method was called although speaker group '%s' is invalid" % self._rooms
             )
+        await self.async_update_transport_state()
 
     async def async_media_pause(self):
         """Send pause command."""
         if self._raumfeld.group_is_valid(self._rooms):
             await self._raumfeld.async_group_pause(self._rooms)
-            await self.async_update_transport_state()
+        elif self._is_spotify_sroom:
+            await self._raumfeld.async_room_pause(self._room)
         else:
             log_debug(
                 "Method was called although speaker group '%s' is invalid" % self._rooms
             )
+        await self.async_update_transport_state()
 
     async def async_media_stop(self):
         """Send stop command."""
@@ -557,8 +562,14 @@ class RaumfeldGroup(MediaPlayerEntity):
 
     async def async_update_transport_state(self):
         """Update state of the player."""
+        info = None
+
         if self._raumfeld.group_is_valid(self._rooms):
             info = await self._raumfeld.async_get_transport_info(self._rooms)
+        elif self._is_spotify_sroom:
+            info = await self._raumfeld.async_get_room_transport_info(self._room)
+
+        if info:
             transport_state = info["CurrentTransportState"]
             if transport_state == TRANSPORT_STATE_STOPPED:
                 self._state = STATE_IDLE
@@ -694,3 +705,18 @@ class RaumfeldRoom(RaumfeldGroup):
         self._name = ROOM_PREFIX + repr(self._rooms)
         self._unique_id = obj_to_uid([room])
         self._icon = "mdi:speaker"
+
+    @property
+    def supported_features(self):
+        """Flag media player features that are supported."""
+        if self._is_spotify_sroom:
+            return SUPPORT_RAUMFELD_SPOTIFY
+        else:
+            return super().supported_features
+
+    async def async_update(self):
+        """Update entity"""
+        if self._raumfeld.group_is_valid(self._rooms):
+            await super().async_update_all()
+        elif self._raumfeld.room_is_spotify_single_room(self._room):
+            self._is_spotify_sroom = True
