@@ -1,4 +1,5 @@
 """The Teufel Raumfeld media_player component."""
+import asyncio
 import base64
 import datetime
 import logging
@@ -52,6 +53,7 @@ from . import log_debug, log_error, log_fatal, log_info
 from .const import (
     CHANGE_STEP_VOLUME_DOWN,
     CHANGE_STEP_VOLUME_UP,
+    DELAY_FAST_UPDATE_CHECKS,
     DEVICE_CLASS_SPEAKER,
     DOMAIN,
     GROUP_PREFIX,
@@ -60,6 +62,7 @@ from .const import (
     SERVICE_PLAY_SYSTEM_SOUND,
     SERVICE_RESTORE,
     SERVICE_SNAPSHOT,
+    TIMEOUT_TRANSITION_PERIOD,
     UPNP_CLASS_ALBUM,
     UPNP_CLASS_LINE_IN,
     UPNP_CLASS_PLAYLIST_CONTAINER,
@@ -364,6 +367,7 @@ class RaumfeldGroup(MediaPlayerEntity):
                 "Method was called although speaker group '%s' is invalid" % self._rooms
             )
         await self.async_update_transport_state()
+        self.async_schedule_update_ha_state()
 
     async def async_media_pause(self):
         """Send pause command."""
@@ -561,31 +565,41 @@ class RaumfeldGroup(MediaPlayerEntity):
     async def async_update_transport_state(self):
         """Update state of the player."""
         info = None
+        max_attempts = int(TIMEOUT_TRANSITION_PERIOD / DELAY_FAST_UPDATE_CHECKS)
 
-        if self._raumfeld.group_is_valid(self._rooms):
-            info = await self._raumfeld.async_get_transport_info(self._rooms)
-        elif self._is_spotify_sroom:
-            info = await self._raumfeld.async_get_room_transport_info(self._room)
+        for attempt in range(1, max_attempts):
+            if self._raumfeld.group_is_valid(self._rooms):
+                info = await self._raumfeld.async_get_transport_info(self._rooms)
+            elif self._is_spotify_sroom:
+                info = await self._raumfeld.async_get_room_transport_info(self._room)
 
-        if info:
-            transport_state = info["CurrentTransportState"]
-            if transport_state == TRANSPORT_STATE_STOPPED:
-                self._state = STATE_IDLE
-            elif transport_state == TRANSPORT_STATE_NO_MEDIA:
-                self._state = STATE_IDLE
-            elif transport_state == TRANSPORT_STATE_PLAYING:
-                self._state = STATE_PLAYING
-            elif transport_state == TRANSPORT_STATE_PAUSED:
-                self._state = STATE_PAUSED
-            elif transport_state == TRANSPORT_STATE_TRANSITIONING:
-                pass
+            if info:
+                transport_state = info["CurrentTransportState"]
+                if transport_state == TRANSPORT_STATE_STOPPED:
+                    self._state = STATE_IDLE
+                elif transport_state == TRANSPORT_STATE_NO_MEDIA:
+                    self._state = STATE_IDLE
+                elif transport_state == TRANSPORT_STATE_PLAYING:
+                    self._state = STATE_PLAYING
+                elif transport_state == TRANSPORT_STATE_PAUSED:
+                    self._state = STATE_PAUSED
+                elif transport_state == TRANSPORT_STATE_TRANSITIONING:
+                    if attempt < max_attempts:
+                        await asyncio.sleep(DELAY_FAST_UPDATE_CHECKS)
+                        log_info(
+                            "Starting attempt '%s' out of '%s' attempts for transport state update"
+                            % (attempt + 1, max_attempts)
+                        )
+                        continue
+                else:
+                    log_fatal("Unrecognized transport state: %s" % transport_state)
+                    self._state = STATE_OFF
             else:
-                log_fatal("Unrecognized transport state: %s" % transport_state)
-                self._state = STATE_OFF
-        else:
-            log_debug(
-                "Method was called although speaker group '%s' is invalid" % self._rooms
-            )
+                log_debug(
+                    "Method was called although speaker group '%s' is invalid"
+                    % self._rooms
+                )
+            break
 
     async def async_update_volume_level(self):
         """Update volume level of the player."""
