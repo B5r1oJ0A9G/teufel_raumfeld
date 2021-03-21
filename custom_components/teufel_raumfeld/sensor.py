@@ -88,7 +88,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
         vol.All(
             cv.make_entity_service_schema({vol.Required(ATTR_POWER_STATE): cv.string})
         ),
-        "set_room_power_state",
+        "async_set_room_power_state",
     )
 
     return True
@@ -219,13 +219,13 @@ class RaumfeldPowerState(RaumfeldRoom):
         super().__init__(sensor_config)
         self._raumfeld = raumfeld
 
-    def set_room_power_state(self, power_state):
+    async def async_set_room_power_state(self, power_state):
         """Put a speaker in standby or wake it up."""
         if power_state == POWER_ON:
-            self._raumfeld.leave_standby(self._room_name)
+            await self._raumfeld.async_leave_standby(self._room_name)
         elif power_state == POWER_ECO:
-            self._raumfeld.enter_automatic_standby(self._room_name)
+            await self._raumfeld.async_enter_automatic_standby(self._room_name)
         elif power_state == POWER_STANDBY:
-            self._raumfeld.enter_manual_standby(self._room_name)
+            await self._raumfeld.async_enter_manual_standby(self._room_name)
         else:
             log_fatal("Unexpected power state: {power_state}")

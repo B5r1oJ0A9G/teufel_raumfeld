@@ -325,9 +325,7 @@ class RaumfeldGroup(MediaPlayerEntity):
     async def async_turn_on(self):
         """Turn the media player on."""
         if not self._raumfeld.group_is_valid(self._rooms):
-            await self.hass.async_add_executor_job(
-                self._raumfeld.create_group, self._rooms
-            )
+            await self._raumfeld.async_create_group(self._rooms)
             await self.async_update_transport_state()
         else:
             log_debug(

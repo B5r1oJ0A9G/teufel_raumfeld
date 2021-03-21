@@ -192,11 +192,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             hass.config_entries.async_forward_entry_setup(entry, component)
         )
 
-    def handle_group(call):
+    async def async_handle_group(call):
         room_lst = call.data.get("room_names")
-        raumfeld.create_group(room_lst)
+        await raumfeld.async_create_group(room_lst)
 
-    hass.services.async_register(DOMAIN, SERVICE_GROUP, handle_group)
+    hass.services.async_register(DOMAIN, SERVICE_GROUP, async_handle_group)
 
     return True
 
@@ -228,9 +228,9 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
         """Check whether a speaker group according to passed rooms exists."""
         return self.zone_is_valid(room_lst)
 
-    def create_group(self, room_lst):
+    async def async_create_group(self, room_lst):
         """Create a speaker group with rooms passed."""
-        self.create_zone(room_lst)
+        await self.async_create_zone(room_lst)
 
     async def async_set_group_mute(self, room_lst, mute):
         """Create a speaker group with rooms passed."""
