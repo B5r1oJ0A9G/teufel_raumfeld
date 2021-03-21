@@ -3,7 +3,6 @@
 import asyncio
 import inspect
 
-import hassfeld.aioupnp
 from hassfeld.constants import (
     POWER_ACTIVE,
     POWER_STANDBY_AUTOMATIC,
@@ -38,16 +37,6 @@ STATE_TO_STATE = {
 }
 
 
-async def async_get_update_info_version(location):
-    """Wrapper function to return the version of a device"""
-    response = await hassfeld.aioupnp.async_get_update_info(location)
-    if "Version" in response:
-        version = response["Version"]
-    else:
-        version = None
-    return version
-
-
 async def async_setup_entry(hass, config_entry, async_add_devices):
     """Set up entry."""
     raumfeld = hass.data[DOMAIN][config_entry.entry_id]
@@ -58,20 +47,17 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     devices = []
 
     for udn in device_udns:
-        device_location = raumfeld.device_udn_to_location(udn)
-        renderer_udn = await hassfeld.aioupnp.async_get_device(
-            device_location, "renderer"
-        )
+        renderer_udn = await raumfeld.async_get_device_renderer(udn)
         device_name = raumfeld.device_udn_to_name(renderer_udn)
-        sw_version = await hassfeld.aioupnp.async_get_info(device_location)
-        manufacturer = await hassfeld.aioupnp.async_get_manufacturer(device_location)
-        model = await hassfeld.aioupnp.async_get_model_name(device_location)
+        sw_version = await raumfeld.async_get_device_info(udn)
+        manufacturer = await raumfeld.async_get_device_manufacturer(udn)
+        model = await raumfeld.async_get_device_model_name(udn)
 
         sensor_config = {
+            "device_udn": udn,
             "device_name": device_name,
-            "get_state": hassfeld.aioupnp.async_get_info,
+            "get_state": raumfeld.async_get_device_info,
             "identifier": device_name,
-            "location": device_location,
             "manufacturer": manufacturer,
             "model": model,
             "sensor_name": "SoftwareVersion",
@@ -81,7 +67,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
         devices.append(RaumfeldSpeaker(raumfeld, sensor_config))
 
         sensor_config["sensor_name"] = "UpdateInfoVersion"
-        sensor_config["get_state"] = async_get_update_info_version
+        sensor_config["get_state"] = raumfeld.async_get_device_update_info_version
         log_debug("sensor_config=%s" % sensor_config)
         devices.append(RaumfeldSpeaker(raumfeld, sensor_config))
 
@@ -115,11 +101,11 @@ class RaumfeldSpeaker(Entity):
         """Initialize the Raumfeld speaker sensor."""
         self._raumfeld = raumfeld
         self._config = sensor_config
+        self._device_udn = self._config["device_udn"]
         self._device_name = self._config["device_name"]
         self._sensor_name = self._config["sensor_name"]
         self._name = f"{self._device_name} - {self._sensor_name}"
         self._unique_id = f"{DOMAIN}.{self._device_name}.{self._sensor_name}"
-        self._location = self._config["location"]
         self._get_state = self._config["get_state"]
         self._sw_version = self._config["sw_version"]
         self._identifier = self._config["identifier"]
@@ -167,10 +153,7 @@ class RaumfeldSpeaker(Entity):
 
     async def async_update(self):
         """Update sensor."""
-        if self._raumfeld.location_is_valid(self._location):
-            self._state = await self._get_state(self._location)
-        else:
-            self._state = None
+        self._state = await self._get_state(self._device_udn)
 
 
 class RaumfeldRoom(Entity):
