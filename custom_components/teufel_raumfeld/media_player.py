@@ -367,7 +367,6 @@ class RaumfeldGroup(MediaPlayerEntity):
                 "Method was called although speaker group '%s' is invalid" % self._rooms
             )
         await self.async_update_transport_state()
-        self.async_schedule_update_ha_state()
 
     async def async_media_pause(self):
         """Send pause command."""
