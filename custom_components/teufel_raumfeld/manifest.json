@@ -1,11 +1,11 @@
 {
     "domain": "teufel_raumfeld",
     "name": "Teufel Raumfeld",
-    "version": "0.1.3-alpha",
+    "version": "0.1.4-alpha",
     "config_flow": true,
     "documentation": "https://www.home-assistant.io/integrations/teufel_raumfeld",
     "issue_tracker": "https://github.com/B5r1oJ0A9G/teufel_raumfeld/issues",
-    "requirements": ["hassfeld==0.3.3-alpha1"],
+    "requirements": ["hassfeld==0.3.4-alpha1"],
     "dependencies": [],
     "codeowners": ["@B5r1oJ0A9G"]
 }
