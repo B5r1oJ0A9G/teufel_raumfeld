@@ -71,7 +71,13 @@ from .const import (
     UPNP_CLASS_TRACK,
 )
 
-SUPPORT_RAUMFELD_SPOTIFY = SUPPORT_PAUSE | SUPPORT_PLAY
+SUPPORT_RAUMFELD_SPOTIFY = (
+    SUPPORT_PAUSE
+    | SUPPORT_PLAY
+    | SUPPORT_VOLUME_SET
+    | SUPPORT_PREVIOUS_TRACK
+    | SUPPORT_NEXT_TRACK
+)
 
 SUPPORT_RAUMFELD_GROUP = (
     SUPPORT_PAUSE
@@ -347,14 +353,16 @@ class RaumfeldGroup(MediaPlayerEntity):
 
     async def async_set_volume_level(self, volume):
         """Set volume level, range 0..1."""
+        raumfeld_vol = int(volume * 100)
         if self._raumfeld.group_is_valid(self._rooms):
-            raumfeld_vol = int(volume * 100)
             await self._raumfeld.async_set_group_volume(self._rooms, raumfeld_vol)
-            await self.async_update_volume_level()
+        elif self._is_spotify_sroom:
+            await self._raumfeld.async_set_room_volume(self._room, raumfeld_vol)
         else:
             log_debug(
                 "Method was called although speaker group '%s' is invalid" % self._rooms
             )
+        await self.async_update_volume_level()
 
     async def async_media_play(self):
         """Send play command."""
@@ -394,21 +402,25 @@ class RaumfeldGroup(MediaPlayerEntity):
         """Send previous track command."""
         if self._raumfeld.group_is_valid(self._rooms):
             await self._raumfeld.async_group_previous_track(self._rooms)
-            await self.async_update_track_info()
+        elif self._is_spotify_sroom:
+            await self._raumfeld.async_room_previous_track(self._room)
         else:
             log_debug(
                 "Method was called although speaker group '%s' is invalid" % self._rooms
             )
+        await self.async_update_track_info()
 
     async def async_media_next_track(self):
         """Send next track command."""
         if self._raumfeld.group_is_valid(self._rooms):
             await self._raumfeld.async_group_next_track(self._rooms)
-            await self.async_update_track_info()
+        elif self._is_spotify_sroom:
+            await self._raumfeld.async_room_next_track(self._room)
         else:
             log_debug(
                 "Method was called although speaker group '%s' is invalid" % self._rooms
             )
+        await self.async_update_track_info()
 
     async def async_media_seek(self, position):
         """Send seek command."""
@@ -602,9 +614,14 @@ class RaumfeldGroup(MediaPlayerEntity):
 
     async def async_update_volume_level(self):
         """Update volume level of the player."""
-        self._volume_level = (
-            await self._raumfeld.async_get_group_volume(self._rooms) / 100
-        )
+        if self._raumfeld.group_is_valid(self._rooms):
+            self._volume_level = (
+                await self._raumfeld.async_get_group_volume(self._rooms) / 100
+            )
+        elif self._is_spotify_sroom:
+            self._volume_level = (
+                await self._raumfeld.async_get_room_volume(self._room) / 100
+            )
 
     async def async_update_mute(self):
         """Update mute status of the player."""
