@@ -18,6 +18,7 @@ import xmltodict
 from homeassistant.components.media_player import BrowseMedia
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import aiohttp_client
 
 from .const import (
     ATTR_EVENT_WSUPD_TYPE,
@@ -174,7 +175,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     host = entry.data["host"]
     port = entry.data["port"]
-    raumfeld = HassRaumfeldHost(host, port)
+    http_session = aiohttp_client.async_get_clientsession(hass)
+    raumfeld = HassRaumfeldHost(host, port, session=http_session)
     set_hassfeld_log_level(raumfeld)
     host_is_not_valid = not await raumfeld.async_host_is_valid()
     if host_is_not_valid:
