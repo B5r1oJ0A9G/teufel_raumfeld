@@ -648,10 +648,11 @@ class RaumfeldGroup(MediaPlayerEntity):
     async def async_update_all(self):
         """Run all state update methods of the player."""
         await self.async_update_transport_state()
-        await self.async_update_volume_level()
-        await self.async_update_mute()
-        await self.async_update_track_info()
-        await self.async_update_play_mode()
+        if self._state != STATE_OFF:
+            await self.async_update_volume_level()
+            await self.async_update_mute()
+            await self.async_update_track_info()
+            await self.async_update_play_mode()
 
     async def async_update(self):
         """Update entity"""
