@@ -186,9 +186,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     raumfeld.callback = cb_webservice_update
     log_info("Starting web service update coroutine")
     hass.async_create_task(raumfeld.async_update_all(http_session))
-    #TODO: Implement as method in hassfeld.
-    while False in raumfeld.init_done.values():
-        await asyncio.sleep(DELAY_FAST_UPDATE_CHECKS)
+    await raumfeld.async_wait_initial_update()
     log_info("Web service update coroutine started")
     log_debug("raumfeld.wsd=%s" % raumfeld.wsd)
     hass.data[DOMAIN][entry.entry_id] = raumfeld
