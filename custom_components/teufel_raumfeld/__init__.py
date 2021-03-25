@@ -33,6 +33,7 @@ from .const import (
     DIDL_ELEM_TITLE,
     DIDL_ELEMENT,
     DIDL_VALUE,
+    DELAY_FAST_UPDATE_CHECKS,
     DOMAIN,
     EVENT_WEBSERVICE_UPDATE,
     MEDIA_CONTENT_ID_SEP,
@@ -183,9 +184,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         log_error("Invalid host: %s:%s" % (host, port))
         return False
     raumfeld.callback = cb_webservice_update
-    log_info("Starting web service update thread")
-    raumfeld.start_update_thread()
-    log_info("Web service update thread started")
+    log_info("Starting web service update coroutine")
+    hass.async_create_task(raumfeld.async_update_all(http_session))
+    #TODO: Implement as method in hassfeld.
+    while False in raumfeld.init_done.values():
+        await asyncio.sleep(DELAY_FAST_UPDATE_CHECKS)
+    log_info("Web service update coroutine started")
     log_debug("raumfeld.wsd=%s" % raumfeld.wsd)
     hass.data[DOMAIN][entry.entry_id] = raumfeld
 
