@@ -203,6 +203,7 @@ class RaumfeldGroup(MediaPlayerEntity):
 
     def __init__(self, rooms, raumfeld):
         """Initialize media player for speaker group."""
+        self._room = None
         self._rooms = rooms
         self._raumfeld = raumfeld
         self._mute = None
