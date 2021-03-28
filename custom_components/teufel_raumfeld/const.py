@@ -40,17 +40,6 @@ SERVICE_GROUP = "group"
 SERVICE_PLAY_SYSTEM_SOUND = "play_sound"
 SERVICE_RESTORE = "restore"
 SERVICE_SNAPSHOT = "snapshot"
-SUPPORTED_OBJECT_IDS = [
-    "0",
-    "0/DemoTracks",
-    "0/Favorites",
-    "0/Line In",
-    "0/My Music",
-    "0/Playlists",
-    "0/Tidal",
-    "0/RadioTime",
-]
-SUPPORTED_OBJECT_PREFIXES = SUPPORTED_OBJECT_IDS[1:]
 TIMEOUT_TRANSITION_PERIOD = 5
 TITLE_UNKNOWN = "Unkown title (Teufel Raumfeld)"
 TRACKINF_ALBUM = "album"
@@ -61,6 +50,7 @@ UNSUPPORTED_OBJECT_IDS = [
     "0/My Music/Search",
     "0/Playlists/Shuffles",
     "0/Renderers",
+    "0/Spotify",
     "0/Tidal/Search",
     "0/RadioTime/Search",
     "0/Zones",

@@ -47,8 +47,6 @@ from .const import (
     POSINF_ELEM_TRACK_DATA,
     POSINF_ELEM_URI,
     SERVICE_GROUP,
-    SUPPORTED_OBJECT_IDS,
-    SUPPORTED_OBJECT_PREFIXES,
     TITLE_UNKNOWN,
     TRACKINF_ALBUM,
     TRACKINF_ARTIST,
@@ -122,18 +120,7 @@ def timespan_secs(timespan):
 
 def is_supported_oid(oid):
     """Returns True, if the passed object ID should be supported."""
-    supported_oid = False
-    if oid not in UNSUPPORTED_OBJECT_IDS:
-        # FIXME: Should be removed in favor of checking for UNSUPPORTED_OBJECT_IDS
-        if oid in SUPPORTED_OBJECT_IDS:
-            supported_oid = True
-        else:
-            for oid_prefix in SUPPORTED_OBJECT_PREFIXES:
-                if oid.startswith(oid_prefix):
-                    supported_oid = True
-                    break
-
-    return supported_oid
+    return bool(oid not in UNSUPPORTED_OBJECT_IDS)
 
 
 async def async_setup(hass: HomeAssistant, config: dict):
