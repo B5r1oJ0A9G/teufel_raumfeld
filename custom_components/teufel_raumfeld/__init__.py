@@ -22,6 +22,7 @@ from homeassistant.helpers import aiohttp_client
 
 from .const import (
     ATTR_EVENT_WSUPD_TYPE,
+    DELAY_FAST_UPDATE_CHECKS,
     DIDL_ATTR_CHILD_CNT,
     DIDL_ATTR_ID,
     DIDL_ELEM_ALBUM,
@@ -33,7 +34,6 @@ from .const import (
     DIDL_ELEM_TITLE,
     DIDL_ELEMENT,
     DIDL_VALUE,
-    DELAY_FAST_UPDATE_CHECKS,
     DOMAIN,
     EVENT_WEBSERVICE_UPDATE,
     MEDIA_CONTENT_ID_SEP,
