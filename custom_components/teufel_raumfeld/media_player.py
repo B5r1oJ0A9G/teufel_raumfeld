@@ -741,8 +741,7 @@ class RaumfeldRoom(RaumfeldGroup):
         """Flag media player features that are supported."""
         if self._is_spotify_sroom:
             return SUPPORT_RAUMFELD_SPOTIFY
-        else:
-            return super().supported_features
+        return super().supported_features
 
     async def async_update(self):
         """Update entity"""
