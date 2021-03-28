@@ -337,12 +337,11 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
                 uri_prefix = location.rsplit(":", 1)[0]
                 play_uri = f"{uri_prefix}:{PORT_LINE_IN}/stream.flac"
                 return play_uri
-            else:
-                log_error(
-                    "Passed media_id '%s' does not appear appropriate for media_type '%s'"
-                    % (media_id, media_type)
-                )
-                return None
+            log_error(
+                "Passed media_id '%s' does not appear appropriate for media_type '%s'"
+                % (media_id, media_type)
+            )
+            return None
 
         log_info(
             "Building of playable URI for media type '%s' not needed or not implemented"
