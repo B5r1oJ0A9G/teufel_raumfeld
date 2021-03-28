@@ -1,6 +1,5 @@
 """Platform for sensor integration."""
 
-import asyncio
 import inspect
 
 from hassfeld.constants import (
