@@ -616,13 +616,11 @@ class RaumfeldGroup(MediaPlayerEntity):
     async def async_update_volume_level(self):
         """Update volume level of the player."""
         if self._raumfeld.group_is_valid(self._rooms):
-            self._volume_level = (
-                await self._raumfeld.async_get_group_volume(self._rooms) / 100
-            )
+            group_volume = await self._raumfeld.async_get_group_volume(self._rooms)
         elif self._is_spotify_sroom:
-            self._volume_level = (
-                await self._raumfeld.async_get_room_volume(self._room) / 100
-            )
+            group_volume = await self._raumfeld.async_get_room_volume(self._room)
+        if group_volume:
+            self._volume_level = group_volume / 100
 
     async def async_update_mute(self):
         """Update mute status of the player."""
@@ -631,37 +629,39 @@ class RaumfeldGroup(MediaPlayerEntity):
     async def async_update_track_info(self):
         """Update media information of the player."""
         track_info = await self._raumfeld.async_get_track_info(self._rooms)
-        self._media_duration = track_info["duration"]
-        self._media_image_url = track_info["image_uri"]
-        self._media_title = track_info["title"]
-        self._media_artist = track_info["artist"]
-        self._media_album_name = track_info["album"]
-        self._media_album_artist = track_info["artist"]
-        self._media_track = track_info["number"]
-        self._media_position = track_info["position"]
-        self._media_position_updated_at = utcnow()
+        if track_info:
+            self._media_duration = track_info["duration"]
+            self._media_image_url = track_info["image_uri"]
+            self._media_title = track_info["title"]
+            self._media_artist = track_info["artist"]
+            self._media_album_name = track_info["album"]
+            self._media_album_artist = track_info["artist"]
+            self._media_track = track_info["number"]
+            self._media_position = track_info["position"]
+            self._media_position_updated_at = utcnow()
 
     async def async_update_play_mode(self):
         """Update play mode of the player."""
         play_mode = await self._raumfeld.async_get_play_mode(self._rooms)
-        self._play_mode = play_mode
-        if play_mode == PLAY_MODE_NORMAL:
-            self._shuffle = False
-            self._repeat = REPEAT_MODE_OFF
-        elif play_mode == PLAY_MODE_SHUFFLE:
-            self._shuffle = True
-            self._repeat = REPEAT_MODE_OFF
-        elif play_mode == PLAY_MODE_REPEAT_ONE:
-            self._shuffle = False
-            self._repeat = REPEAT_MODE_ONE
-        elif play_mode == PLAY_MODE_REPEAT_ALL:
-            self._shuffle = False
-            self._repeat = REPEAT_MODE_ALL
-        elif play_mode == PLAY_MODE_RANDOM:
-            self._shuffle = True
-            self._repeat = REPEAT_MODE_ALL
-        else:
-            log_fatal("Unrecognized play mode: %s" % play_mode)
+        if play_mode:
+            self._play_mode = play_mode
+            if play_mode == PLAY_MODE_NORMAL:
+                self._shuffle = False
+                self._repeat = REPEAT_MODE_OFF
+            elif play_mode == PLAY_MODE_SHUFFLE:
+                self._shuffle = True
+                self._repeat = REPEAT_MODE_OFF
+            elif play_mode == PLAY_MODE_REPEAT_ONE:
+                self._shuffle = False
+                self._repeat = REPEAT_MODE_ONE
+            elif play_mode == PLAY_MODE_REPEAT_ALL:
+                self._shuffle = False
+                self._repeat = REPEAT_MODE_ALL
+            elif play_mode == PLAY_MODE_RANDOM:
+                self._shuffle = True
+                self._repeat = REPEAT_MODE_ALL
+            else:
+                log_fatal("Unrecognized play mode: %s" % play_mode)
 
     async def async_update_all(self):
         """Run all state update methods of the player."""

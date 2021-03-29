@@ -428,41 +428,42 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
     async def async_get_track_info(self, zone_room_lst):
         """Return data to update media information."""
         position_info = await self.async_get_position_info(zone_room_lst)
-        metadata_xml = position_info[POSINF_ELEM_TRACK_DATA]
+        if position_info:
+            metadata_xml = position_info[POSINF_ELEM_TRACK_DATA]
 
-        track_info = {
-            TRACKINF_TITLE: None,
-            TRACKINF_ARTIST: None,
-            TRACKINF_IMGURI: None,
-            TRACKINF_ALBUM: None,
-        }
+            track_info = {
+                TRACKINF_TITLE: None,
+                TRACKINF_ARTIST: None,
+                TRACKINF_IMGURI: None,
+                TRACKINF_ALBUM: None,
+            }
 
-        track_info["number"] = position_info[POSINF_ELEM_TRACK]
-        track_info["duration"] = timespan_secs(position_info[POSINF_ELEM_DURATION])
-        track_info["uri"] = position_info[POSINF_ELEM_URI]
-        track_info["position"] = timespan_secs(position_info[POSINF_ELEM_ABS_TIME])
+            track_info["number"] = position_info[POSINF_ELEM_TRACK]
+            track_info["duration"] = timespan_secs(position_info[POSINF_ELEM_DURATION])
+            track_info["uri"] = position_info[POSINF_ELEM_URI]
+            track_info["position"] = timespan_secs(position_info[POSINF_ELEM_ABS_TIME])
 
-        if metadata_xml is not None:
-            metadata = xmltodict.parse(metadata_xml)
-            if DIDL_ELEM_TITLE in metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM]:
-                track_info[TRACKINF_TITLE] = metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM][
-                    DIDL_ELEM_TITLE
-                ]
-            if DIDL_ELEM_ARTIST in metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM]:
-                track_info[TRACKINF_ARTIST] = metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM][
-                    DIDL_ELEM_ARTIST
-                ]
-            if DIDL_ELEM_ART_URI in metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM]:
-                if (
-                    DIDL_VALUE
-                    in metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM][DIDL_ELEM_ART_URI]
-                ):
-                    track_info[TRACKINF_IMGURI] = metadata[DIDL_ELEMENT][
+            if metadata_xml is not None:
+                metadata = xmltodict.parse(metadata_xml)
+                if DIDL_ELEM_TITLE in metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM]:
+                    track_info[TRACKINF_TITLE] = metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM][
+                        DIDL_ELEM_TITLE
+                    ]
+                if DIDL_ELEM_ARTIST in metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM]:
+                    track_info[TRACKINF_ARTIST] = metadata[DIDL_ELEMENT][
                         DIDL_ELEM_ITEM
-                    ][DIDL_ELEM_ART_URI][DIDL_VALUE]
-            if DIDL_ELEM_ALBUM in metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM]:
-                track_info[TRACKINF_ALBUM] = metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM][
-                    DIDL_ELEM_ALBUM
-                ]
+                    ][DIDL_ELEM_ARTIST]
+                if DIDL_ELEM_ART_URI in metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM]:
+                    if (
+                        DIDL_VALUE
+                        in metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM][DIDL_ELEM_ART_URI]
+                    ):
+                        track_info[TRACKINF_IMGURI] = metadata[DIDL_ELEMENT][
+                            DIDL_ELEM_ITEM
+                        ][DIDL_ELEM_ART_URI][DIDL_VALUE]
+                if DIDL_ELEM_ALBUM in metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM]:
+                    track_info[TRACKINF_ALBUM] = metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM][
+                        DIDL_ELEM_ALBUM
+                    ]
 
-        return track_info
+            return track_info
