@@ -23,6 +23,7 @@ from homeassistant.helpers import aiohttp_client
 from .const import (
     ATTR_EVENT_WSUPD_TYPE,
     DELAY_FAST_UPDATE_CHECKS,
+    DELAY_MODERATE_UPDATE_CHECKS,
     DIDL_ATTR_CHILD_CNT,
     DIDL_ATTR_ID,
     DIDL_ELEM_ALBUM,
@@ -47,6 +48,7 @@ from .const import (
     POSINF_ELEM_TRACK_DATA,
     POSINF_ELEM_URI,
     SERVICE_GROUP,
+    TIMEOUT_HOST_VALIDATION,
     TITLE_UNKNOWN,
     TRACKINF_ALBUM,
     TRACKINF_ARTIST,
@@ -166,10 +168,22 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     http_session = aiohttp_client.async_get_clientsession(hass)
     raumfeld = HassRaumfeldHost(host, port, session=http_session)
     set_hassfeld_log_level(raumfeld)
-    host_is_not_valid = not await raumfeld.async_host_is_valid()
+    max_attempts = int(TIMEOUT_HOST_VALIDATION / DELAY_MODERATE_UPDATE_CHECKS)
+
+    for attempt in range(1, max_attempts):
+        host_is_not_valid = not await raumfeld.async_host_is_valid()
+        if host_is_not_valid:
+            await asyncio.sleep(DELAY_MODERATE_UPDATE_CHECKS)
+            log_info(
+                "Starting attempt '%s' out of '%s' attempts to identify host as valid"
+                % (attempt + 1, max_attempts)
+            )
+            continue
+        break
     if host_is_not_valid:
         log_error("Invalid host: %s:%s" % (host, port))
         return False
+
     raumfeld.callback = cb_webservice_update
     log_info("Starting web service update coroutine")
     asyncio.create_task(raumfeld.async_update_all(http_session))
