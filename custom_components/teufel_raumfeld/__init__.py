@@ -22,7 +22,6 @@ from homeassistant.helpers import aiohttp_client
 
 from .const import (
     ATTR_EVENT_WSUPD_TYPE,
-    DELAY_FAST_UPDATE_CHECKS,
     DELAY_MODERATE_UPDATE_CHECKS,
     DIDL_ATTR_CHILD_CNT,
     DIDL_ATTR_ID,
