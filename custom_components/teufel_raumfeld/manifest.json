@@ -7,5 +7,6 @@
     "issue_tracker": "https://github.com/B5r1oJ0A9G/teufel_raumfeld/issues",
     "requirements": ["hassfeld==0.3.8-alpha1"],
     "dependencies": [],
-    "codeowners": ["@B5r1oJ0A9G"]
+    "codeowners": ["@B5r1oJ0A9G"],
+    "iot_class": "local_polling"
 }
