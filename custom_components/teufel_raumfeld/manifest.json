@@ -3,7 +3,7 @@
     "name": "Teufel Raumfeld",
     "version": "0.1.9-alpha",
     "config_flow": true,
-    "documentation": "https://www.home-assistant.io/integrations/teufel_raumfeld",
+    "documentation": "https://github.com/B5r1oJ0A9G/teufel_raumfeld/wiki",
     "issue_tracker": "https://github.com/B5r1oJ0A9G/teufel_raumfeld/issues",
     "requirements": ["hassfeld==0.3.9-alpha1"],
     "dependencies": [],
