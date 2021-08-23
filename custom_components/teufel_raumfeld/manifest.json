@@ -1,7 +1,7 @@
 {
     "domain": "teufel_raumfeld",
     "name": "Teufel Raumfeld",
-    "version": "0.1.9-alpha",
+    "version": "0.1.9",
     "config_flow": true,
     "documentation": "https://github.com/B5r1oJ0A9G/teufel_raumfeld/wiki",
     "issue_tracker": "https://github.com/B5r1oJ0A9G/teufel_raumfeld/issues",
