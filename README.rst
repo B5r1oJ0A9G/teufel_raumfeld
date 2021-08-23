@@ -33,4 +33,3 @@ The project is licensed under the GNU General Public License v3 (GPLv3).
    
 .. |hacs badge| image:: https://img.shields.io/badge/HACS-Default-orange.svg
    :target: https://github.com/custom-components/hacs
-https://img.shields.io/github/downloads/atom/atom/latest/total
