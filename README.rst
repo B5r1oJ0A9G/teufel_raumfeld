@@ -2,6 +2,8 @@
 teufel_raumfeld
 ===============
 
+|hacs badge|
+
 teufel_raumfeld is an integration for Teufel smart speaker (aka Raumfeld Multiroom) into https://www.home-assistant.io/.
 
 Installation
@@ -26,3 +28,5 @@ License
 The project is licensed under the GNU General Public License v3 (GPLv3).
 
 
+.. |hacs badge| image:: https://img.shields.io/badge/HACS-Default-orange.svg?style=for-the-badge
+   :target: https://github.com/custom-components/hacs
