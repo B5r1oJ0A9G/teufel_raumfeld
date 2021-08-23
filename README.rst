@@ -7,7 +7,7 @@ teufel_raumfeld is an integration for Teufel smart speaker (aka Raumfeld Multiro
 
 Installation
 ------------
-The recommended installation method is via the Home Assistant Community Store: https://hacs.xyz/
+The recommended installation method is via the Home Assistant Community Store: https://hacs.xyz/.
 
 Features
 --------
@@ -18,6 +18,8 @@ Features
 Contribute
 ----------
 
+- Discussions (e.g. Q&A and  troubleshooting): https://github.com/B5r1oJ0A9G/teufel_raumfeld/discussions
+- Wiki: https://github.com/B5r1oJ0A9G/teufel_raumfeld/wiki
 - Issue Tracker: https://github.com/B5r1oJ0A9G/teufel_raumfeld/issues
 - Source Code: https://github.com/B5r1oJ0A9G/teufel_raumfeld
 
