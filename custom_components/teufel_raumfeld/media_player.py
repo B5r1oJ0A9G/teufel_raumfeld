@@ -23,7 +23,11 @@ from hassfeld.constants import (
 )
 import voluptuous as vol
 
+from homeassistant.components import media_source
 from homeassistant.components.media_player import MediaPlayerEntity
+from homeassistant.components.media_player.browse_media import (
+    async_process_play_media_url,
+)
 from homeassistant.components.media_player.const import (
     ATTR_MEDIA_VOLUME_LEVEL,
     MEDIA_TYPE_MUSIC,
@@ -439,10 +443,8 @@ class RaumfeldGroup(MediaPlayerEntity):
         if self._raumfeld.rooms_are_valid(self._rooms):
             if media_type in SUPPORTED_MEDIA_TYPES:
                 if media_type == MEDIA_TYPE_MUSIC:
-                    if media_id.startswith("http"):
-                        play_uri = media_id
-                    else:
-                        log_error("Unexpected URI for media type: %s" % media_type)
+                    play_item = await media_source.async_resolve_media(self.hass, media_id)
+                    play_uri = async_process_play_media_url(self.hass, play_item.url)
                 elif media_type in [
                     UPNP_CLASS_ALBUM,
                     UPNP_CLASS_LINE_IN,
