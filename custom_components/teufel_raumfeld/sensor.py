@@ -2,20 +2,20 @@
 
 import inspect
 
+import voluptuous as vol
 from hassfeld.constants import (
     POWER_ACTIVE,
     POWER_STANDBY_AUTOMATIC,
     POWER_STANDBY_MANUAL,
 )
-import voluptuous as vol
-
-from homeassistant.helpers import config_validation as cv, entity_platform
+from homeassistant.components.media_player import MediaPlayerDeviceClass
+from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers import entity_platform
 from homeassistant.helpers.entity import Entity
 
 from . import log_debug, log_fatal
 from .const import (
     ATTR_POWER_STATE,
-    DEVICE_CLASS_SPEAKER,
     DOMAIN,
     POWER_ECO,
     POWER_ON,
@@ -123,7 +123,7 @@ class RaumfeldSpeaker(Entity):
     @property
     def device_class(self):
         """Return the class of this device, from component DEVICE_CLASSES."""
-        return DEVICE_CLASS_SPEAKER
+        return MediaPlayerDeviceClass.SPEAKER
 
     @property
     def device_info(self):

@@ -5,6 +5,7 @@ import datetime
 import logging
 import pickle
 
+import voluptuous as vol
 from hassfeld.constants import (
     BROWSE_CHILDREN,
     BROWSE_METADATA,
@@ -21,9 +22,10 @@ from hassfeld.constants import (
     TRANSPORT_STATE_STOPPED,
     TRANSPORT_STATE_TRANSITIONING,
 )
-import voluptuous as vol
-
-from homeassistant.components.media_player import MediaPlayerEntity
+from homeassistant.components.media_player import (
+    MediaPlayerDeviceClass,
+    MediaPlayerEntity,
+)
 from homeassistant.components.media_player.const import (
     ATTR_MEDIA_VOLUME_LEVEL,
     MEDIA_TYPE_MUSIC,
@@ -46,7 +48,8 @@ from homeassistant.components.media_player.const import (
     SUPPORT_VOLUME_STEP,
 )
 from homeassistant.const import STATE_IDLE, STATE_OFF, STATE_PAUSED, STATE_PLAYING
-from homeassistant.helpers import config_validation as cv, entity_platform
+from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers import entity_platform
 from homeassistant.util.dt import utcnow
 
 from . import log_debug, log_error, log_fatal, log_info
@@ -54,7 +57,6 @@ from .const import (
     CHANGE_STEP_VOLUME_DOWN,
     CHANGE_STEP_VOLUME_UP,
     DELAY_FAST_UPDATE_CHECKS,
-    DEVICE_CLASS_SPEAKER,
     DOMAIN,
     GROUP_PREFIX,
     MEDIA_CONTENT_ID_SEP,
@@ -251,7 +253,7 @@ class RaumfeldGroup(MediaPlayerEntity):
     @property
     def device_class(self):
         """Return the class of this device, from component DEVICE_CLASSES."""
-        return DEVICE_CLASS_SPEAKER
+        return MediaPlayerDeviceClass.SPEAKER
 
     @property
     def icon(self):
