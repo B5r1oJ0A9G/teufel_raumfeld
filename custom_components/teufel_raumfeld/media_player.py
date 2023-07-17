@@ -130,7 +130,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     raumfeld = hass.data[DOMAIN][config_entry.entry_id]
     room_names = raumfeld.get_rooms()
     room_groups = raumfeld.get_groups()
-    entity_registry = await hass.helpers.entity_registry.async_get()
+    entity_registry = hass.helpers.entity_registry.async_get(hass)
     entity_entries = hass.helpers.entity_registry.async_entries_for_config_entry(
         entity_registry, config_entry.entry_id
     )
