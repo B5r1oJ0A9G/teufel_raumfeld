@@ -3,6 +3,7 @@ teufel_raumfeld
 ===============
 
 |Language grade Python|
+|hassfest badge|
 |hacs badge|
 
 teufel_raumfeld is an integration for Teufel smart speaker (aka Raumfeld Multiroom) into https://www.home-assistant.io/.
@@ -34,9 +35,12 @@ The project is licensed under the GNU General Public License v3 (GPLv3).
 
 .. |github releases| image:: https://img.shields.io/github/downloads/B5r1oJ0A9G/teufel_raumfeld/latest/total
    :target: https://github.com/B5r1oJ0A9G/teufel_raumfeld/releases/
-   
+
 .. |hacs badge| image:: https://img.shields.io/badge/HACS-Default-orange.svg
    :target: https://github.com/custom-components/hacs
 
-.. |Language grade Python| image:: https://img.shields.io/lgtm/grade/python/g/B5r1oJ0A9G/teufel_raumfeld.svg?logo=lgtm&logoWidth=18
-   :target: https://lgtm.com/projects/g/B5r1oJ0A9G/teufel_raumfeld/context:python
+.. |hassfest badge| image:: https://github.com/B5r1oJ0A9G/teufel_raumfeld/actions/workflows/hassfest.yaml/badge.svg
+   :target: https://github.com/B5r1oJ0A9G/teufel_raumfeld/actions/workflows/hassfest.yaml
+
+.. |Language grade Python| image:: https://github.com/B5r1oJ0A9G/teufel_raumfeld/actions/workflows/github-code-scanning/codeql/badge.svg?branch=master
+   :target: https://github.com/B5r1oJ0A9G/teufel_raumfeld/actions/workflows/github-code-scanning/codeql
