@@ -22,9 +22,13 @@ from hassfeld.constants import (
     TRANSPORT_STATE_STOPPED,
     TRANSPORT_STATE_TRANSITIONING,
 )
+from homeassistant.components import media_source
 from homeassistant.components.media_player import (
     MediaPlayerDeviceClass,
     MediaPlayerEntity,
+)
+from homeassistant.components.media_player.browse_media import (
+    async_process_play_media_url,
 )
 from homeassistant.components.media_player.const import (
     ATTR_MEDIA_VOLUME_LEVEL,
@@ -438,13 +442,22 @@ class RaumfeldGroup(MediaPlayerEntity):
 
     async def async_play_media(self, media_type, media_id, **kwargs):
         """Play a piece of media."""
+        play_uri = None
         if self._raumfeld.rooms_are_valid(self._rooms):
             if media_type in SUPPORTED_MEDIA_TYPES:
+                log_debug("media_id=%s" % (media_id))
                 if media_type == MEDIA_TYPE_MUSIC:
                     if media_id.startswith("http"):
                         play_uri = media_id
+                    if media_id.startswith("media-source"):
+                        play_item = await media_source.async_resolve_media(
+                            self.hass, media_id
+                        )
+                        play_uri = async_process_play_media_url(
+                            self.hass, play_item.url
+                        )
                     else:
-                        log_error("Unexpected URI for media type: %s" % media_type)
+                        log_error("Unexpected media ID for media type: %s" % media_type)
                 elif media_type in [
                     UPNP_CLASS_ALBUM,
                     UPNP_CLASS_LINE_IN,
@@ -462,7 +475,12 @@ class RaumfeldGroup(MediaPlayerEntity):
                 if self.state == STATE_OFF:
                     await self.async_turn_on()
                 log_debug("self._rooms=%s, play_uri=%s" % (self._rooms, play_uri))
-                await self._raumfeld.async_set_av_transport_uri(self._rooms, play_uri)
+                if play_uri is None:
+                    log_error("URI to play could not be composed.")
+                else:
+                    await self._raumfeld.async_set_av_transport_uri(
+                        self._rooms, play_uri
+                    )
             else:
                 log_error("Playing of media type '%s' not supported" % media_type)
         else:
