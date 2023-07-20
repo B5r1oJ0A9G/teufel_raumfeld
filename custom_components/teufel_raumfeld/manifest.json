@@ -1,12 +1,12 @@
 {
     "domain": "teufel_raumfeld",
     "name": "Teufel Raumfeld",
-    "version": "0.1.12-alpha6",
+    "codeowners": ["@B5r1oJ0A9G"],
     "config_flow": true,
+    "dependencies": [],
     "documentation": "https://github.com/B5r1oJ0A9G/teufel_raumfeld/wiki",
+    "iot_class": "local_polling",
     "issue_tracker": "https://github.com/B5r1oJ0A9G/teufel_raumfeld/issues",
     "requirements": ["hassfeld==0.3.11-alpha1"],
-    "dependencies": [],
-    "codeowners": ["@B5r1oJ0A9G"],
-    "iot_class": "local_polling"
+    "version": "0.1.12-alpha6"
 }
