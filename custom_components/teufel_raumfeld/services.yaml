@@ -48,3 +48,23 @@ play_sound:
     sound:
       description: "Sound to play"
       example: "Success"
+
+add_room:
+  description: Add a room to a speaker group.
+  fields:
+    room:
+      description: Name of the room to add to the speaker group.
+      example: "Movie room"
+    room_of_group:
+      description: Name of one room member of the speaker group.
+      example: "Movie room"
+
+drop_room:
+  description: Remove a room from a speaker group.
+  fields:
+    room_name:
+      description: Name of the room to remove from a speaker group.
+      example: "Movie room"
+    room_of_group:
+      description: Name of one room member of the speaker group. If provided, the room must be member of that group.
+      example: "Movie room"

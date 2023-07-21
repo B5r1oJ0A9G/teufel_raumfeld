@@ -6,15 +6,14 @@ import os
 import urllib.parse
 
 import hassfeld
+import voluptuous as vol
+import xmltodict
 from hassfeld.constants import (
     TRIGGER_UPDATE_DEVICES,
     TRIGGER_UPDATE_HOST_INFO,
     TRIGGER_UPDATE_SYSTEM_STATE,
     TRIGGER_UPDATE_ZONE_CONFIG,
 )
-import voluptuous as vol
-import xmltodict
-
 from homeassistant.components.media_player import BrowseMedia
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -46,6 +45,12 @@ from .const import (
     POSINF_ELEM_TRACK,
     POSINF_ELEM_TRACK_DATA,
     POSINF_ELEM_URI,
+    SERVICE_ADD_ROOM,
+    SERVICE_ADD_ROOM_PAR_MEMBER,
+    SERVICE_ADD_ROOM_PAR_ROOM,
+    SERVICE_DROP_ROOM,
+    SERVICE_DROP_ROOM_PAR_MEMBER,
+    SERVICE_DROP_ROOM_PAR_ROOM,
     SERVICE_GROUP,
     TIMEOUT_HOST_VALIDATION,
     TITLE_UNKNOWN,
@@ -200,7 +205,28 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         room_lst = call.data.get("room_names")
         await raumfeld.async_create_group(room_lst)
 
+    async def async_handle_add_room(call):
+        room = call.data.get(SERVICE_ADD_ROOM_PAR_ROOM)
+        room_of_group = call.data.get(SERVICE_ADD_ROOM_PAR_MEMBER)
+        room_groups = raumfeld.get_groups()
+        for group in room_groups:
+            if room_of_group in group:
+                await raumfeld.async_add_room_to_group(room, group)
+
+    async def async_handle_drop_room(call):
+        room = call.data.get(SERVICE_DROP_ROOM_PAR_ROOM)
+        room_of_group = call.data.get(SERVICE_DROP_ROOM_PAR_MEMBER)
+        if room_of_group is None:
+            await raumfeld.async_drop_room_from_group(room)
+        else:
+            room_groups = raumfeld.get_groups()
+            for group in room_groups:
+                if room_of_group in group:
+                    await raumfeld.async_drop_room_from_group(room, group)
+
     hass.services.async_register(DOMAIN, SERVICE_GROUP, async_handle_group)
+    hass.services.async_register(DOMAIN, SERVICE_ADD_ROOM, async_handle_add_room)
+    hass.services.async_register(DOMAIN, SERVICE_DROP_ROOM, async_handle_drop_room)
 
     return True
 
@@ -295,6 +321,14 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
     async def async_search_and_group_play(self, zone_room_lst, search_criteria):
         """Search track and play first hit on speaker group"""
         await self.async_search_and_zone_play(zone_room_lst, search_criteria)
+
+    async def async_add_room_to_group(self, room, zone_room_lst):
+        """Add room to speaker group"""
+        await self.async_add_room_to_zone(room, zone_room_lst)
+
+    async def async_drop_room_from_group(self, room, zone_room_lst=None):
+        """Remove room to speaker group"""
+        await self.async_drop_room_from_zone(room, zone_room_lst)
 
     def mk_play_uri(self, media_server_udn, media_type, media_id, track_number=0):
         """Create a valid URI playable by raumfeld media renderer."""
