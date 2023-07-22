@@ -231,6 +231,7 @@ class RaumfeldGroup(MediaPlayerEntity):
         self._repeat = None
         self._play_mode = None
         self._is_spotify_sroom = None
+        self._attributes: dict[str, Any] = {}
 
     # Entity Properties
 
@@ -320,6 +321,11 @@ class RaumfeldGroup(MediaPlayerEntity):
     def media_track(self):
         """Track number of current playing media, music track only."""
         return self._media_track
+
+    @property
+    def extra_state_attributes(self):
+        """Return the state attributes."""
+        return self._attributes
 
     @property
     def shuffle(self):
@@ -481,6 +487,8 @@ class RaumfeldGroup(MediaPlayerEntity):
                     await self._raumfeld.async_set_av_transport_uri(
                         self._rooms, play_uri
                     )
+                    self._attributes["last_content_id"] = play_uri
+                    self._attributes["last_content_type"] = media_type
             else:
                 log_error("Playing of media type '%s' not supported" % media_type)
         else:
