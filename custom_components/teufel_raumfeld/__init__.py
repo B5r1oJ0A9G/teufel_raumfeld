@@ -46,12 +46,12 @@ from .const import (
     POSINF_ELEM_TRACK_DATA,
     POSINF_ELEM_URI,
     SERVICE_ADD_ROOM,
-    SERVICE_ADD_ROOM_PAR_MEMBER,
-    SERVICE_ADD_ROOM_PAR_ROOM,
     SERVICE_DROP_ROOM,
-    SERVICE_DROP_ROOM_PAR_MEMBER,
-    SERVICE_DROP_ROOM_PAR_ROOM,
     SERVICE_GROUP,
+    SERVICE_PAR_MEMBER,
+    SERVICE_PAR_ROOM,
+    SERVICE_PAR_VOLUME,
+    SERVICE_SET_ROOM_VOLUME,
     TIMEOUT_HOST_VALIDATION,
     TITLE_UNKNOWN,
     TRACKINF_ALBUM,
@@ -206,16 +206,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         await raumfeld.async_create_group(room_lst)
 
     async def async_handle_add_room(call):
-        room = call.data.get(SERVICE_ADD_ROOM_PAR_ROOM)
-        room_of_group = call.data.get(SERVICE_ADD_ROOM_PAR_MEMBER)
+        room = call.data.get(SERVICE_PAR_ROOM)
+        room_of_group = call.data.get(SERVICE_PAR_MEMBER)
         room_groups = raumfeld.get_groups()
         for group in room_groups:
             if room_of_group in group:
                 await raumfeld.async_add_room_to_group(room, group)
 
     async def async_handle_drop_room(call):
-        room = call.data.get(SERVICE_DROP_ROOM_PAR_ROOM)
-        room_of_group = call.data.get(SERVICE_DROP_ROOM_PAR_MEMBER)
+        room = call.data.get(SERVICE_PAR_ROOM)
+        room_of_group = call.data.get(SERVICE_PAR_MEMBER)
         if room_of_group is None:
             await raumfeld.async_drop_room_from_group(room)
         else:
@@ -224,9 +224,21 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                 if room_of_group in group:
                     await raumfeld.async_drop_room_from_group(room, group)
 
+    async def async_handle_set_room_volume(call):
+        room = call.data.get(SERVICE_PAR_ROOM)
+        volume = call.data.get(SERVICE_PAR_VOLUME)
+        room_groups = raumfeld.get_groups()
+        for group in room_groups:
+            if room in group:
+                rooms = [room]
+                await raumfeld.async_set_group_room_volume(group, volume, rooms)
+
     hass.services.async_register(DOMAIN, SERVICE_GROUP, async_handle_group)
     hass.services.async_register(DOMAIN, SERVICE_ADD_ROOM, async_handle_add_room)
     hass.services.async_register(DOMAIN, SERVICE_DROP_ROOM, async_handle_drop_room)
+    hass.services.async_register(
+        DOMAIN, SERVICE_SET_ROOM_VOLUME, async_handle_set_room_volume
+    )
 
     return True
 
