@@ -479,26 +479,30 @@ class RaumfeldGroup(MediaPlayerEntity):
                         play_uri = media_id
                 else:
                     log_error("Unhandled media type: %s" % media_type)
-                if self.state == STATE_OFF:
-                    await self.async_turn_on()
                 log_debug("self._rooms=%s, play_uri=%s" % (self._rooms, play_uri))
                 if play_uri is None:
                     log_error("URI to play could not be composed.")
                 else:
+                    announce = kwargs.get(ATTR_MEDIA_ANNOUNCE)
+                    state_was_off = self.state == STATE_OFF
+                    if state_was_off and not announce:
+                        await self.async_turn_on()
                     was_playing = self._state == STATE_PLAYING
-                    is_announce = kwargs.get(ATTR_MEDIA_ANNOUNCE)
-                    if is_announce and was_playing:
+                    if announce and was_playing:
                         log_debug(
                             "Trigger snapshot for '%s' due to announcement"
                             % self._rooms
                         )
                         await self.async_snapshot()
-                    await self._raumfeld.async_set_av_transport_uri(
-                        self._rooms, play_uri
-                    )
-                    self._attributes["last_content_id"] = play_uri
-                    self._attributes["last_content_type"] = media_type
-                    if is_announce and was_playing:
+                    if state_was_off and announce:
+                        log_debug("Skip playing media for announcement because triggered on room or group that is n off state")
+                    else:
+                        await self._raumfeld.async_set_av_transport_uri(
+                            self._rooms, play_uri
+                        )
+                        self._attributes["last_content_id"] = play_uri
+                        self._attributes["last_content_type"] = media_type
+                    if announce and was_playing:
                         while self._state == STATE_PLAYING:
                             await asyncio.sleep(DELAY_FAST_UPDATE_CHECKS)
                         log_debug(
