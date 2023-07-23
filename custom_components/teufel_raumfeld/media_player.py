@@ -457,7 +457,7 @@ class RaumfeldGroup(MediaPlayerEntity):
                         play_uri = media_id
                     if media_id.startswith("media-source"):
                         play_item = await media_source.async_resolve_media(
-                            self.hass, media_id
+                            self.hass, media_id, self.entity_id
                         )
                         play_uri = async_process_play_media_url(
                             self.hass, play_item.url
