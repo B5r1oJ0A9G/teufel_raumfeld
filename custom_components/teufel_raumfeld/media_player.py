@@ -31,6 +31,7 @@ from homeassistant.components.media_player.browse_media import (
     async_process_play_media_url,
 )
 from homeassistant.components.media_player.const import (
+    ATTR_MEDIA_ANNOUNCE,
     ATTR_MEDIA_VOLUME_LEVEL,
     MEDIA_TYPE_MUSIC,
     REPEAT_MODE_ALL,
@@ -484,11 +485,27 @@ class RaumfeldGroup(MediaPlayerEntity):
                 if play_uri is None:
                     log_error("URI to play could not be composed.")
                 else:
+                    was_playing = self._state == STATE_PLAYING
+                    is_announce = kwargs.get(ATTR_MEDIA_ANNOUNCE)
+                    if is_announce and was_playing:
+                        log_debug(
+                            "Trigger snapshot for '%s' due to announcement"
+                            % self._rooms
+                        )
+                        await self.async_snapshot()
                     await self._raumfeld.async_set_av_transport_uri(
                         self._rooms, play_uri
                     )
                     self._attributes["last_content_id"] = play_uri
                     self._attributes["last_content_type"] = media_type
+                    if is_announce and was_playing:
+                        while self._state == STATE_PLAYING:
+                            await asyncio.sleep(DELAY_FAST_UPDATE_CHECKS)
+                        log_debug(
+                            "Trigger restore of snapshot for '%s' due to announcement"
+                            % self._rooms
+                        )
+                        await self.async_restore()
             else:
                 log_error("Playing of media type '%s' not supported" % media_type)
         else:
