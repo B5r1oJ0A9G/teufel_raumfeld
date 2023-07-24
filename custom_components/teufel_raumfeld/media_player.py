@@ -47,6 +47,7 @@ from homeassistant.components.media_player.const import (
     SUPPORT_SEEK,
     SUPPORT_SHUFFLE_SET,
     SUPPORT_STOP,
+    SUPPORT_TURN_OFF,
     SUPPORT_TURN_ON,
     SUPPORT_VOLUME_MUTE,
     SUPPORT_VOLUME_SET,
@@ -97,6 +98,7 @@ SUPPORT_RAUMFELD_GROUP = (
     | SUPPORT_VOLUME_STEP
     | SUPPORT_STOP
     | SUPPORT_TURN_ON
+    | SUPPORT_TURN_OFF
     | SUPPORT_PLAY
     | SUPPORT_SHUFFLE_SET
     | SUPPORT_BROWSE_MEDIA
@@ -349,6 +351,24 @@ class RaumfeldGroup(MediaPlayerEntity):
         """Turn the media player on."""
         if not self._raumfeld.group_is_valid(self._rooms):
             await self._raumfeld.async_create_group(self._rooms)
+            await self._raumfeld.async_restore_group(self._rooms)
+            await self.async_update_transport_state()
+        else:
+            log_debug(
+                "Method was called although speaker group '%s' is invalid" % self._rooms
+            )
+
+    async def async_turn_off(self):
+        """Turn the media player off."""
+        if self._raumfeld.group_is_valid(self._rooms):
+            if self._state == STATE_PLAYING:
+                await self._raumfeld.async_save_group(self._rooms)
+            await self.async_media_pause()
+            rooms_to_drop = self._rooms[1:]
+            while rooms_to_drop:
+                room_to_drop = rooms_to_drop.pop()
+                await self._raumfeld.async_drop_room_from_group(room_to_drop)
+                await asyncio.sleep(DELAY_FAST_UPDATE_CHECKS)
             await self.async_update_transport_state()
         else:
             log_debug(
