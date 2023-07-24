@@ -495,7 +495,9 @@ class RaumfeldGroup(MediaPlayerEntity):
                         )
                         await self.async_snapshot()
                     if state_was_off and announce:
-                        log_debug("Skip playing media for announcement because triggered on room or group that is in off state")
+                        log_debug(
+                            "Skip playing media for announcement because triggered on room or group that is in off state"
+                        )
                     else:
                         await self._raumfeld.async_set_av_transport_uri(
                             self._rooms, play_uri
