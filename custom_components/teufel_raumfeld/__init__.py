@@ -439,7 +439,10 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
 
             # Workaround: Sometimes XML includes namespaces.
             if DIDL_ELEM_TITLE in entry:
-                if DIDL_VALUE in entry[DIDL_ELEM_TITLE]:
+                if (
+                    entry[DIDL_ELEM_TITLE] is not None
+                    and DIDL_VALUE in entry[DIDL_ELEM_TITLE]
+                ):
                     title = entry[DIDL_ELEM_TITLE][DIDL_VALUE]
                 else:
                     title = entry[DIDL_ELEM_TITLE]
