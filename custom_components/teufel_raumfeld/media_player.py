@@ -38,6 +38,7 @@ from homeassistant.components.media_player.const import (
     REPEAT_MODE_OFF,
     REPEAT_MODE_ONE,
     SUPPORT_BROWSE_MEDIA,
+    SUPPORT_GROUPING,
     SUPPORT_NEXT_TRACK,
     SUPPORT_PAUSE,
     SUPPORT_PLAY,
@@ -105,6 +106,8 @@ SUPPORT_RAUMFELD_GROUP = (
     | SUPPORT_REPEAT_SET
 )
 
+SUPPORT_RAUMFELD_ROOM = SUPPORT_RAUMFELD_GROUP | SUPPORT_GROUPING
+
 SUPPORTED_MEDIA_TYPES = [
     MEDIA_TYPE_MUSIC,
     UPNP_CLASS_ALBUM,
@@ -168,11 +171,13 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
                 if entity.disabled:
                     continue
                 devices.append(RaumfeldGroup(group, raumfeld))
+                raumfeld.eid_to_obj[entity.entity_id] = uid_to_obj(entity.unique_id)
         else:
             log_info(
                 "Media player entity '%s' is not recognized as speaker group"
                 % entity.entity_id
             )
+            raumfeld.eid_to_obj[entity.entity_id] = uid_to_obj(entity.unique_id)
 
     async_add_devices(devices)
     platform.async_register_entity_service(SERVICE_RESTORE, {}, "async_restore")
@@ -339,6 +344,11 @@ class RaumfeldGroup(MediaPlayerEntity):
     def repeat(self):
         """Return current repeat mode."""
         return self._repeat
+
+    @property
+    def group_members(self):
+        """Return group memebers."""
+        return self._rooms
 
     @property
     def supported_features(self):
@@ -813,6 +823,35 @@ class RaumfeldRoom(RaumfeldGroup):
         if self._is_spotify_sroom:
             return SUPPORT_RAUMFELD_SPOTIFY
         return super().supported_features
+
+    @property
+    def supported_features(self):
+        """Flag media player features that are supported."""
+        return SUPPORT_RAUMFELD_ROOM
+
+    async def async_join_players(self, group_members):
+        """Join `group_members` as a player group with the current player."""
+        if self._raumfeld.group_is_valid(self._rooms):
+            room_lst = []
+            for member in group_members:
+                obj = self._raumfeld.eid_to_obj[member]
+                room_lst += obj
+            await self._raumfeld.async_add_rooms_to_group(room_lst, self._rooms)
+            await self.async_update_transport_state()
+        else:
+            log_debug(
+                "Method was called although speaker group '%s' is invalid" % self._rooms
+            )
+
+    async def async_unjoin_player(self):
+        """Remove this player from any group."""
+        if not self._raumfeld.group_is_valid(self._rooms):
+            await self._raumfeld.async_drop_room_from_group(self._room)
+            await self.async_update_transport_state()
+        else:
+            log_debug(
+                "Method was called although speaker group '%s' is valid" % self._rooms
+            )
 
     async def async_update(self):
         """Update entity"""

@@ -262,6 +262,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
 class HassRaumfeldHost(hassfeld.RaumfeldHost):
     """Raumfeld Host class adapted for Home Assistant."""
 
+    eid_to_obj = {}
+
     def get_groups(self):
         """Get active speaker groups."""
         return self.get_zones()
@@ -341,6 +343,10 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
     async def async_drop_room_from_group(self, room, zone_room_lst=None):
         """Remove room to speaker group"""
         await self.async_drop_room_from_zone(room, zone_room_lst)
+
+    async def async_add_rooms_to_group(self, room_lst, zone_room_lst):
+        """Add rooms to a speaker group"""
+        await self.async_add_rooms_to_zone(room_lst, zone_room_lst)
 
     def mk_play_uri(self, media_server_udn, media_type, media_id, track_number=0):
         """Create a valid URI playable by raumfeld media renderer."""
