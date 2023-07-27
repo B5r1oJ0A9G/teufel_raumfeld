@@ -29,6 +29,10 @@ MESSAGE_PHASE_ALPHA = (
     " This includes, among other things, the addition, redesign or removal of functionality."
 )
 OBJECT_ID_LINE_IN = "0/Line In"
+OPTION_ANNOUNCEMENT_VOLUME = "announcement_volume"
+OPTION_CHANGE_STEP_VOLUME_DOWN = "change_step_volume_down"
+OPTION_CHANGE_STEP_VOLUME_UP = "change_step_volume_up"
+OPTION_FIXED_ANNOUNCEMENT_VOLUME = "fixed_announcement_volume"
 PLATFORMS = ["media_player", "sensor"]
 PORT_LINE_IN = 8888
 POSINF_ELEM_ABS_TIME = "AbsTime"
@@ -74,7 +78,3 @@ UPNP_CLASS_PODCAST_EPISODE = "object.item.audioItem.podcastEpisode"
 UPNP_CLASS_LINE_IN = "object.item.audioItem.audioBroadcast.lineIn"
 UPNP_CLASS_AUDIO_ITEM = "object.item.audioItem"
 URN_CONTENT_DIRECTORY = "urn:upnp-org:serviceId:ContentDirectory"
-OPTION_CHANGE_STEP_VOLUME_UP = "change_step_volume_up"
-OPTION_CHANGE_STEP_VOLUME_DOWN = "change_step_volume_down"
-OPTION_ANNOUNCEMENT_VOLUME = "announcement_volume"
-OPTION_FIXED_ANNOUNCEMENT_VOLUME = "fixed_announcement_volume"
