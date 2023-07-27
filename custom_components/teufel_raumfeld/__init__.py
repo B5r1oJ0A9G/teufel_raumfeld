@@ -14,11 +14,11 @@ from hassfeld.constants import (
     TRIGGER_UPDATE_SYSTEM_STATE,
     TRIGGER_UPDATE_ZONE_CONFIG,
 )
-
 from homeassistant.components.media_player import BrowseMedia
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import aiohttp_client
+from homeassistant.helpers import config_validation as cv
 
 from .const import (
     ATTR_EVENT_WSUPD_TYPE,
@@ -78,6 +78,8 @@ from .const import (
 )
 
 _LOGGER = logging.getLogger(__name__)
+
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 
 def set_hassfeld_log_level(raumfeld):
