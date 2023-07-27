@@ -22,7 +22,6 @@ from hassfeld.constants import (
     TRANSPORT_STATE_STOPPED,
     TRANSPORT_STATE_TRANSITIONING,
 )
-
 from homeassistant.components import media_source
 from homeassistant.components.media_player import (
     MediaPlayerDeviceClass,

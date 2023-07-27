@@ -4,7 +4,6 @@ from typing import Any
 
 import hassfeld
 import voluptuous as vol
-
 from homeassistant import config_entries, core, exceptions
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
