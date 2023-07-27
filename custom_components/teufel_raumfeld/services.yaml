@@ -1,4 +1,5 @@
 snapshot:
+  name: Save a snapshot
   description: Take a snapshot of the media player.
   fields:
     entity_id:
@@ -6,6 +7,7 @@ snapshot:
       example: "media_player.group_kitchen_living_room"
 
 restore:
+  name: Restore a snapshot
   description: Restore a snapshot of the media player.
   fields:
     entity_id:
@@ -13,6 +15,7 @@ restore:
       example: "media_player.group_kitchen_living_room"
 
 group:
+  name: Group speakers
   description: Group rooms to virtual media player (multi-room).
   fields:
     room_names:
@@ -20,6 +23,7 @@ group:
       example: "[ 'Kitchen', 'Living room' ]"
 
 abs_volume_set:
+  name: Set absolut volume
   description: Set volume of all rooms in a media player's spaker group to the same level.
   fields:
     entity_id:
@@ -30,6 +34,7 @@ abs_volume_set:
       example: 0.3
 
 set_power_state:
+  name: Set power state
   description: Enter automatic or manual standby, resp. leave standby.
   fields:
     entity_id:
@@ -40,6 +45,7 @@ set_power_state:
       example: "off"
 
 play_sound:
+  name: Play a system sound
   description: Plays the system sound "Success" or "Failure", resp. mixes it into the currently played media.
   fields:
     entity_id:
@@ -50,6 +56,7 @@ play_sound:
       example: "Success"
 
 add_room:
+  name: Add room to group
   description: Add a room to a speaker group.
   fields:
     room:
@@ -60,6 +67,7 @@ add_room:
       example: "Movie room"
 
 drop_room:
+  name: Drop room from group
   description: Remove a room from a speaker group.
   fields:
     room:
@@ -70,6 +78,7 @@ drop_room:
       example: "Movie room"
 
 set_room_volume:
+  name: Set room volume
   description: Set volume of a room.
   fields:
     room:
