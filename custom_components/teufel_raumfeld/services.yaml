@@ -4,86 +4,82 @@ snapshot:
   fields:
     entity_id:
       description: Name(s) of entities that will be snapshot.
-      example: "media_player.group_kitchen_living_room"
-
+      example: media_player.group_kitchen_living_room
 restore:
   name: Restore a snapshot
   description: Restore a snapshot of the media player.
   fields:
     entity_id:
       description: Name(s) of entities that will be restored.
-      example: "media_player.group_kitchen_living_room"
-
+      example: media_player.group_kitchen_living_room
 group:
   name: Group speakers
   description: Group rooms to virtual media player (multi-room).
   fields:
     room_names:
-      description: List of room names that will be grouped together. At least one room must be specified
+      description: List of room names that will be grouped together. At least one room
+        must be specified
       example: "[ 'Kitchen', 'Living room' ]"
-
 abs_volume_set:
   name: Set absolut volume
   description: Set volume of all rooms in a media player's spaker group to the same level.
   fields:
     entity_id:
       description: Name(s) of entities to set volume level on.
-      example: "media_player.group_kitchen_living_room"
+      example: media_player.group_kitchen_living_room
     volume_level:
       description: Volume level to set as float.
       example: 0.3
-
 set_power_state:
   name: Set power state
   description: Enter automatic or manual standby, resp. leave standby.
   fields:
     entity_id:
       description: Name(s) of entities to set the power state.
-      example: "sensor.room_kitchen_powerstate"
+      example: sensor.room_kitchen_powerstate
     power_state:
       description: "Power state: eco, off, on."
-      example: "off"
-
+      example: off
 play_sound:
   name: Play a system sound
-  description: Plays the system sound "Success" or "Failure", resp. mixes it into the currently played media.
+  description: Plays the system sound "Success" or "Failure", resp. mixes it into
+    the currently played media.
   fields:
     entity_id:
       description: Name(s) of entities to set volume level on.
-      example: "media_player.group_kitchen_living_room"
+      example: media_player.group_kitchen_living_room
     sound:
-      description: "Sound to play"
-      example: "Success"
-
+      description: Sound to play
+      example: Success
 add_room:
   name: Add room to group
   description: Add a room to a speaker group.
   fields:
     room:
       description: Name of the room to add to the speaker group.
-      example: "Movie room"
+      example: Movie room
     room_of_group:
       description: Name of one room member of the speaker group.
-      example: "Movie room"
-
+      example: Movie room
 drop_room:
   name: Drop room from group
   description: Remove a room from a speaker group.
   fields:
     room:
       description: Name of the room to remove from a speaker group.
-      example: "Movie room"
+      example: Movie room
     room_of_group:
-      description: Name of one room member of the speaker group. If provided, the room must be member of that group.
-      example: "Movie room"
-
+      description: Name of one room member of the speaker group. If provided, the room
+        must be member of that group.
+      example: Movie room
 set_room_volume:
   name: Set room volume
   description: Set volume of a room.
   fields:
     room:
       description: Name of the room to remove from a speaker group.
-      example: "Movie room"
+      example: Movie room
     volume:
-      description: Name of one room member of the speaker group. If provided, the room must be member of that group.
+      description: Name of one room member of the speaker group. If provided, the room
+        must be member of that group.
       example: "20"
