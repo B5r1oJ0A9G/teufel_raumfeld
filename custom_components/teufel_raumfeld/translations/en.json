@@ -15,5 +15,17 @@
                 }
             }
         }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "data": {
+                    "fixed_announcement_volume": "Use custom volume for announcements",
+                    "announcement_volume": "Volume for announcements",
+                    "change_step_volume_up": "Change step for volume up",
+                    "change_step_volume_down": "Change step for volume down"
+                }
+            }
+        }
     }
 }

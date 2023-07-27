@@ -1,8 +1,9 @@
 """Constants for the Teufel Raumfeld integration."""
 ATTR_EVENT_WSUPD_TYPE = "type"
 ATTR_POWER_STATE = "power_state"
-CHANGE_STEP_VOLUME_DOWN = -2
-CHANGE_STEP_VOLUME_UP = 5
+DEFAULT_ANNOUNCEMENT_VOLUME = 40
+DEFAULT_CHANGE_STEP_VOLUME_DOWN = -2
+DEFAULT_CHANGE_STEP_VOLUME_UP = 5
 DEFAULT_HOST_WEBSERVICE = "raumfeld-host.example.com"
 DEFAULT_PORT_WEBSERVICE = "47365"
 DELAY_FAST_UPDATE_CHECKS = 0.3
@@ -73,3 +74,7 @@ UPNP_CLASS_PODCAST_EPISODE = "object.item.audioItem.podcastEpisode"
 UPNP_CLASS_LINE_IN = "object.item.audioItem.audioBroadcast.lineIn"
 UPNP_CLASS_AUDIO_ITEM = "object.item.audioItem"
 URN_CONTENT_DIRECTORY = "urn:upnp-org:serviceId:ContentDirectory"
+OPTION_CHANGE_STEP_VOLUME_UP = "change_step_volume_up"
+OPTION_CHANGE_STEP_VOLUME_DOWN = "change_step_volume_down"
+OPTION_ANNOUNCEMENT_VOLUME = "announcement_volume"
+OPTION_FIXED_ANNOUNCEMENT_VOLUME = "fixed_announcement_volume"

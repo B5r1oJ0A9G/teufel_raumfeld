@@ -14,6 +14,7 @@ from hassfeld.constants import (
     TRIGGER_UPDATE_SYSTEM_STATE,
     TRIGGER_UPDATE_ZONE_CONFIG,
 )
+
 from homeassistant.components.media_player import BrowseMedia
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -21,6 +22,9 @@ from homeassistant.helpers import aiohttp_client
 
 from .const import (
     ATTR_EVENT_WSUPD_TYPE,
+    DEFAULT_ANNOUNCEMENT_VOLUME,
+    DEFAULT_CHANGE_STEP_VOLUME_DOWN,
+    DEFAULT_CHANGE_STEP_VOLUME_UP,
     DELAY_MODERATE_UPDATE_CHECKS,
     DIDL_ATTR_CHILD_CNT,
     DIDL_ATTR_ID,
@@ -38,6 +42,10 @@ from .const import (
     MEDIA_CONTENT_ID_SEP,
     MESSAGE_PHASE_ALPHA,
     OBJECT_ID_LINE_IN,
+    OPTION_ANNOUNCEMENT_VOLUME,
+    OPTION_CHANGE_STEP_VOLUME_DOWN,
+    OPTION_CHANGE_STEP_VOLUME_UP,
+    OPTION_FIXED_ANNOUNCEMENT_VOLUME,
     PLATFORMS,
     PORT_LINE_IN,
     POSINF_ELEM_ABS_TIME,
@@ -161,6 +169,12 @@ def event_on_update(hass, update_type):
         log_fatal("Unexpected update type: %s" % update_type)
 
 
+async def update_listener(hass, entry):
+    """Handle options update."""
+    raumfeld = hass.data[DOMAIN][entry.entry_id]
+    raumfeld.options = entry.options.copy()
+
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up Teufel Raumfeld from a config entry."""
 
@@ -172,6 +186,19 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     http_session = aiohttp_client.async_get_clientsession(hass)
     raumfeld = HassRaumfeldHost(host, port, session=http_session)
     set_hassfeld_log_level(raumfeld)
+    raumfeld.options[OPTION_ANNOUNCEMENT_VOLUME] = entry.options.get(
+        OPTION_ANNOUNCEMENT_VOLUME, DEFAULT_ANNOUNCEMENT_VOLUME
+    )
+    raumfeld.options[OPTION_FIXED_ANNOUNCEMENT_VOLUME] = entry.options.get(
+        OPTION_ANNOUNCEMENT_VOLUME, False
+    )
+    raumfeld.options[OPTION_CHANGE_STEP_VOLUME_UP] = entry.options.get(
+        OPTION_CHANGE_STEP_VOLUME_UP, DEFAULT_CHANGE_STEP_VOLUME_UP
+    )
+    raumfeld.options[OPTION_CHANGE_STEP_VOLUME_DOWN] = entry.options.get(
+        OPTION_CHANGE_STEP_VOLUME_DOWN, DEFAULT_CHANGE_STEP_VOLUME_DOWN
+    )
+
     max_attempts = int(TIMEOUT_HOST_VALIDATION / DELAY_MODERATE_UPDATE_CHECKS)
 
     for attempt in range(1, max_attempts):
@@ -240,6 +267,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         DOMAIN, SERVICE_SET_ROOM_VOLUME, async_handle_set_room_volume
     )
 
+    entry.async_on_unload(entry.add_update_listener(update_listener))
+
     return True
 
 
@@ -262,6 +291,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
 class HassRaumfeldHost(hassfeld.RaumfeldHost):
     """Raumfeld Host class adapted for Home Assistant."""
 
+    options = {}
     eid_to_obj = {}
 
     def get_groups(self):

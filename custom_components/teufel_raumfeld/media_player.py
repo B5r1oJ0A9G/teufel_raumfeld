@@ -22,6 +22,7 @@ from hassfeld.constants import (
     TRANSPORT_STATE_STOPPED,
     TRANSPORT_STATE_TRANSITIONING,
 )
+
 from homeassistant.components import media_source
 from homeassistant.components.media_player import (
     MediaPlayerDeviceClass,
@@ -61,12 +62,14 @@ from homeassistant.util.dt import utcnow
 
 from . import log_debug, log_error, log_fatal, log_info
 from .const import (
-    CHANGE_STEP_VOLUME_DOWN,
-    CHANGE_STEP_VOLUME_UP,
     DELAY_FAST_UPDATE_CHECKS,
     DOMAIN,
     GROUP_PREFIX,
     MEDIA_CONTENT_ID_SEP,
+    OPTION_ANNOUNCEMENT_VOLUME,
+    OPTION_CHANGE_STEP_VOLUME_DOWN,
+    OPTION_CHANGE_STEP_VOLUME_UP,
+    OPTION_FIXED_ANNOUNCEMENT_VOLUME,
     ROOM_PREFIX,
     SERVICE_PLAY_SYSTEM_SOUND,
     SERVICE_RESTORE,
@@ -529,6 +532,14 @@ class RaumfeldGroup(MediaPlayerEntity):
                             "Skip playing media for announcement because triggered on room or group that is in off state"
                         )
                     else:
+                        fixed_announcement_volume = self._raumfeld.options[
+                            OPTION_FIXED_ANNOUNCEMENT_VOLUME
+                        ]
+                        if fixed_announcement_volume:
+                            announcement_volume = (
+                                self._raumfeld.options[OPTION_ANNOUNCEMENT_VOLUME] / 100
+                            )
+                            await self.async_set_volume_level(announcement_volume)
                         await self._raumfeld.async_set_av_transport_uri(
                             self._rooms, play_uri
                         )
@@ -611,8 +622,9 @@ class RaumfeldGroup(MediaPlayerEntity):
     async def async_volume_up(self):
         """Turn volume up for media player."""
         if self._raumfeld.group_is_valid(self._rooms):
+            change_step_volume = self._raumfeld.options[OPTION_CHANGE_STEP_VOLUME_UP]
             await self._raumfeld.async_change_group_volume(
-                self._rooms, CHANGE_STEP_VOLUME_UP
+                self._rooms, change_step_volume
             )
             await self.async_update_volume_level()
         else:
@@ -623,8 +635,11 @@ class RaumfeldGroup(MediaPlayerEntity):
     async def async_volume_down(self):
         """Turn volume down for media player."""
         if self._raumfeld.group_is_valid(self._rooms):
+            change_step_volume = (
+                -1 * self._raumfeld.options[OPTION_CHANGE_STEP_VOLUME_DOWN]
+            )
             await self._raumfeld.async_change_group_volume(
-                self._rooms, CHANGE_STEP_VOLUME_DOWN
+                self._rooms, change_step_volume
             )
             await self.async_update_volume_level()
         else:
