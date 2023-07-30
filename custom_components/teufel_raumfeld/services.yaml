@@ -23,14 +23,13 @@ abs_volume_set:
   fields:
     volume_level:
       required: true
-      description: Volume level to set as float (0.0-1).
-      example: 0.42
-      default: 0.3
+      description: Volume level to set.
+      example: 42
+      default: 30
       selector:
         number:
           min: 0
-          max: 1
-          step: 0.01
+          max: 100
     rooms:
       description: Optional name(s) of rooms to set volume level on. If not set,volume
         is set to all rooms in the speaker group.

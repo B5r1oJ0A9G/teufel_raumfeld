@@ -189,7 +189,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
         vol.All(
             cv.make_entity_service_schema(
                 {
-                    vol.Required(ATTR_MEDIA_VOLUME_LEVEL): cv.small_float,
+                    vol.Required(ATTR_MEDIA_VOLUME_LEVEL): cv.positive_int,
                     vol.Optional("rooms"): vol.All(
                         cv.ensure_list, [vol.In(room_names)]
                     ),
@@ -805,9 +805,9 @@ class RaumfeldGroup(MediaPlayerEntity):
             )
 
     async def async_set_rooms_volume_level(self, volume_level, rooms=None):
-        """Set volume level, range 0..1."""
+        """Set volume level, range 0..100."""
         if self._raumfeld.group_is_valid(self._rooms):
-            raumfeld_vol = int(volume_level * 100)
+            raumfeld_vol = volume_level
             await self._raumfeld.async_set_group_room_volume(
                 self._rooms, raumfeld_vol, rooms
             )
