@@ -35,24 +35,6 @@ abs_volume_set:
       description: Optional name(s) of rooms to set volume level on. If not set,volume
         is set to all rooms in the speaker group.
       example: "[ Kitchen, Playroom ]"
-set_power_state:
-  target:
-    entity:
-      integration: teufel_raumfeld
-      domain: select
-  fields:
-    power_state:
-      required: true
-      name: Power state
-      description: "Power state: eco, off, on."
-      example: off
-      default: on
-      selector:
-        select:
-          options:
-            - "off"
-            - "eco"
-            - "on"
 play_sound:
   target:
     entity:
