@@ -1,85 +1,114 @@
 snapshot:
-  name: Save a snapshot
-  description: Take a snapshot of the media player.
-  fields:
-    entity_id:
-      description: Name(s) of entities that will be snapshot.
-      example: media_player.group_kitchen_living_room
+  target:
+    entity:
+      integration: teufel_raumfeld
+      domain: media_player
 restore:
-  name: Restore a snapshot
-  description: Restore a snapshot of the media player.
-  fields:
-    entity_id:
-      description: Name(s) of entities that will be restored.
-      example: media_player.group_kitchen_living_room
+  target:
+    entity:
+      integration: teufel_raumfeld
+      domain: media_player
 group:
-  name: Group speakers
-  description: Group rooms to virtual media player (multi-room).
   fields:
     room_names:
+      required: true
       description: List of room names that will be grouped together. At least one room
         must be specified
       example: "[ 'Kitchen', 'Living room' ]"
 abs_volume_set:
-  name: Set absolut volume
-  description: Set volume of all rooms in a media player's spaker group to the same level.
+  target:
+    entity:
+      integration: teufel_raumfeld
+      domain: media_player
   fields:
-    entity_id:
-      description: Name(s) of entities to set volume level on.
-      example: media_player.group_kitchen_living_room
     volume_level:
-      description: Volume level to set as float.
-      example: 0.3
+      required: true
+      description: Volume level to set as float (0.0-1).
+      example: 0.42
+      default: 0.3
+      selector:
+        number:
+          min: 0
+          max: 1
+          step: 0.01
+    rooms:
+      description: Optional name(s) of rooms to set volume level on. If not set,volume
+        is set to all rooms in the speaker group.
+      example: "[ Kitchen, Playroom ]"
 set_power_state:
-  name: Set power state
-  description: Enter automatic or manual standby, resp. leave standby.
+  target:
+    entity:
+      integration: teufel_raumfeld
+      domain: select
   fields:
-    entity_id:
-      description: Name(s) of entities to set the power state.
-      example: sensor.room_kitchen_powerstate
     power_state:
+      required: true
+      name: Power state
       description: "Power state: eco, off, on."
       example: off
+      default: on
+      selector:
+        select:
+          options:
+            - "off"
+            - "eco"
+            - "on"
 play_sound:
-  name: Play a system sound
-  description: Plays the system sound "Success" or "Failure", resp. mixes it into
-    the currently played media.
+  target:
+    entity:
+      integration: teufel_raumfeld
+      domain: media_player
   fields:
-    entity_id:
-      description: Name(s) of entities to set volume level on.
-      example: media_player.group_kitchen_living_room
     sound:
+      required: true
+      selector:
+        select:
+          options:
+            - Failure
+            - Success
       description: Sound to play
       example: Success
+      default: Success
 add_room:
-  name: Add room to group
-  description: Add a room to a speaker group.
+  target:
+    entity:
+      integration: teufel_raumfeld
+      domain: media_player
   fields:
     room:
+      required: true
       description: Name of the room to add to the speaker group.
       example: Movie room
     room_of_group:
+      required: true
       description: Name of one room member of the speaker group.
       example: Movie room
 drop_room:
-  name: Drop room from group
-  description: Remove a room from a speaker group.
   fields:
     room:
+      required: true
       description: Name of the room to remove from a speaker group.
       example: Movie room
     room_of_group:
-      description: Name of one room member of the speaker group. If provided, the room
-        must be member of that group.
-      example: Movie room
+      description: Name of the speaker group to remove the room from.
+      example: Ground floor
 set_room_volume:
-  name: Set room volume
-  description: Set volume of a room.
+  target:
+    entity:
+      integration: teufel_raumfeld
+      domain: media_player
   fields:
     room:
+      required: true
       description: Name of the room to remove from a speaker group.
       example: Movie room
     volume:
+      required: true
       description: Name of one room member of the speaker group. If provided, the room
         must be member of that group.
-      example: "20"
+      example: "42"
+      default: "20"
+      selector:
+        number:
+          min: 0
+          max: 100

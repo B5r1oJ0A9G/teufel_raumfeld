@@ -1,6 +1,7 @@
 """Constants for the Teufel Raumfeld integration."""
+from enum import IntFlag
+
 ATTR_EVENT_WSUPD_TYPE = "type"
-ATTR_POWER_STATE = "power_state"
 DEFAULT_ANNOUNCEMENT_VOLUME = 40
 DEFAULT_CHANGE_STEP_VOLUME_DOWN = -2
 DEFAULT_CHANGE_STEP_VOLUME_UP = 5
@@ -8,6 +9,7 @@ DEFAULT_HOST_WEBSERVICE = "raumfeld-host.example.com"
 DEFAULT_PORT_WEBSERVICE = "47365"
 DELAY_FAST_UPDATE_CHECKS = 0.3
 DELAY_MODERATE_UPDATE_CHECKS = 1
+DELAY_POWER_STATE_UPDATE = 2
 DEVICE_MANUFACTURER = "Teufel Audio GmbH"
 DIDL_ATTR_ID = "@id"
 DIDL_ATTR_CHILD_CNT = "@childCount"
@@ -33,7 +35,7 @@ OPTION_ANNOUNCEMENT_VOLUME = "announcement_volume"
 OPTION_CHANGE_STEP_VOLUME_DOWN = "change_step_volume_down"
 OPTION_CHANGE_STEP_VOLUME_UP = "change_step_volume_up"
 OPTION_FIXED_ANNOUNCEMENT_VOLUME = "fixed_announcement_volume"
-PLATFORMS = ["media_player", "sensor"]
+PLATFORMS = ["media_player", "sensor", "select"]
 PORT_LINE_IN = 8888
 POSINF_ELEM_ABS_TIME = "AbsTime"
 POSINF_ELEM_DURATION = "TrackDuration"

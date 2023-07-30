@@ -2,26 +2,17 @@
 
 import inspect
 
-import voluptuous as vol
 from hassfeld.constants import (
     POWER_ACTIVE,
     POWER_STANDBY_AUTOMATIC,
     POWER_STANDBY_MANUAL,
 )
 from homeassistant.components.media_player import MediaPlayerDeviceClass
-from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import entity_platform
 from homeassistant.helpers.entity import Entity
 
-from . import log_debug, log_fatal
-from .const import (
-    ATTR_POWER_STATE,
-    DOMAIN,
-    POWER_ECO,
-    POWER_ON,
-    POWER_STANDBY,
-    ROOM_PREFIX,
-)
+from . import log_debug
+from .const import DOMAIN, POWER_ECO, POWER_ON, POWER_STANDBY, ROOM_PREFIX
 
 STATE_TO_ICON = {
     POWER_ACTIVE: "mdi:power-on",
@@ -70,25 +61,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
         log_debug("sensor_config=%s" % sensor_config)
         devices.append(RaumfeldSpeaker(raumfeld, sensor_config))
 
-    for room in room_names:
-        sensor_config = {
-            "room_name": room,
-            "get_state": raumfeld.get_room_power_state,
-            "identifier": room,
-            "sensor_name": "PowerState",
-        }
-        log_debug("sensor_config=%s" % sensor_config)
-        devices.append(RaumfeldPowerState(raumfeld, sensor_config))
-
     async_add_devices(devices)
-
-    platform.async_register_entity_service(
-        "set_power_state",
-        vol.All(
-            cv.make_entity_service_schema({vol.Required(ATTR_POWER_STATE): cv.string})
-        ),
-        "async_set_room_power_state",
-    )
 
     return True
 
@@ -208,23 +181,3 @@ class RaumfeldRoom(Entity):
             self._state = state
         if state in STATE_TO_ICON:
             self._icon = STATE_TO_ICON[state]
-
-
-class RaumfeldPowerState(RaumfeldRoom):
-    """Power state sensor of a room."""
-
-    def __init__(self, raumfeld, sensor_config):
-        """Initialize the Raumfeld speaker sensor."""
-        super().__init__(sensor_config)
-        self._raumfeld = raumfeld
-
-    async def async_set_room_power_state(self, power_state):
-        """Put a speaker in standby or wake it up."""
-        if power_state == POWER_ON:
-            await self._raumfeld.async_leave_standby(self._room_name)
-        elif power_state == POWER_ECO:
-            await self._raumfeld.async_enter_automatic_standby(self._room_name)
-        elif power_state == POWER_STANDBY:
-            await self._raumfeld.async_enter_manual_standby(self._room_name)
-        else:
-            log_fatal("Unexpected power state: {power_state}")
