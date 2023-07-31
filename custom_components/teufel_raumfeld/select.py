@@ -1,10 +1,8 @@
 """Platform for select integration."""
 
 import asyncio
-import inspect
 
 from homeassistant.components.select import SelectEntity
-from homeassistant.helpers import entity_platform
 
 from . import log_debug, log_fatal
 from .common import RaumfeldRoom
@@ -17,7 +15,6 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     device_udns = raumfeld.get_raumfeld_device_udns()
     log_debug("device_udns=%s" % device_udns)
     room_names = raumfeld.get_rooms()
-    platform = entity_platform.current_platform.get()
     devices = []
 
     for room in room_names:

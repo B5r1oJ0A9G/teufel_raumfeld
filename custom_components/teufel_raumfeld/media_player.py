@@ -4,6 +4,7 @@ import base64
 import datetime
 import logging
 import pickle
+from typing import Any
 
 import voluptuous as vol
 from hassfeld.constants import (
@@ -528,7 +529,8 @@ class RaumfeldGroup(MediaPlayerEntity):
                         await self.async_snapshot()
                     if state_was_off and announce:
                         log_debug(
-                            "Skip playing media for announcement because triggered on room or group that is in off state"
+                            "Skip playing media for announcement because triggered on room "
+                            + "or group that is in off state"
                         )
                     else:
                         fixed_announcement_volume = self._raumfeld.options[

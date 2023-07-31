@@ -1,11 +1,9 @@
 """Platform for sensor integration."""
 
 from homeassistant.components.media_player import MediaPlayerDeviceClass
-from homeassistant.helpers import entity_platform
 from homeassistant.helpers.entity import Entity
 
 from . import log_debug
-from .common import RaumfeldRoom
 from .const import DOMAIN
 
 
@@ -14,8 +12,6 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     raumfeld = hass.data[DOMAIN][config_entry.entry_id]
     device_udns = raumfeld.get_raumfeld_device_udns()
     log_debug("device_udns=%s" % device_udns)
-    room_names = raumfeld.get_rooms()
-    platform = entity_platform.current_platform.get()
     devices = []
 
     for udn in device_udns:
