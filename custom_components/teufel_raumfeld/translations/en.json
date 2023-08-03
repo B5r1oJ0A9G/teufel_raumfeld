@@ -102,6 +102,20 @@
         "restore": {
             "name":"Restore a snapshot",
             "description": "Restore a snapshot of the media player."
+        },
+        "play_sound": {
+            "name":"Play system sound",
+            "description": "Playback a system sounds. The sound gets mixed into potentially played media.",
+            "fields": {
+                "room_names": {
+                    "name":"Room",
+                    "description": "Room name for the playback of the system sound."
+                },
+                "sound": {
+                    "name":"Sound",
+                    "description": "Systen sound to playback."
+                }
+            }
         }
     }
 }
