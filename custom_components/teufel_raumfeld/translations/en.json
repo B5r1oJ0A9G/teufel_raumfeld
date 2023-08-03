@@ -27,5 +27,81 @@
                 }
             }
         }
+    },
+    "services": {
+        "abs_volume_set": {
+            "name":"Set absolut volume",
+            "description": "Sets the volume of multiple rooms in a media player's speaker group to the same level.",
+            "fields": {
+                "volume_level": {
+                    "name":"Volume",
+                    "description": "Volume level to be set as an integer between 1 and 100."
+                },
+                "rooms": {
+                    "name":"Rooms",
+                    "description": "Optional: The names of the rooms for which the volume is to be set. If not specified, the volume is set for all rooms in the speaker group."
+                }
+            }
+        },
+        "add_room": {
+            "name": "Add room to group",
+            "description": "Add a room to a speaker group.",
+            "fields": {
+                "room": {
+                    "name": "Room",
+                    "description": "Name of the room to be added to the speaker group."
+                },
+                "room_of_group": {
+                    "name":"Group member",
+                    "description": "Name of a room member of the target speaker group."
+                }
+            }
+        },
+        "drop_room": {
+            "name": "Drop room from group",
+            "description": "Remove a room from a speaker group.",
+            "fields": {
+                "room": {
+                    "name":"Room",
+                    "description": "Name of the room to be removed from a speaker group."
+                },
+                "room_of_group": {
+                    "name":"Group member",
+                    "description": "Optional: Name of a room that is a member of the speaker group. If specified, the room to be removed must be a member of this group."
+                }
+            }
+        },
+        "group": {
+            "name":"Group speakers",
+            "description": "Group rooms into a virtual media player (multi-room).",
+            "fields": {
+                "room_names": {
+                    "name":"Rooms",
+                    "description": "List of room names to be combined in a group. At least one room must be specified."
+                }
+            }
+        },
+        "set_room_volume": {
+            "name":"Set room volume",
+            "description": "Set the volume of a room.",
+            "fields": {
+                "room": {
+                    "name":"Room",
+                    "description": "Name of the room whose volume is to be adjusted."
+                },
+                "volume": {
+                    "name":"Volume",
+                    "description": "Volume level to be set as an integer between 1 and 100."
+                }
+            }
+        },
+        "snapshot": {
+            "name":"Save a snapshot",
+            "description": "Take a snapshot of the media player."
+        },
+        "restore": {
+            "name":"Restore a snapshot",
+            "description": "Restore a snapshot of the media player."
+        }
     }
 }
