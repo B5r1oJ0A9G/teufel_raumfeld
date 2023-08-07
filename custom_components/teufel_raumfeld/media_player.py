@@ -536,7 +536,7 @@ class RaumfeldGroup(MediaPlayerEntity):
                         fixed_announcement_volume = self._raumfeld.options[
                             OPTION_FIXED_ANNOUNCEMENT_VOLUME
                         ]
-                        if fixed_announcement_volume:
+                        if announce and fixed_announcement_volume:
                             announcement_volume = (
                                 self._raumfeld.options[OPTION_ANNOUNCEMENT_VOLUME] / 100
                             )
