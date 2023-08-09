@@ -23,7 +23,9 @@
                     "fixed_announcement_volume": "Use custom volume for announcements",
                     "announcement_volume": "Custom volume for announcements",
                     "change_step_volume_up": "Change step for volume up",
-                    "change_step_volume_down": "Change step for volume down"
+                    "change_step_volume_down": "Change step for volume down",
+                    "use_default_volume": "Use default volume on speaker group creation",
+                    "default_volume": "Default volume on speaker group creation"
                 }
             }
         }

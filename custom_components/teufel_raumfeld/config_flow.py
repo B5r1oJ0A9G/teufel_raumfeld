@@ -13,12 +13,15 @@ from .const import (
     DEFAULT_ANNOUNCEMENT_VOLUME,
     DEFAULT_CHANGE_STEP_VOLUME_DOWN,
     DEFAULT_CHANGE_STEP_VOLUME_UP,
+    DEFAULT_VOLUME,
     DEFAULT_HOST_WEBSERVICE,
     DEFAULT_PORT_WEBSERVICE,
     OPTION_ANNOUNCEMENT_VOLUME,
     OPTION_CHANGE_STEP_VOLUME_DOWN,
     OPTION_CHANGE_STEP_VOLUME_UP,
+    OPTION_DEFAULT_VOLUME,
     OPTION_FIXED_ANNOUNCEMENT_VOLUME,
+    OPTION_USE_DEFAULT_VOLUME,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -69,6 +72,18 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                         OPTION_ANNOUNCEMENT_VOLUME,
                         default=self.config_entry.options.get(
                             OPTION_ANNOUNCEMENT_VOLUME, DEFAULT_ANNOUNCEMENT_VOLUME
+                        ),
+                    ): vol.All(int, vol.Range(min=0, max=100)),
+                    vol.Required(
+                        OPTION_USE_DEFAULT_VOLUME,
+                        default=self.config_entry.options.get(
+                            OPTION_USE_DEFAULT_VOLUME, False
+                        ),
+                    ): bool,
+                    vol.Required(
+                        OPTION_DEFAULT_VOLUME,
+                        default=self.config_entry.options.get(
+                            OPTION_DEFAULT_VOLUME, DEFAULT_VOLUME
                         ),
                     ): vol.All(int, vol.Range(min=0, max=100)),
                     vol.Required(

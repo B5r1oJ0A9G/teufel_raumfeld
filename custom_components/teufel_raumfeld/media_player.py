@@ -69,7 +69,9 @@ from .const import (
     OPTION_ANNOUNCEMENT_VOLUME,
     OPTION_CHANGE_STEP_VOLUME_DOWN,
     OPTION_CHANGE_STEP_VOLUME_UP,
+    OPTION_DEFAULT_VOLUME,
     OPTION_FIXED_ANNOUNCEMENT_VOLUME,
+    OPTION_USE_DEFAULT_VOLUME,
     ROOM_PREFIX,
     SERVICE_ABS_VOLUME_SET,
     SERVICE_PLAY_SYSTEM_SOUND,
@@ -364,7 +366,11 @@ class RaumfeldGroup(MediaPlayerEntity):
     async def async_turn_on(self):
         """Turn the media player on."""
         if not self._raumfeld.group_is_valid(self._rooms):
+            use_default_volume = self._raumfeld.options[OPTION_USE_DEFAULT_VOLUME]
             await self._raumfeld.async_create_group(self._rooms)
+            if use_default_volume:
+                default_volume = self._raumfeld.options[OPTION_DEFAULT_VOLUME] / 100
+                await self.async_set_rooms_volume_level(default_volume)
             await self._raumfeld.async_restore_group(self._rooms)
             await self.async_update_transport_state()
         else:

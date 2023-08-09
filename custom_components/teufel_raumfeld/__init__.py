@@ -25,6 +25,7 @@ from .const import (
     DEFAULT_ANNOUNCEMENT_VOLUME,
     DEFAULT_CHANGE_STEP_VOLUME_DOWN,
     DEFAULT_CHANGE_STEP_VOLUME_UP,
+    DEFAULT_VOLUME,
     DELAY_MODERATE_UPDATE_CHECKS,
     DIDL_ATTR_CHILD_CNT,
     DIDL_ATTR_ID,
@@ -43,9 +44,11 @@ from .const import (
     MESSAGE_PHASE_ALPHA,
     OBJECT_ID_LINE_IN,
     OPTION_ANNOUNCEMENT_VOLUME,
+    OPTION_DEFAULT_VOLUME,
     OPTION_CHANGE_STEP_VOLUME_DOWN,
     OPTION_CHANGE_STEP_VOLUME_UP,
     OPTION_FIXED_ANNOUNCEMENT_VOLUME,
+    OPTION_USE_DEFAULT_VOLUME,
     PLATFORMS,
     PORT_LINE_IN,
     POSINF_ELEM_ABS_TIME,
@@ -193,6 +196,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     )
     raumfeld.options[OPTION_FIXED_ANNOUNCEMENT_VOLUME] = entry.options.get(
         OPTION_ANNOUNCEMENT_VOLUME, False
+    )
+    raumfeld.options[OPTION_DEFAULT_VOLUME] = entry.options.get(
+        OPTION_DEFAULT_VOLUME, DEFAULT_VOLUME
+    )
+    raumfeld.options[OPTION_USE_DEFAULT_VOLUME] = entry.options.get(
+        OPTION_USE_DEFAULT_VOLUME, False
     )
     raumfeld.options[OPTION_CHANGE_STEP_VOLUME_UP] = entry.options.get(
         OPTION_CHANGE_STEP_VOLUME_UP, DEFAULT_CHANGE_STEP_VOLUME_UP
