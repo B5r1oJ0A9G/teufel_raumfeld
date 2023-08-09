@@ -71,6 +71,7 @@ from .const import (
     OPTION_CHANGE_STEP_VOLUME_UP,
     OPTION_FIXED_ANNOUNCEMENT_VOLUME,
     ROOM_PREFIX,
+    SERVICE_ABS_VOLUME_SET,
     SERVICE_PLAY_SYSTEM_SOUND,
     SERVICE_RESTORE,
     SERVICE_SNAPSHOT,
@@ -186,7 +187,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     platform.async_register_entity_service(SERVICE_RESTORE, {}, "async_restore")
     platform.async_register_entity_service(SERVICE_SNAPSHOT, {}, "async_snapshot")
     platform.async_register_entity_service(
-        "abs_volume_set",
+        SERVICE_ABS_VOLUME_SET,
         vol.All(
             cv.make_entity_service_schema(
                 {
