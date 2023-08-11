@@ -8,6 +8,7 @@ from hassfeld.constants import (
 )
 from homeassistant.helpers.entity import Entity
 
+from . import log_debug
 from .const import DOMAIN, POWER_ECO, POWER_ON, POWER_STANDBY, ROOM_PREFIX
 
 STATE_TO_ICON = {

@@ -1,0 +1,54 @@
+"""Platform for number integration."""
+
+from homeassistant.components.number import NumberEntity
+
+from . import log_debug, log_fatal
+from .common import RaumfeldRoom
+from .const import DELAY_POWER_STATE_UPDATE, DOMAIN
+
+
+async def async_setup_entry(hass, config_entry, async_add_devices):
+    """Set up entry."""
+    raumfeld = hass.data[DOMAIN][config_entry.entry_id]
+    device_udns = raumfeld.get_raumfeld_device_udns()
+    log_debug("device_udns=%s" % device_udns)
+    room_names = raumfeld.get_rooms()
+    devices = []
+
+    for room in room_names:
+        sensor_config = {
+            "room_name": room,
+            "get_state": raumfeld.async_get_room_volume,
+            "identifier": room,
+            "sensor_name": "Volume",
+            "native_unit_of_measurement": "%",
+        }
+        log_debug("sensor_config=%s" % sensor_config)
+        devices.append(RaumfeldRoomVolume(raumfeld, sensor_config))
+
+    async_add_devices(devices)
+
+    return True
+
+
+class RaumfeldRoomVolume(RaumfeldRoom, NumberEntity):
+    """Volume selector of a room."""
+
+    def __init__(self, raumfeld, sensor_config):
+        """Initialize the Raumfeld speaker sensor."""
+        super().__init__(sensor_config)
+        self._raumfeld = raumfeld
+        self._icon = "mdi:volume-high"
+
+    @property
+    def icon(self):
+        """Return the icon to use in the frontend."""
+        return self._icon
+
+    async def async_set_native_value(self, value):
+        """Put a speaker in standby or wake it up."""
+        volume = int(value)
+        log_debug("%s -> volume: %s" % (self._room_name, volume))
+        await self._raumfeld.async_set_room_volume(self._room_name, volume)
+        await self.async_update()
+        self.async_schedule_update_ha_state()
