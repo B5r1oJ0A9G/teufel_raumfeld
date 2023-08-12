@@ -16,15 +16,15 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     devices = []
 
     for room in room_names:
-        sensor_config = {
+        number_config = {
             "room_name": room,
             "get_state": raumfeld.async_get_room_volume,
             "identifier": room,
             "sensor_name": "Volume",
             "native_unit_of_measurement": "%",
         }
-        log_debug("sensor_config=%s" % sensor_config)
-        devices.append(RaumfeldRoomVolume(raumfeld, sensor_config))
+        log_debug("number_config=%s" % number_config)
+        devices.append(RaumfeldRoomVolume(raumfeld, number_config))
 
     async_add_devices(devices)
 
@@ -34,9 +34,9 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 class RaumfeldRoomVolume(RaumfeldRoom, NumberEntity):
     """Volume selector of a room."""
 
-    def __init__(self, raumfeld, sensor_config):
-        """Initialize the Raumfeld speaker sensor."""
-        super().__init__(sensor_config)
+    def __init__(self, raumfeld, number_config):
+        """Initialize the Raumfeld speaker number."""
+        super().__init__(number_config)
         self._raumfeld = raumfeld
         self._icon = "mdi:volume-high"
 
