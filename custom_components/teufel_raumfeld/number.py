@@ -46,7 +46,7 @@ class RaumfeldRoomVolume(RaumfeldRoom, NumberEntity):
         return self._icon
 
     async def async_set_native_value(self, value):
-        """Put a speaker in standby or wake it up."""
+        """Set new speaker volume."""
         volume = int(value)
         log_debug("%s -> volume: %s" % (self._room_name, volume))
         await self._raumfeld.async_set_room_volume(self._room_name, volume)
