@@ -32,6 +32,7 @@ MESSAGE_PHASE_ALPHA = (
     " This includes, among other things, the addition, redesign or removal of functionality."
 )
 NUMBER_ROOM_VOLUME_ICON = "mdi:volume-high"
+NUMBER_ROOM_VOLUME_NAME = "Volume"
 OBJECT_ID_LINE_IN = "0/Line In"
 OPTION_ANNOUNCEMENT_VOLUME = "announcement_volume"
 OPTION_CHANGE_STEP_VOLUME_DOWN = "change_step_volume_down"

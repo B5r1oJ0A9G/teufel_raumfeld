@@ -4,7 +4,12 @@ from homeassistant.components.number import NumberEntity
 
 from . import log_debug, log_fatal
 from .common import RaumfeldRoom
-from .const import DELAY_POWER_STATE_UPDATE, DOMAIN, NUMBER_ROOM_VOLUME_ICON
+from .const import (
+    DELAY_POWER_STATE_UPDATE,
+    DOMAIN,
+    NUMBER_ROOM_VOLUME_ICON,
+    NUMBER_ROOM_VOLUME_NAME,
+)
 
 
 async def async_setup_entry(hass, config_entry, async_add_devices):
@@ -20,7 +25,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
             "room_name": room,
             "get_state": raumfeld.async_get_room_volume,
             "identifier": room,
-            "sensor_name": "Volume",
+            "sensor_name": NUMBER_ROOM_VOLUME_NAME,
             "native_unit_of_measurement": "%",
         }
         log_debug("number_config=%s" % number_config)
