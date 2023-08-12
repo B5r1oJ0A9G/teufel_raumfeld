@@ -4,7 +4,7 @@ from homeassistant.components.number import NumberEntity
 
 from . import log_debug, log_fatal
 from .common import RaumfeldRoom
-from .const import DELAY_POWER_STATE_UPDATE, DOMAIN
+from .const import DELAY_POWER_STATE_UPDATE, DOMAIN, NUMBER_ROOM_VOLUME_ICON
 
 
 async def async_setup_entry(hass, config_entry, async_add_devices):
@@ -38,7 +38,7 @@ class RaumfeldRoomVolume(RaumfeldRoom, NumberEntity):
         """Initialize the Raumfeld speaker number."""
         super().__init__(number_config)
         self._raumfeld = raumfeld
-        self._icon = "mdi:volume-high"
+        self._icon = NUMBER_ROOM_VOLUME_ICON
 
     @property
     def icon(self):

@@ -31,6 +31,7 @@ MESSAGE_PHASE_ALPHA = (
     "You are using teufel_raumfeld, which is still in alpha phase and therefore subject to change."
     " This includes, among other things, the addition, redesign or removal of functionality."
 )
+NUMBER_ROOM_VOLUME_ICON = "mdi:volume-high"
 OBJECT_ID_LINE_IN = "0/Line In"
 OPTION_ANNOUNCEMENT_VOLUME = "announcement_volume"
 OPTION_CHANGE_STEP_VOLUME_DOWN = "change_step_volume_down"
