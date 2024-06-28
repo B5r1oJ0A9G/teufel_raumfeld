@@ -27,6 +27,7 @@ from homeassistant.components import media_source
 from homeassistant.components.media_player import (
     MediaPlayerDeviceClass,
     MediaPlayerEntity,
+    MediaPlayerEntityFeature,
 )
 from homeassistant.components.media_player.browse_media import (
     async_process_play_media_url,
@@ -87,29 +88,29 @@ from .const import (
 )
 
 SUPPORT_RAUMFELD_SPOTIFY = (
-    SUPPORT_PAUSE
-    | SUPPORT_PLAY
-    | SUPPORT_VOLUME_SET
-    | SUPPORT_PREVIOUS_TRACK
-    | SUPPORT_NEXT_TRACK
+    MediaPlayerEntityFeature.PAUSE
+    | MediaPlayerEntityFeature.PLAY
+    | MediaPlayerEntityFeature.VOLUME_SET
+    | MediaPlayerEntityFeature.PREVIOUS_TRACK
+    | MediaPlayerEntityFeature.NEXT_TRACK
 )
 
 SUPPORT_RAUMFELD_GROUP = (
-    SUPPORT_PAUSE
-    | SUPPORT_SEEK
-    | SUPPORT_VOLUME_SET
-    | SUPPORT_VOLUME_MUTE
-    | SUPPORT_PREVIOUS_TRACK
-    | SUPPORT_NEXT_TRACK
-    | SUPPORT_PLAY_MEDIA
-    | SUPPORT_VOLUME_STEP
-    | SUPPORT_STOP
-    | SUPPORT_TURN_ON
-    | SUPPORT_TURN_OFF
-    | SUPPORT_PLAY
-    | SUPPORT_SHUFFLE_SET
-    | SUPPORT_BROWSE_MEDIA
-    | SUPPORT_REPEAT_SET
+    MediaPlayerEntityFeature.PAUSE
+    | MediaPlayerEntityFeature.SEEK
+    | MediaPlayerEntityFeature.VOLUME_SET
+    | MediaPlayerEntityFeature.VOLUME_MUTE
+    | MediaPlayerEntityFeature.PREVIOUS_TRACK
+    | MediaPlayerEntityFeature.NEXT_TRACK
+    | MediaPlayerEntityFeature.PLAY_MEDIA
+    | MediaPlayerEntityFeature.VOLUME_STEP
+    | MediaPlayerEntityFeature.STOP
+    | MediaPlayerEntityFeature.TURN_ON
+    | MediaPlayerEntityFeature.TURN_OFF
+    | MediaPlayerEntityFeature.PLAY
+    | MediaPlayerEntityFeature.SHUFFLE_SET
+    | MediaPlayerEntityFeature.BROWSE_MEDIA
+    | MediaPlayerEntityFeature.REPEAT_SET
 )
 
 SUPPORT_RAUMFELD_ROOM = SUPPORT_RAUMFELD_GROUP | SUPPORT_GROUPING
