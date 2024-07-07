@@ -58,6 +58,7 @@ from homeassistant.components.media_player.const import (
 from homeassistant.const import STATE_IDLE, STATE_OFF, STATE_PAUSED, STATE_PLAYING
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import entity_platform
+from homeassistant.helpers import entity_registry
 from homeassistant.util.dt import utcnow
 
 from . import log_debug, log_error, log_fatal, log_info
@@ -148,9 +149,9 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     raumfeld = hass.data[DOMAIN][config_entry.entry_id]
     room_names = raumfeld.get_rooms()
     room_groups = raumfeld.get_groups()
-    entity_registry = hass.helpers.entity_registry.async_get(hass)
-    entity_entries = hass.helpers.entity_registry.async_entries_for_config_entry(
-        entity_registry, config_entry.entry_id
+    registry = entity_registry.async_get(hass)
+    entity_entries = entity_registry.async_entries_for_config_entry(
+        registry, config_entry.entry_id
     )
     platform = entity_platform.current_platform.get()
     devices = []
