@@ -234,10 +234,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     log_debug("raumfeld.wsd=%s" % raumfeld.wsd)
     hass.data[DOMAIN][entry.entry_id] = raumfeld
 
-    for component in PLATFORMS:
-        hass.async_create_task(
-            hass.config_entries.async_forward_entry_setup(entry, component)
-        )
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     async def async_handle_group(call):
         room_lst = call.data.get("room_names")
