@@ -25,36 +25,14 @@ from hassfeld.constants import (
 )
 from homeassistant.components import media_source
 from homeassistant.components.media_player import (
+    ATTR_MEDIA_ANNOUNCE,
+    ATTR_MEDIA_VOLUME_LEVEL,
     MediaPlayerDeviceClass,
     MediaPlayerEntity,
     MediaPlayerEntityFeature,
-)
-from homeassistant.components.media_player.browse_media import (
+    MediaType,
+    RepeatMode,
     async_process_play_media_url,
-)
-from homeassistant.components.media_player.const import (
-    ATTR_MEDIA_ANNOUNCE,
-    ATTR_MEDIA_VOLUME_LEVEL,
-    MEDIA_TYPE_MUSIC,
-    REPEAT_MODE_ALL,
-    REPEAT_MODE_OFF,
-    REPEAT_MODE_ONE,
-    SUPPORT_BROWSE_MEDIA,
-    SUPPORT_GROUPING,
-    SUPPORT_NEXT_TRACK,
-    SUPPORT_PAUSE,
-    SUPPORT_PLAY,
-    SUPPORT_PLAY_MEDIA,
-    SUPPORT_PREVIOUS_TRACK,
-    SUPPORT_REPEAT_SET,
-    SUPPORT_SEEK,
-    SUPPORT_SHUFFLE_SET,
-    SUPPORT_STOP,
-    SUPPORT_TURN_OFF,
-    SUPPORT_TURN_ON,
-    SUPPORT_VOLUME_MUTE,
-    SUPPORT_VOLUME_SET,
-    SUPPORT_VOLUME_STEP,
 )
 from homeassistant.const import STATE_IDLE, STATE_OFF, STATE_PAUSED, STATE_PLAYING
 from homeassistant.helpers import config_validation as cv
@@ -114,10 +92,10 @@ SUPPORT_RAUMFELD_GROUP = (
     | MediaPlayerEntityFeature.REPEAT_SET
 )
 
-SUPPORT_RAUMFELD_ROOM = SUPPORT_RAUMFELD_GROUP | SUPPORT_GROUPING
+SUPPORT_RAUMFELD_ROOM = SUPPORT_RAUMFELD_GROUP | MediaPlayerEntityFeature.GROUPING
 
 SUPPORTED_MEDIA_TYPES = [
-    MEDIA_TYPE_MUSIC,
+    MediaType.MUSIC,
     UPNP_CLASS_ALBUM,
     UPNP_CLASS_TRACK,
     UPNP_CLASS_RADIO,
@@ -495,7 +473,7 @@ class RaumfeldGroup(MediaPlayerEntity):
         if self._raumfeld.rooms_are_valid(self._rooms):
             if media_type in SUPPORTED_MEDIA_TYPES:
                 log_debug("media_id=%s" % (media_id))
-                if media_type == MEDIA_TYPE_MUSIC:
+                if media_type == MediaType.MUSIC:
                     if media_id.startswith("http"):
                         play_uri = media_id
                     if media_id.startswith("media-source"):
@@ -574,7 +552,7 @@ class RaumfeldGroup(MediaPlayerEntity):
         """Enable/disable shuffle mode."""
         if self._raumfeld.group_is_valid(self._rooms):
             if shuffle:
-                if self._repeat != REPEAT_MODE_OFF:
+                if self._repeat != RepeatMode.OFF:
                     await self._raumfeld.async_set_play_mode(
                         self._rooms, PLAY_MODE_RANDOM
                     )
@@ -599,7 +577,7 @@ class RaumfeldGroup(MediaPlayerEntity):
     async def async_set_repeat(self, repeat):
         """Set repeat mode."""
         if self._raumfeld.group_is_valid(self._rooms):
-            if repeat == REPEAT_MODE_ALL:
+            if repeat == RepeatMode.ALL:
                 if self._shuffle:
                     await self._raumfeld.async_set_play_mode(
                         self._rooms, PLAY_MODE_RANDOM
@@ -608,11 +586,11 @@ class RaumfeldGroup(MediaPlayerEntity):
                     await self._raumfeld.async_set_play_mode(
                         self._rooms, PLAY_MODE_REPEAT_ALL
                     )
-            elif repeat == REPEAT_MODE_ONE:
+            elif repeat == RepeatMode.ONE:
                 await self._raumfeld.async_set_play_mode(
                     self._rooms, PLAY_MODE_REPEAT_ONE
                 )
-            elif repeat == REPEAT_MODE_OFF:
+            elif repeat == RepeatMode.OFF:
                 if self._shuffle:
                     await self._raumfeld.async_set_play_mode(
                         self._rooms, PLAY_MODE_SHUFFLE
@@ -753,19 +731,19 @@ class RaumfeldGroup(MediaPlayerEntity):
             self._play_mode = play_mode
             if play_mode == PLAY_MODE_NORMAL:
                 self._shuffle = False
-                self._repeat = REPEAT_MODE_OFF
+                self._repeat = RepeatMode.OFF
             elif play_mode == PLAY_MODE_SHUFFLE:
                 self._shuffle = True
-                self._repeat = REPEAT_MODE_OFF
+                self._repeat = RepeatMode.OFF
             elif play_mode == PLAY_MODE_REPEAT_ONE:
                 self._shuffle = False
-                self._repeat = REPEAT_MODE_ONE
+                self._repeat = RepeatMode.ONE
             elif play_mode == PLAY_MODE_REPEAT_ALL:
                 self._shuffle = False
-                self._repeat = REPEAT_MODE_ALL
+                self._repeat = RepeatMode.ALL
             elif play_mode == PLAY_MODE_RANDOM:
                 self._shuffle = True
-                self._repeat = REPEAT_MODE_ALL
+                self._repeat = RepeatMode.ALL
             else:
                 log_fatal("Unrecognized play mode: %s" % play_mode)
 
