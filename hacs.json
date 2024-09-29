@@ -1,5 +1,6 @@
 {
     "name": "Teufel Raumfeld",
     "zip_release": true,
+    "render_readme": true,
     "filename": "teufel_raumfeld.zip"
 }
