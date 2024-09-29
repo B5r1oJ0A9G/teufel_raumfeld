@@ -296,7 +296,7 @@ class RaumfeldGroup(MediaPlayerEntity):
     @property
     def media_duration(self):
         """Duration of current playing media in seconds."""
-        return self._media_duration
+        return self._media_duration if self._media_duration else None
 
     @property
     def media_position(self):
