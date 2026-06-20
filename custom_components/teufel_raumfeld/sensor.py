@@ -16,6 +16,9 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 
     for udn in device_udns:
         renderer_udn = await raumfeld.async_get_device_renderer(udn)
+        if renderer_udn is None:
+            log_debug("No renderer found for device UDN: %s, skipping sensor creation" % udn)
+            continue
         device_name = raumfeld.device_udn_to_name(renderer_udn)
         sw_version = await raumfeld.async_get_device_info(udn)
         manufacturer = await raumfeld.async_get_device_manufacturer(udn)
