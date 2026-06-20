@@ -646,6 +646,8 @@ class RaumfeldGroup(MediaPlayerEntity):
             object_id = media_content_id
 
         metadata = await self._raumfeld.async_browse_media(object_id, BROWSE_METADATA)
+        if not metadata:
+            return None
         metadata = metadata[0]
 
         children = await self._raumfeld.async_browse_media(object_id, BROWSE_CHILDREN)
