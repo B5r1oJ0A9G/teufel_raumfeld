@@ -463,6 +463,9 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
         browsable_oid = object_id.split(MEDIA_CONTENT_ID_SEP)[0]
         media_xml = await self.async_browse_media_server(browsable_oid, browse_flag)
 
+        if media_xml is None:
+            return browse_lst
+
         media = xmltodict.parse(
             media_xml, force_list=(DIDL_ELEM_CONTAINER, DIDL_ELEM_ITEM)
         )
