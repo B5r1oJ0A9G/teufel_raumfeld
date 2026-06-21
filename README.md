@@ -51,7 +51,7 @@ Then restart Home Assistant.
 
 After installation:
 
-1. **Settings → Devices ' + chr(38) + ' Services → Add Integration**
+1. **Settings → Devices & Services → Add Integration**
 2. Select **Teufel Raumfeld**
 3. Enter the hostname/IP of your Raumfeld host (default port: 47365)
 4. The integration auto-discovers rooms and groups
