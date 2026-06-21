@@ -1,5 +1,5 @@
 """Constants for the Teufel Raumfeld integration."""
-VERSION = "0.1.16-alpha3"
+VERSION = "0.1.16-alpha5"
 from enum import IntFlag
 
 ATTR_EVENT_WSUPD_TYPE = "type"
