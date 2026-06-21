@@ -1,8 +1,9 @@
 # Teufel Raumfeld
 
-{% if prerelease %}
-> **⚠️ Beta-Version** — diese Integration befindet sich in der Alpha-/Beta-Phase. Funktionalität kann sich ändern.
-{% endif %}
+[![GitHub Downloads](https://img.shields.io/github/downloads/B5r1oJ0A9G/teufel_raumfeld/latest/total)](https://github.com/B5r1oJ0A9G/teufel_raumfeld/releases/)
+[![HACS Default](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs)
+[![hassfest](https://github.com/B5r1oJ0A9G/teufel_raumfeld/actions/workflows/hassfest.yaml/badge.svg)](https://github.com/B5r1oJ0A9G/teufel_raumfeld/actions/workflows/hassfest.yaml)
+[![CodeQL](https://github.com/B5r1oJ0A9G/teufel_raumfeld/actions/workflows/github-code-scanning/codeql/badge.svg?branch=master)](https://github.com/B5r1oJ0A9G/teufel_raumfeld/actions/workflows/github-code-scanning/codeql)
 
 Home Assistant Integration für **Teufel Smart Speaker** (Raumfeld Multiroom-System). Steuere deine Teufel-Lautsprecher direkt aus Home Assistant — Lautstärke, Wiedergabe, Gruppen und mehr.
 
