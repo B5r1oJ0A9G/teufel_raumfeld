@@ -1,0 +1,43 @@
+[project]
+name = "teufel_raumfeld"
+version = "0.1.16-alpha2"
+description = "Teufel Raumfeld Home Assistant Integration"
+requires-python = ">=3.13.2,<3.14"
+dependencies = [
+    "hassfeld==0.3.13-alpha2",
+    "voluptuous>=0.14",
+    "xmltodict>=0.13",
+]
+
+[project.optional-dependencies]
+ha = ["homeassistant>=2025.5.0,<2026.3.0"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    "ruff>=0.5",
+    "mypy>=1.10",
+]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["custom_components"]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+ignore_missing_imports = true
+exclude = [
+    "^custom_components/teufel_raumfeld/const\\.py$",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
