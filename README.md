@@ -5,56 +5,56 @@
 [![hassfest](https://github.com/B5r1oJ0A9G/teufel_raumfeld/actions/workflows/hassfest.yaml/badge.svg)](https://github.com/B5r1oJ0A9G/teufel_raumfeld/actions/workflows/hassfest.yaml)
 [![CodeQL](https://github.com/B5r1oJ0A9G/teufel_raumfeld/actions/workflows/github-code-scanning/codeql/badge.svg?branch=master)](https://github.com/B5r1oJ0A9G/teufel_raumfeld/actions/workflows/github-code-scanning/codeql)
 
-Home Assistant Integration für **Teufel Smart Speaker** (Raumfeld Multiroom-System). Steuere deine Teufel-Lautsprecher direkt aus Home Assistant — Lautstärke, Wiedergabe, Gruppen und mehr.
+Home Assistant integration for **Teufel Smart Speakers** (Raumfeld multiroom system). Control your Teufel speakers directly from Home Assistant — volume, playback, groups, and more.
 
-Die API-Logik steckt in der Begleit-Bibliothek [hassfeld](https://github.com/B5r1oJ0A9G/hassfeld).
+The API logic lives in the companion library [hassfeld](https://github.com/B5r1oJ0A9G/hassfeld).
 
 ---
 
 ## Features
 
-- **Mediensteuerung** — Play, Pause, Stop, Next, Previous, Shuffle, Repeat, Seek
-- **Lautstärke** — pro Raum und global, mit konfigurierbaren Schrittweiten
-- **Quellenwahl** — Line-In, Spotify, Tidal, Internetradio, Podcasts, lokale Musik
-- **Raumgruppen** — Räume zu Gruppen zusammenfassen, per Service steuern
-- **Snapshots** — Wiedergabezustand speichern und wiederherstellen
-- **Ansagen** — System-Sounds und TTS-Ansagen über den `play_sound`-Service
-- **Auto-Discovery** — Räume und Gruppen automatisch erkennen
-- **Config-Flow** — Einrichtung direkt über die Home Assistant UI
+- **Media control** — Play, Pause, Stop, Next, Previous, Shuffle, Repeat, Seek
+- **Volume** — per-room and global, with configurable step sizes
+- **Source selection** — Line-In, Spotify, Tidal, Internet radio, Podcasts, local music
+- **Room groups** — Combine rooms into groups, control via services
+- **Snapshots** — Save and restore playback state
+- **Announcements** — System sounds and TTS announcements via the `play_sound` service
+- **Auto-discovery** — Rooms and groups detected automatically
+- **Config-Flow** — Set up directly through the Home Assistant UI
 
-Unterstützte Plattformen: `media_player`, `sensor`, `select`, `number`
+Supported platforms: `media_player`, `sensor`, `select`, `number`
 
 ---
 
 ## Installation
 
-### HACS (empfohlen)
+### HACS (recommended)
 
-1. Stelle sicher, dass [HACS](https://hacs.xyz/) installiert ist
-2. HACS → Integrationen → Drei-Punkte-Menü → **Benutzerdefinierte Repositories**
-3. Füge `https://github.com/B5r1oJ0A9G/teufel_raumfeld` hinzu, Kategorie: **Integration**
-4. Suche nach **Teufel Raumfeld** und installiere
-5. Starte Home Assistant neu
+1. Make sure [HACS](https://hacs.xyz/) is installed
+2. HACS → Integrations → Three-dot menu → **Custom repositories**
+3. Add `https://github.com/B5r1oJ0A9G/teufel_raumfeld`, category: **Integration**
+4. Search for **Teufel Raumfeld** and install
+5. Restart Home Assistant
 
-### Manuell
+### Manual
 
 ```bash
 cd /config/custom_components
 git clone https://github.com/B5r1oJ0A9G/teufel_raumfeld.git teufel_raumfeld
 ```
 
-Danach Home Assistant neu starten.
+Then restart Home Assistant.
 
 ---
 
-## Konfiguration
+## Configuration
 
-Nach der Installation:
+After installation:
 
-1. **Einstellungen → Geräte & Dienste → Integration hinzufügen**
-2. **Teufel Raumfeld** auswählen
-3. Hostnamen/IP des Raumfeld-Hosts eingeben (Standard-Port: 47365)
-4. Die Integration erkennt Räume und Gruppen automatisch
+1. **Settings → Devices ' + chr(38) + ' Services → Add Integration**
+2. Select **Teufel Raumfeld**
+3. Enter the hostname/IP of your Raumfeld host (default port: 47365)
+4. The integration auto-discovers rooms and groups
 
 ---
 
@@ -62,14 +62,14 @@ Nach der Installation:
 
 | | |
 |---|---|
-| Dokumentation | [Wiki](https://github.com/B5r1oJ0A9G/teufel_raumfeld/wiki) |
-| Issue-Tracker | [GitHub Issues](https://github.com/B5r1oJ0A9G/teufel_raumfeld/issues) |
-| Diskussionen | [GitHub Discussions](https://github.com/B5r1oJ0A9G/teufel_raumfeld/discussions) |
-| Quellcode | [GitHub](https://github.com/B5r1oJ0A9G/teufel_raumfeld) |
+| Documentation | [Wiki](https://github.com/B5r1oJ0A9G/teufel_raumfeld/wiki) |
+| Issue tracker | [GitHub Issues](https://github.com/B5r1oJ0A9G/teufel_raumfeld/issues) |
+| Discussions | [GitHub Discussions](https://github.com/B5r1oJ0A9G/teufel_raumfeld/discussions) |
+| Source code | [GitHub](https://github.com/B5r1oJ0A9G/teufel_raumfeld) |
 | hassfeld (API) | [GitHub](https://github.com/B5r1oJ0A9G/hassfeld) |
 
 ---
 
-## Lizenz
+## License
 
 GNU General Public License v3 (GPLv3)
