@@ -2,6 +2,7 @@
 import asyncio
 import base64
 import datetime
+import json
 import logging
 import pickle
 from typing import Any
@@ -36,8 +37,7 @@ from homeassistant.components.media_player import (
 )
 from homeassistant.const import STATE_IDLE, STATE_OFF, STATE_PAUSED, STATE_PLAYING
 from homeassistant.helpers import config_validation as cv
-from homeassistant.helpers import entity_platform
-from homeassistant.helpers import entity_registry
+from homeassistant.helpers import entity_platform, entity_registry
 from homeassistant.util.dt import utcnow
 
 from . import log_debug, log_error, log_fatal, log_info
@@ -107,20 +107,32 @@ SUPPORTED_MEDIA_TYPES = [
 _LOGGER = logging.getLogger(__name__)
 
 
-def obj_to_uid(obj):
-    """Bulid unique id based on object (room list)."""
-    object_ser = pickle.dumps(obj)
-    serialised_b64 = base64.encodebytes(object_ser)
-    unique_id = serialised_b64.decode()
-    return unique_id
+UID_PREFIX = "v2:"
+
+def obj_to_uid(rooms):
+    """Build unique id from sorted room names."""
+    sorted_rooms = sorted(list(rooms))
+    json_str = json.dumps(sorted_rooms, sort_keys=True)
+    uid = UID_PREFIX + base64.b64encode(json_str.encode()).decode().strip()
+    return uid
 
 
 def uid_to_obj(uid):
-    """Bulid object (room list) from unique id."""
-    serialized_b64 = uid.encode()
-    object_ser = base64.decodebytes(serialized_b64)
-    obj = pickle.loads(object_ser)
-    return obj
+    """Build object (room list) from unique id."""
+    if uid.startswith(UID_PREFIX):
+        try:
+            json_str = base64.b64decode(uid[len(UID_PREFIX):].encode()).decode()
+            return json.loads(json_str)
+        except Exception:
+            pass
+    # Fall back to legacy pickle format
+    try:
+        serialized_b64 = uid.encode()
+        object_ser = base64.decodebytes(serialized_b64)
+        return pickle.loads(object_ser)
+    except Exception:
+        _LOGGER.error("Failed to decode unique_id: %s", uid)
+        return []
 
 
 async def async_setup_entry(hass, config_entry, async_add_devices):
