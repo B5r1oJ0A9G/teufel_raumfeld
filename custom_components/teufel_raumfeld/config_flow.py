@@ -47,6 +47,10 @@ async def validate_input(hass: core.HomeAssistant, data):
 
 
 class OptionsFlowHandler(config_entries.OptionsFlow):
+    def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
+        """Initialize options flow."""
+        # config_entry is a property resolved after framework init via self.handler.
+        # Accepted here so async_get_options_flow can pass it without TypeError.
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
