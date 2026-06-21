@@ -12,6 +12,7 @@ jobs:
 
       - name: Build release zip
         run: |
+          cp README.md custom_components/teufel_raumfeld/
           cd custom_components/teufel_raumfeld
           zip -r ../../teufel_raumfeld.zip . \
             -x "__pycache__/*" "*.pyc"
