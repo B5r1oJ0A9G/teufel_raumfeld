@@ -11,13 +11,13 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     """Set up entry."""
     raumfeld = hass.data[DOMAIN][config_entry.entry_id]
     device_udns = raumfeld.get_raumfeld_device_udns()
-    log_debug("device_udns=%s" % device_udns)
+    log_debug(f"device_udns={device_udns}")
     devices = []
 
     for udn in device_udns:
         renderer_udn = await raumfeld.async_get_device_renderer(udn)
         if renderer_udn is None:
-            log_debug("No renderer found for device UDN: %s, skipping sensor creation" % udn)
+            log_debug(f"No renderer found for device UDN: {udn}, skipping sensor creation")
             continue
         device_name = raumfeld.device_udn_to_name(renderer_udn)
         sw_version = await raumfeld.async_get_device_info(udn)
@@ -34,12 +34,12 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
             "sensor_name": "SoftwareVersion",
             "sw_version": sw_version,
         }
-        log_debug("sensor_config=%s" % sensor_config)
+        log_debug(f"sensor_config={sensor_config}")
         devices.append(RaumfeldSpeaker(raumfeld, sensor_config))
 
         sensor_config["sensor_name"] = "UpdateInfoVersion"
         sensor_config["get_state"] = raumfeld.async_get_device_update_info_version
-        log_debug("sensor_config=%s" % sensor_config)
+        log_debug(f"sensor_config={sensor_config}")
         devices.append(RaumfeldSpeaker(raumfeld, sensor_config))
 
     async_add_devices(devices)

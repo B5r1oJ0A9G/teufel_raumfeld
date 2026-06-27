@@ -68,7 +68,7 @@ class RaumfeldRoom(Entity):
         """Update sensor."""
         if inspect.iscoroutinefunction(self._get_state):
             state = await self._get_state(self._room_name)
-            log_debug("state: %s" % state)
+            log_debug(f"state: {state}")
         else:
             state = self._get_state(self._room_name)
 

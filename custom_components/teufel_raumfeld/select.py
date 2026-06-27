@@ -13,7 +13,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     """Set up entry."""
     raumfeld = hass.data[DOMAIN][config_entry.entry_id]
     device_udns = raumfeld.get_raumfeld_device_udns()
-    log_debug("device_udns=%s" % device_udns)
+    log_debug(f"device_udns={device_udns}")
     room_names = raumfeld.get_rooms()
     devices = []
 
@@ -24,7 +24,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
             "identifier": room,
             "sensor_name": "PowerState",
         }
-        log_debug("sensor_config=%s" % sensor_config)
+        log_debug(f"sensor_config={sensor_config}")
         devices.append(RaumfeldPowerState(raumfeld, sensor_config))
 
     async_add_devices(devices)
@@ -43,7 +43,7 @@ class RaumfeldPowerState(RaumfeldRoom, SelectEntity):
 
     async def async_select_option(self, option):
         """Put a speaker in standby or wake it up."""
-        log_debug("%s -> option: %s" % (self._room_name, option))
+        log_debug(f"{self._room_name} -> option: {option}")
         if option == POWER_ON:
             await self._raumfeld.async_leave_standby(self._room_name)
         elif option == POWER_ECO:

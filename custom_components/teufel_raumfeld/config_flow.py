@@ -8,7 +8,6 @@ from homeassistant import config_entries, core, exceptions
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 
-from .const import DOMAIN  # pylint:disable=unused-import
 from .const import (
     DEFAULT_ANNOUNCEMENT_VOLUME,
     DEFAULT_CHANGE_STEP_VOLUME_DOWN,
@@ -16,6 +15,7 @@ from .const import (
     DEFAULT_HOST_WEBSERVICE,
     DEFAULT_PORT_WEBSERVICE,
     DEFAULT_VOLUME,
+    DOMAIN,  # pylint:disable=unused-import
     OPTION_ANNOUNCEMENT_VOLUME,
     OPTION_CHANGE_STEP_VOLUME_DOWN,
     OPTION_CHANGE_STEP_VOLUME_UP,

@@ -2,10 +2,9 @@
 
 from homeassistant.components.number import NumberEntity
 
-from . import log_debug, log_fatal
+from . import log_debug
 from .common import RaumfeldRoom
 from .const import (
-    DELAY_POWER_STATE_UPDATE,
     DOMAIN,
     NUMBER_ROOM_VOLUME_ICON,
     NUMBER_ROOM_VOLUME_NAME,
@@ -16,7 +15,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
     """Set up entry."""
     raumfeld = hass.data[DOMAIN][config_entry.entry_id]
     device_udns = raumfeld.get_raumfeld_device_udns()
-    log_debug("device_udns=%s" % device_udns)
+    log_debug(f"device_udns={device_udns}")
     room_names = raumfeld.get_rooms()
     devices = []
 
@@ -28,7 +27,7 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
             "sensor_name": NUMBER_ROOM_VOLUME_NAME,
             "native_unit_of_measurement": "%",
         }
-        log_debug("number_config=%s" % number_config)
+        log_debug(f"number_config={number_config}")
         devices.append(RaumfeldRoomVolume(raumfeld, number_config))
 
     async_add_devices(devices)
@@ -53,7 +52,7 @@ class RaumfeldRoomVolume(RaumfeldRoom, NumberEntity):
     async def async_set_native_value(self, value):
         """Set new speaker volume."""
         volume = int(value)
-        log_debug("%s -> volume: %s" % (self._room_name, volume))
+        log_debug(f"{self._room_name} -> volume: {volume}")
         await self._raumfeld.async_set_room_volume(self._room_name, volume)
         await self.async_update()
         self.async_schedule_update_ha_state()

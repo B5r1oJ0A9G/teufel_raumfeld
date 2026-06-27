@@ -6,7 +6,6 @@ import os
 import urllib.parse
 
 import hassfeld
-import voluptuous as vol
 import xmltodict
 from hassfeld.constants import (
     TRIGGER_UPDATE_DEVICES,
@@ -27,7 +26,6 @@ from .const import (
     DEFAULT_CHANGE_STEP_VOLUME_UP,
     DEFAULT_VOLUME,
     DELAY_MODERATE_UPDATE_CHECKS,
-    DIDL_ATTR_CHILD_CNT,
     DIDL_ATTR_ID,
     DIDL_ELEM_ALBUM,
     DIDL_ELEM_ART_URI,
@@ -95,8 +93,7 @@ def set_hassfeld_log_level(raumfeld):
         hassfeld_level = logging.CRITICAL
 
     log_info(
-        "Setting logging level of hassfeld to: %s"
-        % logging.getLevelName(hassfeld_level)
+        f"Setting logging level of hassfeld to: {logging.getLevelName(hassfeld_level)}"
     )
     raumfeld.set_logging_level(hassfeld_level)
 
@@ -152,7 +149,7 @@ async def async_setup(hass: HomeAssistant, config: dict):
 
 def event_on_update(hass, update_type):
     """fires events on Raumfeld web service updates."""
-    log_info("Update event triggered for type: %s" % update_type)
+    log_info(f"Update event triggered for type: {update_type}")
     if update_type == TRIGGER_UPDATE_HOST_INFO:
         hass.bus.fire(
             EVENT_WEBSERVICE_UPDATE, {ATTR_EVENT_WSUPD_TYPE: TRIGGER_UPDATE_HOST_INFO}
@@ -171,7 +168,7 @@ def event_on_update(hass, update_type):
             {ATTR_EVENT_WSUPD_TYPE: TRIGGER_UPDATE_SYSTEM_STATE},
         )
     else:
-        log_fatal("Unexpected update type: %s" % update_type)
+        log_fatal(f"Unexpected update type: {update_type}")
 
 
 async def update_listener(hass, entry):
@@ -217,13 +214,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         if host_is_not_valid:
             await asyncio.sleep(DELAY_MODERATE_UPDATE_CHECKS)
             log_info(
-                "Starting attempt '%s' out of '%s' attempts to identify host as valid"
-                % (attempt + 1, max_attempts)
+                f"Starting attempt '{attempt + 1}' out of '{max_attempts}' attempts to identify host as valid"
             )
             continue
         break
     if host_is_not_valid:
-        log_error("Invalid host: %s:%s" % (host, port))
+        log_error(f"Invalid host: {host}:{port}")
         return False
 
     raumfeld.callback = cb_webservice_update
@@ -231,7 +227,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     asyncio.create_task(raumfeld.async_update_all(http_session))
     await raumfeld.async_wait_initial_update()
     log_info("Web service update coroutine started")
-    log_debug("raumfeld.wsd=%s" % raumfeld.wsd)
+    log_debug(f"raumfeld.wsd={raumfeld.wsd}")
     hass.data[DOMAIN][entry.entry_id] = raumfeld
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
@@ -441,14 +437,12 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
                 play_uri = f"{uri_prefix}:{PORT_LINE_IN}/stream.flac"
                 return play_uri
             log_error(
-                "Passed media_id '%s' does not appear appropriate for media_type '%s'"
-                % (media_id, media_type)
+                f"Passed media_id '{media_id}' does not appear appropriate for media_type '{media_type}'"
             )
             return None
 
         log_info(
-            "Building of playable URI for media type '%s' not needed or not implemented"
-            % media_type
+            f"Building of playable URI for media type '{media_type}' not needed or not implemented"
         )
 
         return media_id
@@ -481,7 +475,7 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
             media_content_id = entry[DIDL_ATTR_ID]
 
             if not is_supported_oid(media_content_id):
-                log_info("Unsupported Object ID: %s" % media_content_id)
+                log_info(f"Unsupported Object ID: {media_content_id}")
                 continue
 
             # Workaround: Sometimes XML includes namespaces.
@@ -494,7 +488,7 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
                 else:
                     title = entry[DIDL_ELEM_TITLE]
             else:
-                log_warn("Media with id '%s' is lacking a title" % media_content_id)
+                log_warn(f"Media with id '{media_content_id}' is lacking a title")
                 title = TITLE_UNKNOWN
 
             # Workaround: Sometimes XML includes namespaces.

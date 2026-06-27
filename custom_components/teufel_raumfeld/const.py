@@ -1,6 +1,5 @@
 """Constants for the Teufel Raumfeld integration."""
 VERSION = "0.1.17-alpha1"
-from enum import IntFlag
 
 ATTR_EVENT_WSUPD_TYPE = "type"
 DEFAULT_ANNOUNCEMENT_VOLUME = 40
