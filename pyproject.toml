@@ -1,10 +1,10 @@
 [project]
 name = "teufel_raumfeld"
-version = "0.1.17-alpha1"
+version = "0.1.17-alpha2"
 description = "Teufel Raumfeld Home Assistant Integration"
 requires-python = ">=3.13.2,<3.14"
 dependencies = [
-    "hassfeld==0.3.13-alpha2",
+    "hassfeld==0.3.14",
     "voluptuous>=0.14",
     "xmltodict>=0.13",
 ]

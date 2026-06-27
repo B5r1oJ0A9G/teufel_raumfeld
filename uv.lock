@@ -847,7 +847,7 @@ wheels = [
 
 [[package]]
 name = "hassfeld"
-version = "0.3.13a2"
+version = "0.3.14"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -855,9 +855,9 @@ dependencies = [
     { name = "requests" },
     { name = "xmltodict" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/11/ca/cfe3be2938680be4e91d908064e35e5bd7e438569d861ca4eddd3c14c9e5/hassfeld-0.3.13a2.tar.gz", hash = "sha256:32072d293b585db567430e8fa3523ea49945a91e844158b1033fe91e34cea3ac", size = 26963, upload-time = "2023-08-02T19:32:00.227Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/ce/7c/eec6d8aaf0aac8c45c46424ab4d16772cc02685351b2e554392f463afad5/hassfeld-0.3.14.tar.gz", hash = "sha256:d2dfdabce1b5c8e32b58cbb218a87c23f3e0553877f644bb60b4c577c77918a7", size = 30270, upload-time = "2026-06-27T17:15:34.146Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ff/b4/4b21fda7145430b7478279a8f5bdf10559b3152f4419b6317d2c5d3ea2d9/hassfeld-0.3.13a2-py3-none-any.whl", hash = "sha256:4aa3adca095d6aa45fd3f23f260530e408f5e64b7f1eb2daebef494aeba2c4f9", size = 31827, upload-time = "2023-08-02T19:31:58.976Z" },
+    { url = "https://files.pythonhosted.org/packages/75/5f/9f6b3a6062ed986ad7e4169a5b05b4ca9e80eb9ac7de7fa4811d7e8b1511/hassfeld-0.3.14-py3-none-any.whl", hash = "sha256:2c9111be65defa057f1fa582d3116d502f0748b1ef066c23d509accf93e22eef", size = 29947, upload-time = "2026-06-27T17:15:33.2Z" },
 ]
 
 [[package]]
@@ -1763,7 +1763,7 @@ wheels = [
 
 [[package]]
 name = "teufel-raumfeld"
-version = "0.1.16a2"
+version = "0.1.17a2"
 source = { virtual = "." }
 dependencies = [
     { name = "hassfeld" },
@@ -1786,7 +1786,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "hassfeld", specifier = "==0.3.13a2" },
+    { name = "hassfeld", specifier = "==0.3.14" },
     { name = "homeassistant", marker = "extra == 'ha'", specifier = ">=2025.5.0,<2026.3.0" },
     { name = "voluptuous", specifier = ">=0.14" },
     { name = "xmltodict", specifier = ">=0.13" },
