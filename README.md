@@ -31,17 +31,12 @@ Supported platforms: `media_player`, `sensor`, `select`, `number`
 ### HACS (recommended)
 
 1. Make sure [HACS](https://hacs.xyz/) is installed
-2. HACS → Integrations → Three-dot menu → **Custom repositories**
-3. Add `https://github.com/B5r1oJ0A9G/teufel_raumfeld`, category: **Integration**
-4. Search for **Teufel Raumfeld** and install
-5. Restart Home Assistant
+2. HACS → Integrations → Search for **Teufel Raumfeld** and install
+3. Restart Home Assistant
 
 ### Manual
 
-```bash
-cd /config/custom_components
-git clone https://github.com/B5r1oJ0A9G/teufel_raumfeld.git teufel_raumfeld
-```
+Download the [latest release](https://github.com/B5r1oJ0A9G/teufel_raumfeld/releases/latest) and extract it to `/config/custom_components/teufel_raumfeld/`.
 
 Then restart Home Assistant.
 
