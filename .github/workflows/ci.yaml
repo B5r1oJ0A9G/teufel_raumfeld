@@ -33,4 +33,5 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: uv sync --group dev --extra ha
+      - run: uv pip install -e .
       - run: uv run pytest tests/ -v
