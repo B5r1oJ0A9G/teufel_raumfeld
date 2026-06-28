@@ -183,3 +183,22 @@ class TestDiagnostics:
         result = await async_get_config_entry_diagnostics(MagicMock(), entry)
 
         assert result["host"]["valid"] == "unknown"
+
+
+# — ENTITY NAME WITH has_entity_name —
+
+
+def test_sensor_name_is_sensor_name_only():
+    """With has_entity_name=True, name must not include device/room prefix."""
+    entity = _make_speaker()
+    assert entity.name == "SoftwareVersion"
+
+
+def test_select_name_is_sensor_name_only():
+    entity = _make_power_state()
+    assert entity.name == "PowerState"
+
+
+def test_number_name_is_sensor_name_only():
+    entity = _make_volume()
+    assert entity.name == "Volume"

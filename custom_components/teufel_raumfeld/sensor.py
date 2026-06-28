@@ -62,7 +62,7 @@ class RaumfeldSpeaker(Entity):
         self._device_udn = self._config["device_udn"]
         self._device_name = self._config["device_name"]
         self._sensor_name = self._config["sensor_name"]
-        self._name = f"{self._device_name} - {self._sensor_name}"
+        self._name = self._sensor_name
         self._unique_id = f"{DOMAIN}.{self._device_name}.{self._sensor_name}"
         self._get_state = self._config["get_state"]
         self._sw_version = self._config["sw_version"]
