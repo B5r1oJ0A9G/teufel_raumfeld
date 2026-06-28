@@ -1,4 +1,5 @@
 """Constants for the Teufel Raumfeld integration."""
+
 VERSION = "0.1.17-alpha1"
 
 ATTR_EVENT_WSUPD_TYPE = "type"

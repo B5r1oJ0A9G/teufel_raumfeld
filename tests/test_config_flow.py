@@ -72,9 +72,7 @@ class TestConfigFlowUserStep:
         ) as mock_validate:
             mock_validate.return_value = {"title": "Raumfeld host: 192.168.1.100"}
 
-            result = await flow.async_step_user(
-                user_input={"host": "192.168.1.100", "port": "47365"}
-            )
+            result = await flow.async_step_user(user_input={"host": "192.168.1.100", "port": "47365"})
             assert result["type"] == "create_entry"
             assert result["title"] == "Raumfeld host: 192.168.1.100"
             assert result["data"]["host"] == "192.168.1.100"
@@ -95,9 +93,7 @@ class TestConfigFlowUserStep:
         ) as mock_validate:
             mock_validate.side_effect = CannotConnect
 
-            result = await flow.async_step_user(
-                user_input={"host": "bad-host", "port": "47365"}
-            )
+            result = await flow.async_step_user(user_input={"host": "bad-host", "port": "47365"})
             assert result["type"] == "form"
             assert result["errors"]["base"] == "cannot_connect"
 
@@ -114,9 +110,7 @@ class TestConfigFlowUserStep:
         ) as mock_validate:
             mock_validate.side_effect = RuntimeError("Boom")
 
-            result = await flow.async_step_user(
-                user_input={"host": "bad-host", "port": "47365"}
-            )
+            result = await flow.async_step_user(user_input={"host": "bad-host", "port": "47365"})
             assert result["type"] == "form"
             assert result["errors"]["base"] == "unknown"
 

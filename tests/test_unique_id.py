@@ -40,16 +40,12 @@ class TestObjToUid:
     def test_single_room(self):
         """Single-room group works correctly."""
         uid = obj_to_uid(["Wohnzimmer"])
-        assert uid == UID_PREFIX + base64.b64encode(
-            json.dumps(["Wohnzimmer"], sort_keys=True).encode()
-        ).decode().strip()
+        assert uid == UID_PREFIX + base64.b64encode(json.dumps(["Wohnzimmer"], sort_keys=True).encode()).decode().strip()
 
     def test_empty_list(self):
         """Empty room list works correctly."""
         uid = obj_to_uid([])
-        assert uid == UID_PREFIX + base64.b64encode(
-            json.dumps([], sort_keys=True).encode()
-        ).decode().strip()
+        assert uid == UID_PREFIX + base64.b64encode(json.dumps([], sort_keys=True).encode()).decode().strip()
 
 
 class TestUidToObj:
