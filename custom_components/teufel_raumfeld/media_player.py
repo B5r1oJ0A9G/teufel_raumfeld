@@ -44,7 +44,6 @@ from homeassistant.util.dt import utcnow
 from . import log_debug, log_error, log_fatal, log_info
 from .const import (
     DELAY_FAST_UPDATE_CHECKS,
-    DOMAIN,
     GROUP_PREFIX,
     MEDIA_CONTENT_ID_SEP,
     OPTION_ANNOUNCEMENT_VOLUME,
@@ -139,7 +138,7 @@ def uid_to_obj(uid):
 
 async def async_setup_entry(hass, config_entry, async_add_devices):
     """Set up entry."""
-    raumfeld = hass.data[DOMAIN][config_entry.entry_id]
+    raumfeld = config_entry.runtime_data
     room_names = raumfeld.get_rooms()
     room_groups = raumfeld.get_groups()
     registry = entity_registry.async_get(hass)
@@ -202,6 +201,8 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 
 class RaumfeldGroup(MediaPlayerEntity):
     """Class representing a virtual media renderer for a speaker group."""
+
+    _attr_has_entity_name = True
 
     def __init__(self, rooms, raumfeld):
         """Initialize media player for speaker group."""
@@ -730,6 +731,7 @@ class RaumfeldGroup(MediaPlayerEntity):
 
 
 class RaumfeldRoom(RaumfeldGroup):
+    _attr_has_entity_name = True
     """Class representing a virtual media renderer for a room."""
 
     def __init__(self, room, raumfeld):

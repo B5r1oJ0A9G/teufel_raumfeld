@@ -28,6 +28,8 @@ STATE_TO_STATE = {
 class RaumfeldRoom(Entity):
     """Representation of a Raumfeld speaker."""
 
+    _attr_has_entity_name = True
+
     def __init__(self, sensor_config):
         """Initialize the Raumfeld speaker sensor."""
         self._config = sensor_config

@@ -30,8 +30,16 @@ _LOGGER = logging.getLogger(__name__)
 # TODO(@B5r1oJ0A9G): Adjust the data schema to the data that you need.
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {
-        vol.Required("host", default=DEFAULT_HOST_WEBSERVICE): str,
-        vol.Required("port", default=DEFAULT_PORT_WEBSERVICE): str,
+        vol.Required(
+            "host",
+            default=DEFAULT_HOST_WEBSERVICE,
+            description={"suggested_value": DEFAULT_HOST_WEBSERVICE},
+        ): str,
+        vol.Required(
+            "port",
+            default=DEFAULT_PORT_WEBSERVICE,
+            description={"suggested_value": DEFAULT_PORT_WEBSERVICE},
+        ): str,
     }
 )
 
@@ -127,6 +135,11 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             _LOGGER.exception("Unexpected exception")
             errors["base"] = "unknown"
         else:
+            # Check if this host is already configured
+            for entry in self._async_current_entries():
+                if entry.data.get("host") == user_input["host"]:
+                    return self.async_abort(reason="already_configured")
+
             data = user_input
             data["entry_id"] = "raumfeld_host"
             return self.async_create_entry(title=info["title"], data=data)
