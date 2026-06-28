@@ -3,6 +3,7 @@
 import asyncio
 
 from homeassistant.components.select import SelectEntity
+from homeassistant.const import EntityCategory
 
 from . import log_debug, log_fatal
 from .common import RaumfeldRoom
@@ -35,7 +36,9 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 class RaumfeldPowerState(RaumfeldRoom, SelectEntity):
     """Power state selector of a room."""
 
+    _attr_entity_category = EntityCategory.CONFIG
     _attr_has_entity_name = True
+    PARALLEL_UPDATES = 1
 
     def __init__(self, raumfeld, sensor_config):
         """Initialize the Raumfeld speaker sensor."""

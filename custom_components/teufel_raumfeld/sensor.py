@@ -1,6 +1,6 @@
 """Platform for sensor integration."""
 
-from homeassistant.components.media_player import MediaPlayerDeviceClass
+from homeassistant.const import EntityCategory
 from homeassistant.helpers.entity import Entity
 
 from . import log_debug
@@ -51,6 +51,9 @@ class RaumfeldSpeaker(Entity):
     """Representation of a Raumfeld speaker."""
 
     _attr_has_entity_name = True
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_entity_registry_enabled_default = False
+    PARALLEL_UPDATES = 1
 
     def __init__(self, raumfeld, sensor_config):
         """Initialize the Raumfeld speaker sensor."""
@@ -75,11 +78,6 @@ class RaumfeldSpeaker(Entity):
             "name": self._device_name,
             "sw_version": self._sw_version,
         }
-
-    @property
-    def device_class(self):
-        """Return the class of this device, from component DEVICE_CLASSES."""
-        return MediaPlayerDeviceClass.SPEAKER
 
     @property
     def device_info(self):

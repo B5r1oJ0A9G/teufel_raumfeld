@@ -17,7 +17,7 @@ from hassfeld.constants import (
 from homeassistant.components.media_player import BrowseMedia
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import aiohttp_client
+from homeassistant.helpers import aiohttp_client, entity_registry
 from homeassistant.helpers import config_validation as cv
 
 from .const import (
@@ -254,6 +254,42 @@ async def async_setup_entry(hass: HomeAssistant, entry: TeufelRaumfeldConfigEntr
     hass.services.async_register(DOMAIN, SERVICE_SET_ROOM_VOLUME, async_handle_set_room_volume)
 
     entry.async_on_unload(entry.add_update_listener(update_listener))
+
+    async def _async_cleanup_stale_entities():
+        """Remove entity entries for zones/rooms that no longer exist."""
+        await asyncio.sleep(5)  # Let all platforms finish setup
+        ent_reg = entity_registry.async_get(hass)
+        current_rooms = set(raumfeld.get_rooms())
+        current_zone_room_sets = [frozenset(z) for z in raumfeld.get_zones()]
+        valid_zone_uids = set()
+        # Single-room zones are just rooms
+        for zone in current_zone_room_sets:
+            from custom_components.teufel_raumfeld.media_player import obj_to_uid
+
+            valid_zone_uids.add(obj_to_uid(list(zone)))
+        for room in current_rooms:
+            from custom_components.teufel_raumfeld.media_player import obj_to_uid
+
+            valid_zone_uids.add(obj_to_uid([room]))
+
+        for entity_id, entity in list(ent_reg.entities.items()):
+            if entity.config_entry_id != entry.entry_id:
+                continue
+            if entity.platform in ("sensor", "select", "number"):
+                # Extract room name from unique_id: teufel_raumfeld.Room: <room> - <sensor>
+                parts = entity.unique_id.split(".", 2)
+                if len(parts) > 2:
+                    room_part = parts[2].split(" - ")[0]
+                    if room_part.startswith("Room: "):
+                        room_name = room_part[6:]
+                        if room_name not in current_rooms:
+                            ent_reg.async_remove(entity_id)
+                            log_info(f"Cleaned up stale entity: {entity_id}")
+            elif entity.platform == "media_player":
+                # Keep media_player entities — they survive zone deletion by design
+                pass
+
+    entry.async_create_task(hass, _async_cleanup_stale_entities())
 
     return True
 

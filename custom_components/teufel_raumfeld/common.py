@@ -10,7 +10,7 @@ from hassfeld.constants import (
 from homeassistant.helpers.entity import Entity
 
 from . import log_debug
-from .const import DOMAIN, POWER_ECO, POWER_ON, POWER_STANDBY, ROOM_PREFIX
+from .const import DEVICE_MANUFACTURER, DOMAIN, POWER_ECO, POWER_ON, POWER_STANDBY, ROOM_PREFIX
 
 STATE_TO_ICON = {
     POWER_ACTIVE: "mdi:power-on",
@@ -29,6 +29,7 @@ class RaumfeldRoom(Entity):
     """Representation of a Raumfeld speaker."""
 
     _attr_has_entity_name = True
+    PARALLEL_UPDATES = 1
 
     def __init__(self, sensor_config):
         """Initialize the Raumfeld speaker sensor."""
@@ -66,6 +67,16 @@ class RaumfeldRoom(Entity):
     def unique_id(self):
         """Return a unique ID."""
         return self._unique_id
+
+    @property
+    def device_info(self):
+        """Return information about the device."""
+        return {
+            "identifiers": {(DOMAIN, self._room_name)},
+            "name": self._room_name,
+            "manufacturer": DEVICE_MANUFACTURER,
+            "model": "Raumfeld Speaker",
+        }
 
     async def async_update(self):
         """Update sensor."""
