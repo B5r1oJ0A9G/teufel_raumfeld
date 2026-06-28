@@ -6,12 +6,12 @@ from homeassistant.components.select import SelectEntity
 
 from . import log_debug, log_fatal
 from .common import RaumfeldRoom
-from .const import DELAY_POWER_STATE_UPDATE, DOMAIN, POWER_ECO, POWER_ON, POWER_STANDBY
+from .const import DELAY_POWER_STATE_UPDATE, POWER_ECO, POWER_ON, POWER_STANDBY
 
 
 async def async_setup_entry(hass, config_entry, async_add_devices):
     """Set up entry."""
-    raumfeld = hass.data[DOMAIN][config_entry.entry_id]
+    raumfeld = config_entry.runtime_data
     device_udns = raumfeld.get_raumfeld_device_udns()
     log_debug(f"device_udns={device_udns}")
     room_names = raumfeld.get_rooms()
@@ -34,6 +34,8 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 
 class RaumfeldPowerState(RaumfeldRoom, SelectEntity):
     """Power state selector of a room."""
+
+    _attr_has_entity_name = True
 
     def __init__(self, raumfeld, sensor_config):
         """Initialize the Raumfeld speaker sensor."""

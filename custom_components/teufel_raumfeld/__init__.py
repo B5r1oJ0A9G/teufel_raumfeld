@@ -79,6 +79,8 @@ from .const import (
     URN_CONTENT_DIRECTORY,
 )
 
+type TeufelRaumfeldConfigEntry = ConfigEntry[HassRaumfeldHost]
+
 _LOGGER = logging.getLogger(__name__)
 
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
@@ -142,7 +144,6 @@ async def async_setup(hass: HomeAssistant, config: dict):
     """Set up the Teufel Raumfeld component."""
     log_warn(MESSAGE_PHASE_ALPHA)
     log_debug(config)
-    hass.data[DOMAIN] = {}
     return True
 
 
@@ -164,13 +165,13 @@ def event_on_update(hass, update_type):
         log_fatal(f"Unexpected update type: {update_type}")
 
 
-async def update_listener(hass, entry):
+async def update_listener(hass: HomeAssistant, entry: TeufelRaumfeldConfigEntry):
     """Handle options update."""
-    raumfeld = hass.data[DOMAIN][entry.entry_id]
+    raumfeld = entry.runtime_data
     raumfeld.options = entry.options.copy()
 
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
+async def async_setup_entry(hass: HomeAssistant, entry: TeufelRaumfeldConfigEntry):
     """Set up Teufel Raumfeld from a config entry."""
 
     def cb_webservice_update(update_type, hass=hass):
@@ -211,7 +212,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     await raumfeld.async_wait_initial_update()
     log_info("Web service update coroutine started")
     log_debug(f"raumfeld.wsd={raumfeld.wsd}")
-    hass.data[DOMAIN][entry.entry_id] = raumfeld
+    entry.runtime_data = raumfeld
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
@@ -257,14 +258,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     return True
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
+async def async_unload_entry(hass: HomeAssistant, entry: TeufelRaumfeldConfigEntry) -> bool:
     """Unload a config entry."""
     unload_ok = all(
         await asyncio.gather(*[hass.config_entries.async_forward_entry_unload(entry, component) for component in PLATFORMS])
     )
-    if unload_ok:
-        hass.data[DOMAIN].pop(entry.entry_id)
-
     return unload_ok
 
 

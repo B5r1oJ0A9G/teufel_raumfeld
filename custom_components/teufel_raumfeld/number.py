@@ -5,7 +5,6 @@ from homeassistant.components.number import NumberEntity
 from . import log_debug
 from .common import RaumfeldRoom
 from .const import (
-    DOMAIN,
     NUMBER_ROOM_VOLUME_ICON,
     NUMBER_ROOM_VOLUME_NAME,
 )
@@ -13,7 +12,7 @@ from .const import (
 
 async def async_setup_entry(hass, config_entry, async_add_devices):
     """Set up entry."""
-    raumfeld = hass.data[DOMAIN][config_entry.entry_id]
+    raumfeld = config_entry.runtime_data
     device_udns = raumfeld.get_raumfeld_device_udns()
     log_debug(f"device_udns={device_udns}")
     room_names = raumfeld.get_rooms()
@@ -37,6 +36,8 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 
 class RaumfeldRoomVolume(RaumfeldRoom, NumberEntity):
     """Volume selector of a room."""
+
+    _attr_has_entity_name = True
 
     def __init__(self, raumfeld, number_config):
         """Initialize the Raumfeld speaker number."""

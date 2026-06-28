@@ -9,7 +9,7 @@ from .const import DOMAIN
 
 async def async_setup_entry(hass, config_entry, async_add_devices):
     """Set up entry."""
-    raumfeld = hass.data[DOMAIN][config_entry.entry_id]
+    raumfeld = config_entry.runtime_data
     device_udns = raumfeld.get_raumfeld_device_udns()
     log_debug(f"device_udns={device_udns}")
     devices = []
@@ -49,6 +49,8 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 
 class RaumfeldSpeaker(Entity):
     """Representation of a Raumfeld speaker."""
+
+    _attr_has_entity_name = True
 
     def __init__(self, raumfeld, sensor_config):
         """Initialize the Raumfeld speaker sensor."""
