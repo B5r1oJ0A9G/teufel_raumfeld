@@ -264,11 +264,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: TeufelRaumfeldConfigEntr
         valid_zone_uids = set()
         # Single-room zones are just rooms
         for zone in current_zone_room_sets:
-            from custom_components.teufel_raumfeld.media_player import obj_to_uid
+            from .media_player import obj_to_uid
 
             valid_zone_uids.add(obj_to_uid(list(zone)))
         for room in current_rooms:
-            from custom_components.teufel_raumfeld.media_player import obj_to_uid
+            from .media_player import obj_to_uid
 
             valid_zone_uids.add(obj_to_uid([room]))
 
