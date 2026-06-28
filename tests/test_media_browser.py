@@ -28,9 +28,7 @@ class TestAsyncBrowseMedia:
         host = HassRaumfeldHost(host="127.0.0.1")
         host.async_browse_media_server = AsyncMock(return_value=None)
 
-        result = await host.async_browse_media(
-            object_id=f"0/My Music{MEDIA_CONTENT_ID_SEP}some_uri"
-        )
+        result = await host.async_browse_media(object_id=f"0/My Music{MEDIA_CONTENT_ID_SEP}some_uri")
 
         assert result == []
         # Should have called browse with the part before the separator

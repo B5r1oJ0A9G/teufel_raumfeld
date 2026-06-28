@@ -25,7 +25,8 @@ target-version = "py313"
 line-length = 125
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "N", "W", "UP"]
+select = ["E", "F", "I", "N", "W", "UP", "TD"]
+ignore = ["TD003"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["custom_components"]

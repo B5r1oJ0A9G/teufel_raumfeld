@@ -12,6 +12,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
       - run: uv sync --group dev --extra ha
+      - run: uv run ruff format --check custom_components/ tests/
       - run: uv run ruff check custom_components/ tests/
 
   type-check:

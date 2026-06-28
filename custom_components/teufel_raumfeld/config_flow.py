@@ -1,4 +1,5 @@
 """Config flow for Teufel Raumfeld integration."""
+
 import logging
 from typing import Any
 
@@ -26,7 +27,7 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
-# TODO adjust the data schema to the data that you need
+# TODO(@B5r1oJ0A9G): Adjust the data schema to the data that you need.
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {
         vol.Required("host", default=DEFAULT_HOST_WEBSERVICE): str,
@@ -52,9 +53,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
         # config_entry is a property resolved after framework init via self.handler.
         # Accepted here so async_get_options_flow can pass it without TypeError.
 
-    async def async_step_init(
-        self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         """Manage the options."""
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)
@@ -65,27 +64,19 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 {
                     vol.Required(
                         OPTION_FIXED_ANNOUNCEMENT_VOLUME,
-                        default=self.config_entry.options.get(
-                            OPTION_FIXED_ANNOUNCEMENT_VOLUME, False
-                        ),
+                        default=self.config_entry.options.get(OPTION_FIXED_ANNOUNCEMENT_VOLUME, False),
                     ): bool,
                     vol.Required(
                         OPTION_ANNOUNCEMENT_VOLUME,
-                        default=self.config_entry.options.get(
-                            OPTION_ANNOUNCEMENT_VOLUME, DEFAULT_ANNOUNCEMENT_VOLUME
-                        ),
+                        default=self.config_entry.options.get(OPTION_ANNOUNCEMENT_VOLUME, DEFAULT_ANNOUNCEMENT_VOLUME),
                     ): vol.All(int, vol.Range(min=0, max=100)),
                     vol.Required(
                         OPTION_USE_DEFAULT_VOLUME,
-                        default=self.config_entry.options.get(
-                            OPTION_USE_DEFAULT_VOLUME, False
-                        ),
+                        default=self.config_entry.options.get(OPTION_USE_DEFAULT_VOLUME, False),
                     ): bool,
                     vol.Required(
                         OPTION_DEFAULT_VOLUME,
-                        default=self.config_entry.options.get(
-                            OPTION_DEFAULT_VOLUME, DEFAULT_VOLUME
-                        ),
+                        default=self.config_entry.options.get(OPTION_DEFAULT_VOLUME, DEFAULT_VOLUME),
                     ): vol.All(int, vol.Range(min=0, max=100)),
                     vol.Required(
                         OPTION_CHANGE_STEP_VOLUME_UP,
@@ -110,7 +101,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Config flow to add Raumfeld media players and sensors."""
 
     VERSION = 1
-    # TODO pick one of the available connection classes in homeassistant/config_entries.py
+    # TODO(@B5r1oJ0A9G): Pick one of the available connection classes in homeassistant/config_entries.py.
     CONNECTION_CLASS = config_entries.CONN_CLASS_UNKNOWN
 
     @staticmethod
@@ -124,9 +115,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_user(self, user_input=None):
         """Handle the initial step."""
         if user_input is None:
-            return self.async_show_form(
-                step_id="user", data_schema=STEP_USER_DATA_SCHEMA
-            )
+            return self.async_show_form(step_id="user", data_schema=STEP_USER_DATA_SCHEMA)
 
         errors = {}
 
@@ -142,9 +131,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             data["entry_id"] = "raumfeld_host"
             return self.async_create_entry(title=info["title"], data=data)
 
-        return self.async_show_form(
-            step_id="user", data_schema=STEP_USER_DATA_SCHEMA, errors=errors
-        )
+        return self.async_show_form(step_id="user", data_schema=STEP_USER_DATA_SCHEMA, errors=errors)
 
 
 class CannotConnect(exceptions.HomeAssistantError):

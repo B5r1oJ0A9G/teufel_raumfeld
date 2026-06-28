@@ -1,4 +1,5 @@
 """Commonly used classes."""
+
 import inspect
 
 from hassfeld.constants import (

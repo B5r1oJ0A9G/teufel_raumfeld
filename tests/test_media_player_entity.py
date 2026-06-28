@@ -68,9 +68,7 @@ class TestRaumfeldGroupVolume:
 
         await self.group.async_volume_up()
 
-        self.raumfeld.async_change_group_volume.assert_called_once_with(
-            self.rooms, 5
-        )
+        self.raumfeld.async_change_group_volume.assert_called_once_with(self.rooms, 5)
 
     @pytest.mark.asyncio
     async def test_volume_down_calls_change_group_volume(self):
@@ -80,9 +78,7 @@ class TestRaumfeldGroupVolume:
 
         await self.group.async_volume_down()
 
-        self.raumfeld.async_change_group_volume.assert_called_once_with(
-            self.rooms, -2
-        )
+        self.raumfeld.async_change_group_volume.assert_called_once_with(self.rooms, -2)
 
     @pytest.mark.asyncio
     async def test_volume_up_invalid_group_logs(self):
@@ -99,9 +95,7 @@ class TestRaumfeldGroupVolume:
 
         await self.group.async_set_volume_level(0.75)
 
-        self.raumfeld.async_set_group_volume.assert_called_once_with(
-            self.rooms, 75
-        )
+        self.raumfeld.async_set_group_volume.assert_called_once_with(self.rooms, 75)
 
 
 class TestRaumfeldGroupMute:
@@ -121,9 +115,7 @@ class TestRaumfeldGroupMute:
 
         await self.group.async_mute_volume(True)
 
-        self.raumfeld.async_set_group_mute.assert_called_once_with(
-            self.rooms, True
-        )
+        self.raumfeld.async_set_group_mute.assert_called_once_with(self.rooms, True)
 
     @pytest.mark.asyncio
     async def test_mute_false(self):
@@ -133,9 +125,7 @@ class TestRaumfeldGroupMute:
 
         await self.group.async_mute_volume(False)
 
-        self.raumfeld.async_set_group_mute.assert_called_once_with(
-            self.rooms, False
-        )
+        self.raumfeld.async_set_group_mute.assert_called_once_with(self.rooms, False)
 
 
 class TestRaumfeldGroupTransport:

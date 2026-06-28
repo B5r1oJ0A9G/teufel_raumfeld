@@ -1,4 +1,5 @@
 """The Teufel Raumfeld integration."""
+
 import asyncio
 import inspect
 import logging
@@ -92,9 +93,7 @@ def set_hassfeld_log_level(raumfeld):
     else:
         hassfeld_level = logging.CRITICAL
 
-    log_info(
-        f"Setting logging level of hassfeld to: {logging.getLevelName(hassfeld_level)}"
-    )
+    log_info(f"Setting logging level of hassfeld to: {logging.getLevelName(hassfeld_level)}")
     raumfeld.set_logging_level(hassfeld_level)
 
 
@@ -151,17 +150,11 @@ def event_on_update(hass, update_type):
     """fires events on Raumfeld web service updates."""
     log_info(f"Update event triggered for type: {update_type}")
     if update_type == TRIGGER_UPDATE_HOST_INFO:
-        hass.bus.fire(
-            EVENT_WEBSERVICE_UPDATE, {ATTR_EVENT_WSUPD_TYPE: TRIGGER_UPDATE_HOST_INFO}
-        )
+        hass.bus.fire(EVENT_WEBSERVICE_UPDATE, {ATTR_EVENT_WSUPD_TYPE: TRIGGER_UPDATE_HOST_INFO})
     elif update_type == TRIGGER_UPDATE_ZONE_CONFIG:
-        hass.bus.fire(
-            EVENT_WEBSERVICE_UPDATE, {ATTR_EVENT_WSUPD_TYPE: TRIGGER_UPDATE_ZONE_CONFIG}
-        )
+        hass.bus.fire(EVENT_WEBSERVICE_UPDATE, {ATTR_EVENT_WSUPD_TYPE: TRIGGER_UPDATE_ZONE_CONFIG})
     elif update_type == TRIGGER_UPDATE_DEVICES:
-        hass.bus.fire(
-            EVENT_WEBSERVICE_UPDATE, {ATTR_EVENT_WSUPD_TYPE: TRIGGER_UPDATE_DEVICES}
-        )
+        hass.bus.fire(EVENT_WEBSERVICE_UPDATE, {ATTR_EVENT_WSUPD_TYPE: TRIGGER_UPDATE_DEVICES})
     elif update_type == TRIGGER_UPDATE_SYSTEM_STATE:
         hass.bus.fire(
             EVENT_WEBSERVICE_UPDATE,
@@ -188,18 +181,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     http_session = aiohttp_client.async_get_clientsession(hass)
     raumfeld = HassRaumfeldHost(host, port, session=http_session)
     set_hassfeld_log_level(raumfeld)
-    raumfeld.options[OPTION_ANNOUNCEMENT_VOLUME] = entry.options.get(
-        OPTION_ANNOUNCEMENT_VOLUME, DEFAULT_ANNOUNCEMENT_VOLUME
-    )
-    raumfeld.options[OPTION_FIXED_ANNOUNCEMENT_VOLUME] = entry.options.get(
-        OPTION_ANNOUNCEMENT_VOLUME, False
-    )
-    raumfeld.options[OPTION_DEFAULT_VOLUME] = entry.options.get(
-        OPTION_DEFAULT_VOLUME, DEFAULT_VOLUME
-    )
-    raumfeld.options[OPTION_USE_DEFAULT_VOLUME] = entry.options.get(
-        OPTION_USE_DEFAULT_VOLUME, False
-    )
+    raumfeld.options[OPTION_ANNOUNCEMENT_VOLUME] = entry.options.get(OPTION_ANNOUNCEMENT_VOLUME, DEFAULT_ANNOUNCEMENT_VOLUME)
+    raumfeld.options[OPTION_FIXED_ANNOUNCEMENT_VOLUME] = entry.options.get(OPTION_ANNOUNCEMENT_VOLUME, False)
+    raumfeld.options[OPTION_DEFAULT_VOLUME] = entry.options.get(OPTION_DEFAULT_VOLUME, DEFAULT_VOLUME)
+    raumfeld.options[OPTION_USE_DEFAULT_VOLUME] = entry.options.get(OPTION_USE_DEFAULT_VOLUME, False)
     raumfeld.options[OPTION_CHANGE_STEP_VOLUME_UP] = entry.options.get(
         OPTION_CHANGE_STEP_VOLUME_UP, DEFAULT_CHANGE_STEP_VOLUME_UP
     )
@@ -213,9 +198,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         host_is_not_valid = not await raumfeld.async_host_is_valid()
         if host_is_not_valid:
             await asyncio.sleep(DELAY_MODERATE_UPDATE_CHECKS)
-            log_info(
-                f"Starting attempt '{attempt + 1}' out of '{max_attempts}' attempts to identify host as valid"
-            )
+            log_info(f"Starting attempt '{attempt + 1}' out of '{max_attempts}' attempts to identify host as valid")
             continue
         break
     if host_is_not_valid:
@@ -267,9 +250,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     hass.services.async_register(DOMAIN, SERVICE_GROUP, async_handle_group)
     hass.services.async_register(DOMAIN, SERVICE_ADD_ROOM, async_handle_add_room)
     hass.services.async_register(DOMAIN, SERVICE_DROP_ROOM, async_handle_drop_room)
-    hass.services.async_register(
-        DOMAIN, SERVICE_SET_ROOM_VOLUME, async_handle_set_room_volume
-    )
+    hass.services.async_register(DOMAIN, SERVICE_SET_ROOM_VOLUME, async_handle_set_room_volume)
 
     entry.async_on_unload(entry.add_update_listener(update_listener))
 
@@ -279,12 +260,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Unload a config entry."""
     unload_ok = all(
-        await asyncio.gather(
-            *[
-                hass.config_entries.async_forward_entry_unload(entry, component)
-                for component in PLATFORMS
-            ]
-        )
+        await asyncio.gather(*[hass.config_entries.async_forward_entry_unload(entry, component) for component in PLATFORMS])
     )
     if unload_ok:
         hass.data[DOMAIN].pop(entry.entry_id)
@@ -408,12 +384,7 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
 
             if media_type in [UPNP_CLASS_TRACK, UPNP_CLASS_PODCAST_EPISODE]:
                 track_number = str(track_number)
-                play_uri += (
-                    "&fid="
-                    + urllib.parse.quote(media_id, safe="")
-                    + "&fii="
-                    + track_number
-                )
+                play_uri += "&fid=" + urllib.parse.quote(media_id, safe="") + "&fii=" + track_number
 
             return play_uri
         if media_type == UPNP_CLASS_RADIO:
@@ -436,14 +407,10 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
                 uri_prefix = location.rsplit(":", 1)[0]
                 play_uri = f"{uri_prefix}:{PORT_LINE_IN}/stream.flac"
                 return play_uri
-            log_error(
-                f"Passed media_id '{media_id}' does not appear appropriate for media_type '{media_type}'"
-            )
+            log_error(f"Passed media_id '{media_id}' does not appear appropriate for media_type '{media_type}'")
             return None
 
-        log_info(
-            f"Building of playable URI for media type '{media_type}' not needed or not implemented"
-        )
+        log_info(f"Building of playable URI for media type '{media_type}' not needed or not implemented")
 
         return media_id
 
@@ -460,9 +427,7 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
         if media_xml is None:
             return browse_lst
 
-        media = xmltodict.parse(
-            media_xml, force_list=(DIDL_ELEM_CONTAINER, DIDL_ELEM_ITEM)
-        )
+        media = xmltodict.parse(media_xml, force_list=(DIDL_ELEM_CONTAINER, DIDL_ELEM_ITEM))
 
         if DIDL_ELEM_CONTAINER in media[DIDL_ELEMENT]:
             media_entries += media[DIDL_ELEMENT][DIDL_ELEM_CONTAINER]
@@ -480,10 +445,7 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
 
             # Workaround: Sometimes XML includes namespaces.
             if DIDL_ELEM_TITLE in entry:
-                if (
-                    entry[DIDL_ELEM_TITLE] is not None
-                    and DIDL_VALUE in entry[DIDL_ELEM_TITLE]
-                ):
+                if entry[DIDL_ELEM_TITLE] is not None and DIDL_VALUE in entry[DIDL_ELEM_TITLE]:
                     title = entry[DIDL_ELEM_TITLE][DIDL_VALUE]
                 else:
                     title = entry[DIDL_ELEM_TITLE]
@@ -549,24 +511,13 @@ class HassRaumfeldHost(hassfeld.RaumfeldHost):
             if metadata_xml is not None:
                 metadata = xmltodict.parse(metadata_xml)
                 if DIDL_ELEM_TITLE in metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM]:
-                    track_info[TRACKINF_TITLE] = metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM][
-                        DIDL_ELEM_TITLE
-                    ]
+                    track_info[TRACKINF_TITLE] = metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM][DIDL_ELEM_TITLE]
                 if DIDL_ELEM_ARTIST in metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM]:
-                    track_info[TRACKINF_ARTIST] = metadata[DIDL_ELEMENT][
-                        DIDL_ELEM_ITEM
-                    ][DIDL_ELEM_ARTIST]
+                    track_info[TRACKINF_ARTIST] = metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM][DIDL_ELEM_ARTIST]
                 if DIDL_ELEM_ART_URI in metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM]:
-                    if (
-                        DIDL_VALUE
-                        in metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM][DIDL_ELEM_ART_URI]
-                    ):
-                        track_info[TRACKINF_IMGURI] = metadata[DIDL_ELEMENT][
-                            DIDL_ELEM_ITEM
-                        ][DIDL_ELEM_ART_URI][DIDL_VALUE]
+                    if DIDL_VALUE in metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM][DIDL_ELEM_ART_URI]:
+                        track_info[TRACKINF_IMGURI] = metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM][DIDL_ELEM_ART_URI][DIDL_VALUE]
                 if DIDL_ELEM_ALBUM in metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM]:
-                    track_info[TRACKINF_ALBUM] = metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM][
-                        DIDL_ELEM_ALBUM
-                    ]
+                    track_info[TRACKINF_ALBUM] = metadata[DIDL_ELEMENT][DIDL_ELEM_ITEM][DIDL_ELEM_ALBUM]
 
             return track_info

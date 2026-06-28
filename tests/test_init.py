@@ -80,9 +80,7 @@ class TestMkPlayUri:
         self.host.media_server_udn = "uuid:test-ms-udn"
 
     def test_album_uri(self):
-        uri = self.host.mk_play_uri(
-            self.host.media_server_udn, UPNP_CLASS_ALBUM, "0/My Music/Albums/Test"
-        )
+        uri = self.host.mk_play_uri(self.host.media_server_udn, UPNP_CLASS_ALBUM, "0/My Music/Albums/Test")
         assert uri is not None
         assert uri.startswith("dlna-playcontainer://")
 
@@ -96,9 +94,7 @@ class TestMkPlayUri:
         assert uri.startswith("dlna-playcontainer://")
 
     def test_track_uri_has_fid(self):
-        uri = self.host.mk_play_uri(
-            self.host.media_server_udn, UPNP_CLASS_TRACK, "0/My Music/Albums/Test/1.mp3"
-        )
+        uri = self.host.mk_play_uri(self.host.media_server_udn, UPNP_CLASS_TRACK, "0/My Music/Albums/Test/1.mp3")
         assert "&fid=" in uri
 
     def test_podcast_episode_has_fid(self):
@@ -110,9 +106,7 @@ class TestMkPlayUri:
         assert "&fid=" in uri
 
     def test_radio_uri(self):
-        uri = self.host.mk_play_uri(
-            self.host.media_server_udn, UPNP_CLASS_RADIO, "0/RadioTime/Stations/WDR2"
-        )
+        uri = self.host.mk_play_uri(self.host.media_server_udn, UPNP_CLASS_RADIO, "0/RadioTime/Stations/WDR2")
         assert uri.startswith("dlna-playsingle://")
         assert "&iid=" in uri
 
@@ -126,21 +120,15 @@ class TestMkPlayUri:
 
     def test_line_in_non_matching_oid_returns_none(self):
         self.host.device_udn_to_location = MagicMock()
-        uri = self.host.mk_play_uri(
-            self.host.media_server_udn, UPNP_CLASS_LINE_IN, "0/SomeOther"
-        )
+        uri = self.host.mk_play_uri(self.host.media_server_udn, UPNP_CLASS_LINE_IN, "0/SomeOther")
         assert uri is None
 
     def test_audio_item_fallback(self):
-        uri = self.host.mk_play_uri(
-            self.host.media_server_udn, UPNP_CLASS_AUDIO_ITEM, "some_id"
-        )
+        uri = self.host.mk_play_uri(self.host.media_server_udn, UPNP_CLASS_AUDIO_ITEM, "some_id")
         assert uri == "some_id"
 
     def test_album_uri_correct_params(self):
-        uri = self.host.mk_play_uri(
-            self.host.media_server_udn, UPNP_CLASS_ALBUM, "0/Albums/5"
-        )
+        uri = self.host.mk_play_uri(self.host.media_server_udn, UPNP_CLASS_ALBUM, "0/Albums/5")
         assert "?sid=" in uri
         assert "&cid=" in uri
         assert "&md=0" in uri
@@ -162,9 +150,7 @@ class TestAsyncBrowseMedia:
     @pytest.mark.asyncio
     async def test_separator_stripped(self):
         self.host.async_browse_media_server = AsyncMock(return_value=None)
-        await self.host.async_browse_media(
-            object_id=f"0/My Music{MEDIA_CONTENT_ID_SEP}dlna-playsingle://..."
-        )
+        await self.host.async_browse_media(object_id=f"0/My Music{MEDIA_CONTENT_ID_SEP}dlna-playsingle://...")
         called_oid = self.host.async_browse_media_server.call_args[0][0]
         assert called_oid == "0/My Music"
 
@@ -175,11 +161,11 @@ class TestAsyncBrowseMedia:
             ' xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/">'
             '<container id="0/My Music" childCount="5" restricted="1">'
             "<dc:title>My Music</dc:title>"
-            '<upnp:class>object.container.storageFolder</upnp:class>'
+            "<upnp:class>object.container.storageFolder</upnp:class>"
             "</container>"
             '<item id="0/My Music/Track1.mp3" restricted="1">'
             "<dc:title>Test Track</dc:title>"
-            '<upnp:class>object.item.audioItem.musicTrack</upnp:class>'
+            "<upnp:class>object.item.audioItem.musicTrack</upnp:class>"
             "</item>"
             "</DIDL-Lite>"
         )
@@ -202,11 +188,11 @@ class TestAsyncBrowseMedia:
             ' xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/">'
             '<container id="0/My Music/Search" childCount="0" restricted="1">'
             "<dc:title>Search</dc:title>"
-            '<upnp:class>object.container</upnp:class>'
+            "<upnp:class>object.container</upnp:class>"
             "</container>"
             '<item id="0/My Music/Track1.mp3" restricted="1">'
             "<dc:title>Valid Track</dc:title>"
-            '<upnp:class>object.item.audioItem.musicTrack</upnp:class>'
+            "<upnp:class>object.item.audioItem.musicTrack</upnp:class>"
             "</item>"
             "</DIDL-Lite>"
         )
@@ -224,7 +210,7 @@ class TestAsyncBrowseMedia:
             '<DIDL-Lite xmlns:dc="http://purl.org/dc/elements/1.1/"'
             ' xmlns:upnp="urn:schemas-upnp-org:metadata-1-0/upnp/">'
             '<container id="0/My Music" childCount="5" restricted="1">'
-            '<upnp:class>object.container.storageFolder</upnp:class>'
+            "<upnp:class>object.container.storageFolder</upnp:class>"
             "</container>"
             "</DIDL-Lite>"
         )
