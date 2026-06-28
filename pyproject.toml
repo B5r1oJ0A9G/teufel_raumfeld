@@ -1,6 +1,6 @@
 [project]
 name = "teufel_raumfeld"
-version = "0.1.17-alpha3"
+version = "0.1.17-alpha4"
 description = "Teufel Raumfeld Home Assistant Integration"
 requires-python = ">=3.13.2,<3.14"
 dependencies = [
