@@ -1,10 +1,8 @@
-"""Unit tests for IQS properties: PARALLEL_UPDATES, entity_category, device_info, disabled-by-default.
+"""Unit tests for IQS properties and diagnostics."""
 
-These tests verify the class-level attributes set in PR #94.
-No HA lifecycle needed — just instantiate or inspect.
-"""
+from unittest.mock import AsyncMock, MagicMock
 
-from unittest.mock import MagicMock
+import pytest
 
 from homeassistant.const import EntityCategory
 
@@ -15,11 +13,11 @@ from custom_components.teufel_raumfeld.number import RaumfeldRoomVolume
 from custom_components.teufel_raumfeld.select import RaumfeldPowerState
 from custom_components.teufel_raumfeld.sensor import RaumfeldSpeaker
 
+
 # — helpers —
 
 
 def _make_speaker():
-    """Create a minimal RaumfeldSpeaker instance for property inspection."""
     raumfeld = MagicMock()
     config = {
         "device_udn": "uuid:test",
@@ -77,22 +75,19 @@ def test_all_entity_classes_have_parallel_updates():
         assert cls.PARALLEL_UPDATES == 1, f"{cls.__name__} missing PARALLEL_UPDATES"
 
 
-# — ENTITY CATEGORY (test instance properties, not _attr_*) —
+# — ENTITY CATEGORY —
 
 
 def test_sensor_category_is_diagnostic():
-    entity = _make_speaker()
-    assert entity.entity_category == EntityCategory.DIAGNOSTIC
+    assert _make_speaker().entity_category == EntityCategory.DIAGNOSTIC
 
 
 def test_select_category_is_config():
-    entity = _make_power_state()
-    assert entity.entity_category == EntityCategory.CONFIG
+    assert _make_power_state().entity_category == EntityCategory.CONFIG
 
 
 def test_number_category_is_config():
-    entity = _make_volume()
-    assert entity.entity_category == EntityCategory.CONFIG
+    assert _make_volume().entity_category == EntityCategory.CONFIG
 
 
 def test_media_player_has_no_category():
@@ -100,12 +95,11 @@ def test_media_player_has_no_category():
         assert entity.entity_category is None
 
 
-# — DISABLED BY DEFAULT (test instance property) —
+# — DISABLED BY DEFAULT —
 
 
 def test_sensor_disabled_by_default():
-    entity = _make_speaker()
-    assert entity.entity_registry_enabled_default is False
+    assert _make_speaker().entity_registry_enabled_default is False
 
 
 # — DEVICE INFO —
@@ -132,5 +126,62 @@ def test_device_info_on_base_room():
 
 
 def test_speaker_sensor_has_no_device_class():
-    entity = _make_speaker()
-    assert entity.device_class is None
+    assert _make_speaker().device_class is None
+
+
+# — DIAGNOSTICS —
+
+
+class TestDiagnostics:
+    """Tests for async_get_config_entry_diagnostics."""
+
+    @pytest.mark.asyncio
+    async def test_returns_expected_keys(self):
+        from custom_components.teufel_raumfeld.diagnostics import async_get_config_entry_diagnostics
+
+        raumfeld = MagicMock()
+        raumfeld.async_host_is_valid = AsyncMock(return_value=True)
+        raumfeld.get_zones.return_value = [["Kitchen"]]
+        raumfeld.get_rooms.return_value = ["Kitchen"]
+        raumfeld.get_raumfeld_device_udns.return_value = ["uuid:1"]
+        raumfeld.options = {"volume": 50}
+
+        entry = MagicMock()
+        entry.runtime_data = raumfeld
+        entry.entry_id = "test-id"
+        entry.data = {"host": "1.2.3.4", "port": "47365"}
+        entry.options = {}
+        entry.domain = "teufel_raumfeld"
+        entry.title = "Test"
+
+        result = await async_get_config_entry_diagnostics(MagicMock(), entry)
+
+        assert result["host"]["valid"] is True
+        assert result["zones"] == [["Kitchen"]]
+        assert result["rooms"] == ["Kitchen"]
+        assert result["devices"] == ["uuid:1"]
+        assert result["entry"]["data"]["host"] == "**REDACTED**"
+        assert result["entry"]["data"]["port"] == "**REDACTED**"
+
+    @pytest.mark.asyncio
+    async def test_host_unreachable_does_not_crash(self):
+        from custom_components.teufel_raumfeld.diagnostics import async_get_config_entry_diagnostics
+
+        raumfeld = MagicMock()
+        raumfeld.async_host_is_valid = AsyncMock(side_effect=RuntimeError("boom"))
+        raumfeld.get_zones.return_value = []
+        raumfeld.get_rooms.return_value = []
+        raumfeld.get_raumfeld_device_udns.return_value = []
+        raumfeld.options = {}
+
+        entry = MagicMock()
+        entry.runtime_data = raumfeld
+        entry.entry_id = "test-id"
+        entry.data = {}
+        entry.options = {}
+        entry.domain = "teufel_raumfeld"
+        entry.title = "Test"
+
+        result = await async_get_config_entry_diagnostics(MagicMock(), entry)
+
+        assert result["host"]["valid"] == "unknown"

@@ -2,26 +2,41 @@
 
 from typing import Any
 
-from homeassistant.components.diagnostics import async_redact_data
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-
-from . import HassRaumfeldHost
 
 TO_REDACT = {"host", "port"}
 
 
-async def async_get_config_entry_diagnostics(hass: HomeAssistant, entry: ConfigEntry) -> dict[str, Any]:
+def _redact_dict(data: dict, keys: set) -> dict:
+    """Return a copy of data with the given keys replaced by '**REDACTED**'."""
+    return {k: "**REDACTED**" if k in keys else v for k, v in data.items()}
+
+
+async def async_get_config_entry_diagnostics(
+    hass: HomeAssistant, entry: ConfigEntry
+) -> dict[str, Any]:
     """Return diagnostics for a config entry."""
-    raumfeld: HassRaumfeldHost = entry.runtime_data
+    raumfeld = entry.runtime_data
+
+    # Safely collect host validity — may fail if host is unreachable
+    host_valid: bool | str = "unknown"
+    try:
+        host_valid = await raumfeld.async_host_is_valid()
+    except Exception:
+        pass
 
     return {
-        "entry": async_redact_data(entry.as_dict(), TO_REDACT),
-        "host": {
-            "valid": await raumfeld.async_host_is_valid(),
+        "entry": {
+            "entry_id": entry.entry_id,
+            "data": _redact_dict(dict(entry.data), TO_REDACT),
+            "options": dict(entry.options),
+            "domain": entry.domain,
+            "title": entry.title,
         },
-        "zones": raumfeld.get_zones() if hasattr(raumfeld, "get_zones") else None,
-        "rooms": raumfeld.get_rooms() if hasattr(raumfeld, "get_rooms") else None,
-        "devices": raumfeld.get_raumfeld_device_udns() if hasattr(raumfeld, "get_raumfeld_device_udns") else None,
-        "options": raumfeld.options if hasattr(raumfeld, "options") else None,
+        "host": {"valid": host_valid},
+        "zones": raumfeld.get_zones(),
+        "rooms": raumfeld.get_rooms(),
+        "devices": raumfeld.get_raumfeld_device_udns(),
+        "options": getattr(raumfeld, "options", None),
     }
