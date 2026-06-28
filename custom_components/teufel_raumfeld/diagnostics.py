@@ -8,16 +8,19 @@ from homeassistant.core import HomeAssistant
 TO_REDACT = {"host", "port"}
 
 
-def _redact_dict(data: dict, keys: set) -> dict:
-    """Return a copy of data with the given keys replaced by '**REDACTED**'."""
-    return {k: "**REDACTED**" if k in keys else v for k, v in data.items()}
-
-
 async def async_get_config_entry_diagnostics(
     hass: HomeAssistant, entry: ConfigEntry
 ) -> dict[str, Any]:
     """Return diagnostics for a config entry."""
     raumfeld = entry.runtime_data
+
+    # Redact sensitive fields using the official HA utility
+    entry_data = dict(entry.data)
+    try:
+        from homeassistant.components.diagnostics import async_redact_data
+        entry_data = async_redact_data(entry_data, TO_REDACT)
+    except ImportError:
+        entry_data = {k: "**REDACTED**" if k in TO_REDACT else v for k, v in entry_data.items()}
 
     # Safely collect host validity — may fail if host is unreachable
     host_valid: bool | str = "unknown"
@@ -29,7 +32,7 @@ async def async_get_config_entry_diagnostics(
     return {
         "entry": {
             "entry_id": entry.entry_id,
-            "data": _redact_dict(dict(entry.data), TO_REDACT),
+            "data": entry_data,
             "options": dict(entry.options),
             "domain": entry.domain,
             "title": entry.title,

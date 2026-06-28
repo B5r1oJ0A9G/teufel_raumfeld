@@ -3,7 +3,6 @@
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-
 from homeassistant.const import EntityCategory
 
 from custom_components.teufel_raumfeld.common import RaumfeldRoom as BaseRaumfeldRoom
@@ -12,7 +11,6 @@ from custom_components.teufel_raumfeld.media_player import RaumfeldGroup, Raumfe
 from custom_components.teufel_raumfeld.number import RaumfeldRoomVolume
 from custom_components.teufel_raumfeld.select import RaumfeldPowerState
 from custom_components.teufel_raumfeld.sensor import RaumfeldSpeaker
-
 
 # — helpers —
 
