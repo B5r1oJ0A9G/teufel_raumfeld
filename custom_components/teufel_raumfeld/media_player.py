@@ -44,6 +44,8 @@ from homeassistant.util.dt import utcnow
 from . import log_debug, log_error, log_fatal, log_info
 from .const import (
     DELAY_FAST_UPDATE_CHECKS,
+    DEVICE_MANUFACTURER,
+    DOMAIN,
     GROUP_PREFIX,
     MEDIA_CONTENT_ID_SEP,
     OPTION_ANNOUNCEMENT_VOLUME,
@@ -203,6 +205,7 @@ class RaumfeldGroup(MediaPlayerEntity):
     """Class representing a virtual media renderer for a speaker group."""
 
     _attr_has_entity_name = True
+    PARALLEL_UPDATES = 1
 
     def __init__(self, rooms, raumfeld):
         """Initialize media player for speaker group."""
@@ -338,6 +341,16 @@ class RaumfeldGroup(MediaPlayerEntity):
     def group_members(self):
         """Return group memebers."""
         return self._rooms
+
+    @property
+    def device_info(self):
+        """Return information about the device."""
+        return {
+            "identifiers": {(DOMAIN, self._unique_id)},
+            "name": self._name,
+            "manufacturer": DEVICE_MANUFACTURER,
+            "model": "Raumfeld Zone",
+        }
 
     @property
     def supported_features(self):
@@ -731,8 +744,9 @@ class RaumfeldGroup(MediaPlayerEntity):
 
 
 class RaumfeldRoom(RaumfeldGroup):
-    _attr_has_entity_name = True
     """Class representing a virtual media renderer for a room."""
+
+    PARALLEL_UPDATES = 1
 
     def __init__(self, room, raumfeld):
         """Initialize media player for room."""

@@ -1,6 +1,7 @@
 """Platform for number integration."""
 
 from homeassistant.components.number import NumberEntity
+from homeassistant.const import EntityCategory
 
 from . import log_debug
 from .common import RaumfeldRoom
@@ -37,7 +38,9 @@ async def async_setup_entry(hass, config_entry, async_add_devices):
 class RaumfeldRoomVolume(RaumfeldRoom, NumberEntity):
     """Volume selector of a room."""
 
+    _attr_entity_category = EntityCategory.CONFIG
     _attr_has_entity_name = True
+    PARALLEL_UPDATES = 1
 
     def __init__(self, raumfeld, number_config):
         """Initialize the Raumfeld speaker number."""
