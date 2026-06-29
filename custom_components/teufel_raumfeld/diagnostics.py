@@ -8,9 +8,7 @@ from homeassistant.core import HomeAssistant
 TO_REDACT = {"host", "port"}
 
 
-async def async_get_config_entry_diagnostics(
-    hass: HomeAssistant, entry: ConfigEntry
-) -> dict[str, Any]:
+async def async_get_config_entry_diagnostics(hass: HomeAssistant, entry: ConfigEntry) -> dict[str, Any]:
     """Return diagnostics for a config entry."""
     raumfeld = entry.runtime_data
 
@@ -18,6 +16,7 @@ async def async_get_config_entry_diagnostics(
     entry_data = dict(entry.data)
     try:
         from homeassistant.components.diagnostics import async_redact_data
+
         entry_data = async_redact_data(entry_data, TO_REDACT)
     except ImportError:
         entry_data = {k: "**REDACTED**" if k in TO_REDACT else v for k, v in entry_data.items()}
