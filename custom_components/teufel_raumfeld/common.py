@@ -36,7 +36,7 @@ class RaumfeldRoom(Entity):
         self._config = sensor_config
         self._room_name = self._config["room_name"]
         self._sensor_name = self._config["sensor_name"]
-        self._name = f"{ROOM_PREFIX}{self._room_name} - {self._sensor_name}"
+        self._name = self._sensor_name
         self._unique_id = f"{DOMAIN}.{ROOM_PREFIX}{self._room_name}.{self._sensor_name}"
         self._get_state = self._config["get_state"]
         self._room_name = self._config["room_name"]
